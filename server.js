@@ -1595,6 +1595,24 @@ await client.query(`
 
 console.log(' Follow-up tracking columns initialized');
 
+// Support tickets table
+await client.query(`
+    CREATE TABLE IF NOT EXISTS support_tickets (
+        id SERIAL PRIMARY KEY,
+        lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+        client_name VARCHAR(255),
+        client_email VARCHAR(255),
+        subject VARCHAR(500) NOT NULL,
+        message TEXT NOT NULL,
+        priority VARCHAR(50) DEFAULT 'medium',
+        category VARCHAR(100) DEFAULT 'general',
+        status VARCHAR(50) DEFAULT 'open',
+        assigned_to INTEGER REFERENCES admin_users(id),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+`);
+
         // Client uploads table
 await client.query(`
     CREATE TABLE IF NOT EXISTS client_uploads (
@@ -1641,24 +1659,6 @@ await client.query(`
         completed_at TIMESTAMP,
         approved_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-`);
-
-// Support tickets table
-await client.query(`
-    CREATE TABLE IF NOT EXISTS support_tickets (
-        id SERIAL PRIMARY KEY,
-        lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-        client_name VARCHAR(255),
-        client_email VARCHAR(255),
-        subject VARCHAR(500) NOT NULL,
-        message TEXT NOT NULL,
-        priority VARCHAR(50) DEFAULT 'medium',
-        category VARCHAR(100) DEFAULT 'general',
-        status VARCHAR(50) DEFAULT 'open',
-        assigned_to INTEGER REFERENCES admin_users(id),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
 `);
 
