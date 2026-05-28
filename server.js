@@ -1490,108 +1490,107 @@ async function initializeDatabase(){
 await client.query(`
     DO $$ 
     BEGIN
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='leads' AND column_name='follow_up_step'
-        ) THEN
-            ALTER TABLE leads ADD COLUMN follow_up_step INTEGER DEFAULT 0;
-            RAISE NOTICE 'Added follow_up_step column to leads table';
-        END IF;
-        
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='leads' AND column_name='last_contact_date'
-        ) THEN
-            ALTER TABLE leads ADD COLUMN last_contact_date DATE;
-            RAISE NOTICE 'Added last_contact_date column to leads table';
-        END IF;
-        
-        -- Add lead temperature tracking columns
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='leads' AND column_name='lead_temperature'
-        ) THEN
-            ALTER TABLE leads ADD COLUMN lead_temperature VARCHAR(20) DEFAULT 'cold';
-            RAISE NOTICE 'Added lead_temperature column to leads table';
-        END IF;
-        
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='leads' AND column_name='became_hot_at'
-        ) THEN
-            ALTER TABLE leads ADD COLUMN became_hot_at TIMESTAMP;
-            RAISE NOTICE 'Added became_hot_at column to leads table';
-        END IF;
-        
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='leads' AND column_name='last_engagement_at'
-        ) THEN
-            ALTER TABLE leads ADD COLUMN last_engagement_at TIMESTAMP;
-            RAISE NOTICE 'Added last_engagement_at column to leads table';
-        END IF;
-        
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='leads' AND column_name='engagement_score'
-        ) THEN
-            ALTER TABLE leads ADD COLUMN engagement_score INTEGER DEFAULT 0;
-            RAISE NOTICE 'Added engagement_score column to leads table';
-        END IF;
-        
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='leads' AND column_name='engagement_history'
-        ) THEN
-            ALTER TABLE leads ADD COLUMN engagement_history JSONB DEFAULT '[]'::jsonb;
-            RAISE NOTICE 'Added engagement_history column to leads table';
-        END IF;
-        
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='leads' AND column_name='follow_up_count'
-        ) THEN
-            ALTER TABLE leads ADD COLUMN follow_up_count INTEGER DEFAULT 0;
-            RAISE NOTICE 'Added follow_up_count column to leads table';
-        END IF;
-        
-        -- Add email_log tracking columns for better analytics
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='email_log' AND column_name='error_message'
-        ) THEN
-            ALTER TABLE email_log ADD COLUMN error_message TEXT;
-            RAISE NOTICE 'Added error_message column to email_log table';
-        END IF;
-        
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='email_log' AND column_name='created_at'
-        ) THEN
-            ALTER TABLE email_log ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-            -- Set created_at for existing rows
-            UPDATE email_log SET created_at = COALESCE(sent_at, CURRENT_TIMESTAMP) WHERE created_at IS NULL;
-            RAISE NOTICE 'Added created_at column to email_log table';
+        -- ── leads table migrations (skip entirely on fresh DB; CREATE TABLE below adds all columns) ──
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='leads') THEN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='leads' AND column_name='follow_up_step'
+            ) THEN
+                ALTER TABLE leads ADD COLUMN follow_up_step INTEGER DEFAULT 0;
+                RAISE NOTICE 'Added follow_up_step column to leads table';
+            END IF;
+            
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='leads' AND column_name='last_contact_date'
+            ) THEN
+                ALTER TABLE leads ADD COLUMN last_contact_date DATE;
+                RAISE NOTICE 'Added last_contact_date column to leads table';
+            END IF;
+            
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='leads' AND column_name='lead_temperature'
+            ) THEN
+                ALTER TABLE leads ADD COLUMN lead_temperature VARCHAR(20) DEFAULT 'cold';
+                RAISE NOTICE 'Added lead_temperature column to leads table';
+            END IF;
+            
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='leads' AND column_name='became_hot_at'
+            ) THEN
+                ALTER TABLE leads ADD COLUMN became_hot_at TIMESTAMP;
+                RAISE NOTICE 'Added became_hot_at column to leads table';
+            END IF;
+            
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='leads' AND column_name='last_engagement_at'
+            ) THEN
+                ALTER TABLE leads ADD COLUMN last_engagement_at TIMESTAMP;
+                RAISE NOTICE 'Added last_engagement_at column to leads table';
+            END IF;
+            
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='leads' AND column_name='engagement_score'
+            ) THEN
+                ALTER TABLE leads ADD COLUMN engagement_score INTEGER DEFAULT 0;
+                RAISE NOTICE 'Added engagement_score column to leads table';
+            END IF;
+            
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='leads' AND column_name='engagement_history'
+            ) THEN
+                ALTER TABLE leads ADD COLUMN engagement_history JSONB DEFAULT '[]'::jsonb;
+                RAISE NOTICE 'Added engagement_history column to leads table';
+            END IF;
+            
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='leads' AND column_name='follow_up_count'
+            ) THEN
+                ALTER TABLE leads ADD COLUMN follow_up_count INTEGER DEFAULT 0;
+                RAISE NOTICE 'Added follow_up_count column to leads table';
+            END IF;
         END IF;
 
-        -- brevo_message_id: used by the Brevo webhook to reliably look up the
-        -- exact email_log row instead of guessing by email + timestamp.
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='email_log' AND column_name='brevo_message_id'
-        ) THEN
-            ALTER TABLE email_log ADD COLUMN brevo_message_id TEXT;
-            RAISE NOTICE 'Added brevo_message_id column to email_log table';
-        END IF;
+        -- ── email_log table migrations (skip entirely on fresh DB) ──
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='email_log') THEN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='email_log' AND column_name='error_message'
+            ) THEN
+                ALTER TABLE email_log ADD COLUMN error_message TEXT;
+                RAISE NOTICE 'Added error_message column to email_log table';
+            END IF;
+            
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='email_log' AND column_name='created_at'
+            ) THEN
+                ALTER TABLE email_log ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+                UPDATE email_log SET created_at = COALESCE(sent_at, CURRENT_TIMESTAMP) WHERE created_at IS NULL;
+                RAISE NOTICE 'Added created_at column to email_log table';
+            END IF;
 
-        -- email_type: categorize emails for better analytics
-        -- Values: 'follow-up', 'marketing', 'invoice', 'timeline', 'system'
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='email_log' AND column_name='email_type'
-        ) THEN
-            ALTER TABLE email_log ADD COLUMN email_type VARCHAR(50) DEFAULT 'follow-up';
-            RAISE NOTICE 'Added email_type column to email_log table';
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='email_log' AND column_name='brevo_message_id'
+            ) THEN
+                ALTER TABLE email_log ADD COLUMN brevo_message_id TEXT;
+                RAISE NOTICE 'Added brevo_message_id column to email_log table';
+            END IF;
+
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='email_log' AND column_name='email_type'
+            ) THEN
+                ALTER TABLE email_log ADD COLUMN email_type VARCHAR(50) DEFAULT 'follow-up';
+                RAISE NOTICE 'Added email_type column to email_log table';
+            END IF;
         END IF;
     END $$;
 `);
