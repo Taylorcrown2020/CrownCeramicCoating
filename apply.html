@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <title>Apply for Position | Diamondback Coding</title>
+    <meta name="description" content="Apply to join the Diamondback Coding team. Submit your application and join our team of talented professionals.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --black: #0a0a0a;
+            --dark-grey: #1a1a1a;
+            --white: #ffffff;
+            --grey-50: #fafafa;
+            --grey-100: #f7f7f7;
+            --grey-200: #f5f5f5;
+            --grey-300: #e5e5e5;
+            --grey-400: #d5d5d5;
+            --grey-600: #999999;
+            --grey-700: #666666;
+            --gold: #f4c87e;
+            --beige: #e8e4dc;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--grey-50);
+            color: var(--black);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .nav-logo {
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .back-link {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover {
+            opacity: 0.7;
+        }
+
+        /* Application Container */
+        .application-container {
+            max-width: 800px;
+            margin: 120px auto 80px;
+            padding: 0 24px;
+        }
+
+        .application-header {
+            background: var(--white);
+            padding: 48px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 2px solid var(--grey-300);
+        }
+
+        .job-badge {
+            display: inline-block;
+            background: var(--grey-200);
+            color: var(--grey-700);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+        }
+
+        .application-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 42px;
+            font-weight: 400;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .job-details {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .job-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            color: var(--grey-700);
+        }
+
+        .job-detail-item svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--grey-600);
+            stroke-width: 2;
+        }
+
+        /* Job Description Section */
+        .job-description-section {
+            background: var(--grey-50);
+            padding: 48px;
+            border-radius: 0;
+        }
+
+        .job-description-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--black);
+        }
+
+        .job-description-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--grey-700);
+            margin-bottom: 40px;
+        }
+
+        .job-duties-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            margin-top: 40px;
+            color: var(--black);
+        }
+
+        .job-duties-list {
+            list-style: none;
+            margin-bottom: 0;
+            padding-left: 0;
+        }
+
+        .job-duties-list li {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--grey-700);
+            padding: 12px 0 12px 32px;
+            position: relative;
+            border-bottom: 1px solid var(--grey-300);
+        }
+
+        .job-duties-list li:last-child {
+            border-bottom: none;
+        }
+
+        .job-duties-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* Application Form */
+        .application-form {
+            background: var(--white);
+            padding: 48px;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--grey-300);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--black);
+            margin-bottom: 8px;
+        }
+
+        .form-label .required {
+            color: #e74c3c;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            border: 2px solid var(--grey-300);
+            border-radius: 8px;
+            transition: all 0.2s;
+            background: var(--white);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .file-upload-container {
+            border: 2px dashed var(--grey-300);
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: var(--grey-50);
+        }
+
+        .file-upload-container:hover {
+            border-color: var(--gold);
+            background: var(--white);
+        }
+
+        .file-upload-container.drag-over {
+            border-color: var(--gold);
+            background: rgba(244, 200, 126, 0.1);
+        }
+
+        .file-upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            color: var(--grey-600);
+        }
+
+        .file-upload-text {
+            font-size: 15px;
+            color: var(--grey-700);
+            margin-bottom: 8px;
+        }
+
+        .file-upload-hint {
+            font-size: 13px;
+            color: var(--grey-600);
+        }
+
+        .file-upload-input {
+            display: none;
+        }
+
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--grey-100);
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .uploaded-file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .uploaded-file-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--white);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .uploaded-file-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--grey-700);
+        }
+
+        .uploaded-file-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .uploaded-file-size {
+            font-size: 13px;
+            color: var(--grey-600);
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: var(--grey-600);
+            cursor: pointer;
+            padding: 8px;
+            transition: color 0.2s;
+        }
+
+        .remove-file:hover {
+            color: #e74c3c;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .checkbox-input {
+            margin-top: 4px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            color: var(--grey-700);
+            line-height: 1.6;
+        }
+
+        .submit-button {
+            width: 100%;
+            background: var(--black);
+            color: var(--white);
+            padding: 18px 32px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .submit-button:hover {
+            background: var(--gold);
+            color: var(--black);
+            transform: translateY(-2px);
+        }
+
+        .submit-button:disabled {
+            background: var(--grey-400);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            background: var(--white);
+            padding: 60px 48px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .success-icon svg {
+            width: 48px;
+            height: 48px;
+            stroke: white;
+            stroke-width: 3;
+        }
+
+        .success-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 36px;
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        .success-text {
+            font-size: 16px;
+            color: var(--grey-700);
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .success-button {
+            display: inline-block;
+            background: var(--black);
+            color: var(--white);
+            padding: 16px 40px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .success-button:hover {
+            background: var(--gold);
+            color: var(--black);
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 24px;
+            }
+
+            .application-container {
+                margin-top: 100px;
+            }
+
+            .application-header,
+            .application-form {
+                padding: 32px 24px;
+            }
+
+            .job-description-section {
+                padding: 32px 24px;
+            }
+
+            .job-description-title {
+                font-size: 20px;
+            }
+
+            .job-description-text {
+                font-size: 15px;
+            }
+
+            .job-duties-title {
+                font-size: 18px;
+            }
+
+            .job-duties-list li {
+                font-size: 14px;
+                padding: 10px 0 10px 28px;
+            }
+
+            .application-title {
+                font-size: 32px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .job-details {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .success-message {
+                padding: 40px 24px;
+            }
+
+            .success-title {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+    <div class="nav-container">
+        <a href="index.html" class="nav-logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3L3 7.5V16.5L12 21L21 16.5V7.5L12 3Z" stroke="white" stroke-width="1.5"/>
+                <path d="M12 12L3 7.5" stroke="white" stroke-width="1.5"/>
+                <path d="M12 12V21" stroke="white" stroke-width="1.5"/>
+                <path d="M12 12L21 7.5" stroke="white" stroke-width="1.5"/>
+            </svg>
+            <span>DIAMONDBACK CODING</span>
+        </a>
+        <a href="careers.html" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Careers
+        </a>
+    </div>
+</nav>
+
+<!-- Application Container -->
+<div class="application-container">
+    <div id="applicationFormContainer">
+        <!-- Application Header -->
+        <div class="application-header">
+            <div class="job-badge">NOW HIRING</div>
+            <h1 class="application-title" id="jobTitle">Position Title</h1>
+            <div class="job-details">
+                <div class="job-detail-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                    <span id="jobType">Full-time</span>
+                </div>
+                <div class="job-detail-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span id="jobLocation">Location</span>
+                </div>
+                <div class="job-detail-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Posted Today</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Description -->
+        <div class="job-description-section">
+            <h2 class="job-description-title">About This Role</h2>
+            <p class="job-description-text" id="jobDescription"></p>
+            
+            <h3 class="job-duties-title">Key Responsibilities</h3>
+            <ul class="job-duties-list" id="jobDuties"></ul>
+            
+            <h3 class="job-duties-title">Requirements</h3>
+            <ul class="job-duties-list" id="jobRequirements"></ul>
+        </div>
+
+        <!-- Application Form -->
+        <form class="application-form" id="applicationForm">
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h2 class="form-section-title">Personal Information</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="firstName">First Name <span class="required">*</span></label>
+                        <input type="text" id="firstName" name="firstName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="lastName">Last Name <span class="required">*</span></label>
+                        <input type="text" id="lastName" name="lastName" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="city">City <span class="required">*</span></label>
+                        <input type="text" id="city" name="city" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="state">State <span class="required">*</span></label>
+                        <input type="text" id="state" name="state" class="form-input" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Information -->
+            <div class="form-section">
+                <h2 class="form-section-title">Professional Information</h2>
+                <div class="form-group">
+                    <label class="form-label" for="linkedIn">LinkedIn Profile URL</label>
+                    <input type="url" id="linkedIn" name="linkedIn" class="form-input" placeholder="https://linkedin.com/in/yourprofile">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="portfolio">Portfolio / Website URL</label>
+                    <input type="url" id="portfolio" name="portfolio" class="form-input" placeholder="https://yourportfolio.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="experience">Years of Relevant Experience <span class="required">*</span></label>
+                    <select id="experience" name="experience" class="form-select" required>
+                        <option value="">Select experience level</option>
+                        <option value="0-1">0-1 years</option>
+                        <option value="1-3">1-3 years</option>
+                        <option value="3-5">3-5 years</option>
+                        <option value="5-10">5-10 years</option>
+                        <option value="10+">10+ years</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Cover Letter -->
+            <div class="form-section">
+                <h2 class="form-section-title">Why Diamondback Coding?</h2>
+                <div class="form-group">
+                    <label class="form-label" for="coverLetter">Tell us why you're interested in this position <span class="required">*</span></label>
+                    <textarea id="coverLetter" name="coverLetter" class="form-textarea" required placeholder="Share your motivation, relevant experience, and what makes you a great fit for this role..."></textarea>
+                </div>
+            </div>
+
+            <!-- Resume Upload -->
+            <div class="form-section">
+                <h2 class="form-section-title">Resume / CV</h2>
+                <div class="form-group">
+                    <label class="form-label">Upload Resume <span class="required">*</span></label>
+                    <div class="file-upload-container" id="fileUploadContainer">
+                        <svg class="file-upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <div class="file-upload-text">Click to upload or drag and drop</div>
+                        <div class="file-upload-hint">PDF, DOC, DOCX (Max 5MB)</div>
+                        <input type="file" id="resume" name="resume" class="file-upload-input" accept=".pdf,.doc,.docx" required>
+                    </div>
+                    <div id="uploadedFile" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="form-section">
+                <h2 class="form-section-title">Additional Information</h2>
+                <div class="form-group">
+                    <label class="form-label" for="startDate">When are you available to start? <span class="required">*</span></label>
+                    <select id="startDate" name="startDate" class="form-select" required>
+                        <option value="">Select availability</option>
+                        <option value="immediately">Immediately</option>
+                        <option value="2-weeks">2 weeks notice</option>
+                        <option value="1-month">1 month</option>
+                        <option value="2-months">2+ months</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="salary">Expected Salary Range (Optional)</label>
+                    <input type="text" id="salary" name="salary" class="form-input" placeholder="e.g., $60,000 - $80,000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="referral">How did you hear about this position?</label>
+                    <select id="referral" name="referral" class="form-select">
+                        <option value="">Select source</option>
+                        <option value="website">Diamondback Coding Website</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="indeed">Indeed</option>
+                        <option value="referral">Employee Referral</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Terms -->
+            <div class="form-section">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="terms" name="terms" class="checkbox-input" required>
+                    <label for="terms" class="checkbox-label">
+                        I confirm that the information provided is accurate and I agree to Diamondback Coding's privacy policy and terms of service. <span class="required">*</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-button">
+                <span>Submit Application</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <!-- Success Message (Hidden by default) -->
+    <div class="success-message" id="successMessage">
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+        <h2 class="success-title">Application Submitted!</h2>
+        <p class="success-text">
+            Thank you for your interest in joining Diamondback Coding. We've received your application and will review it carefully. Our team typically responds within 3-5 business days.<br><br>
+            If your qualifications match our needs, we'll reach out to schedule an interview.
+        </p>
+        <a href="careers.html" class="success-button">Back to Careers</a>
+    </div>
+</div>
+
+<script>
+    const JOBS_API = '/api/jobs';
+    const APPLICATIONS_API = '/api/applications';
+
+    // Get job ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const jobId = urlParams.get('job');
+
+    async function initPage() {
+        if (!jobId) {
+            window.location.href = 'careers.html';
+            return;
+        }
+        try {
+            const res = await fetch(JOBS_API);
+            const data = await res.json();
+            if (!data.success) throw new Error('Failed to fetch jobs');
+
+            // Find this specific job by ID
+            const job = data.jobs.find(j => String(j.id) === String(jobId));
+            if (!job) {
+                window.location.href = 'careers.html';
+                return;
+            }
+
+            // Populate header
+            document.getElementById('jobTitle').textContent = job.title;
+            document.getElementById('jobType').textContent = job.type;
+            document.getElementById('jobLocation').textContent = job.location;
+            document.title = `Apply for ${job.title} | Diamondback Coding`;
+
+            // Populate description
+            document.getElementById('jobDescription').textContent = job.description || '';
+
+            // Populate duties
+            const dutiesList = document.getElementById('jobDuties');
+            dutiesList.innerHTML = '';
+            (job.duties || []).forEach(duty => {
+                const li = document.createElement('li');
+                li.textContent = duty;
+                dutiesList.appendChild(li);
+            });
+
+            // Populate requirements
+            const requirementsList = document.getElementById('jobRequirements');
+            requirementsList.innerHTML = '';
+            (job.requirements || []).forEach(req => {
+                const li = document.createElement('li');
+                li.textContent = req;
+                requirementsList.appendChild(li);
+            });
+
+            // Store job for form submission
+            window._currentJob = job;
+
+        } catch (err) {
+            console.error('[APPLY] Error loading job:', err);
+            window.location.href = 'careers.html';
+        }
+    }
+
+    // File Upload Handling
+    const fileUploadContainer = document.getElementById('fileUploadContainer');
+    const fileInput = document.getElementById('resume');
+    const uploadedFileDiv = document.getElementById('uploadedFile');
+
+    fileUploadContainer.addEventListener('click', () => { fileInput.click(); });
+    fileUploadContainer.addEventListener('dragover', (e) => { e.preventDefault(); fileUploadContainer.classList.add('drag-over'); });
+    fileUploadContainer.addEventListener('dragleave', () => { fileUploadContainer.classList.remove('drag-over'); });
+    fileUploadContainer.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadContainer.classList.remove('drag-over');
+        if (e.dataTransfer.files.length > 0) { fileInput.files = e.dataTransfer.files; displayUploadedFile(e.dataTransfer.files[0]); }
+    });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) displayUploadedFile(e.target.files[0]); });
+
+    function displayUploadedFile(file) {
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        uploadedFileDiv.innerHTML = `
+            <div class="uploaded-file">
+                <div class="uploaded-file-info">
+                    <div class="uploaded-file-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="uploaded-file-name">${file.name}</div>
+                        <div class="uploaded-file-size">${fileSize} MB</div>
+                    </div>
+                </div>
+                <button type="button" class="remove-file" onclick="removeFile()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>`;
+        uploadedFileDiv.style.display = 'block';
+    }
+
+    function removeFile() {
+        fileInput.value = '';
+        uploadedFileDiv.style.display = 'none';
+        uploadedFileDiv.innerHTML = '';
+    }
+
+    // Form Submission — sends to backend API
+    document.getElementById('applicationForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitBtn = this.querySelector('.submit-button');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Submitting...</span>';
+
+        try {
+            const formData = new FormData();
+            formData.append('jobId', jobId);
+            formData.append('firstName', this.firstName.value);
+            formData.append('lastName', this.lastName.value);
+            formData.append('email', this.email.value);
+            formData.append('phone', this.phone.value);
+            formData.append('city', this.city.value);
+            formData.append('state', this.state.value);
+            formData.append('linkedIn', this.linkedIn.value);
+            formData.append('portfolio', this.portfolio.value);
+            formData.append('experience', this.experience.value);
+            formData.append('coverLetter', this.coverLetter.value);
+            formData.append('startDate', this.startDate.value);
+            formData.append('salary', this.salary.value);
+            formData.append('referral', this.referral.value);
+            if (fileInput.files[0]) formData.append('resume', fileInput.files[0]);
+
+            const res = await fetch(APPLICATIONS_API, { method: 'POST', body: formData });
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                document.getElementById('applicationFormContainer').style.display = 'none';
+                document.getElementById('successMessage').classList.add('show');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                throw new Error(data.message || 'Submission failed');
+            }
+        } catch (err) {
+            console.error('[APPLY] Submission error:', err);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>Submit Application</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+            alert('There was an error submitting your application. Please try again.');
+        }
+    });
+
+    // Init
+    initPage();
+</script>
+
+</body>
+</html>

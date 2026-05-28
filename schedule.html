@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule a Consultation | Diamondback Coding</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-gold: #E5C4A0;
+            --brand-gold-dark: #d4a574;
+            --brand-black: #000000;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border-light: #e5e7eb;
+            --text-primary: #000000;
+            --text-secondary: #4b5563;
+            --text-muted: #6b7280;
+            --status-success: #10b981;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius: 6px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        .header { background: var(--brand-black); padding: 20px 0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo svg { width: 28px; height: 28px; flex-shrink: 0; }
+        .logo-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ffffff;
+        }
+
+        /* ── Layout ── */
+        .main { padding: 60px 24px; min-height: calc(100vh - 200px); }
+        .scheduling-container { max-width: 1000px; margin: 0 auto; }
+        .page-header { text-align: center; margin-bottom: 50px; }
+        .page-title { font-family: var(--font-display); font-size: 48px; font-weight: 400; margin-bottom: 16px; }
+        .page-subtitle { font-size: 18px; color: var(--text-secondary); max-width: 700px; margin: 0 auto; line-height: 1.7; }
+
+        /* ── Setup Call Banner ── */
+        .setup-banner {
+            display: none;
+            background: rgba(255, 107, 53, 0.08);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            border-radius: 10px;
+            padding: 18px 24px;
+            margin: 20px auto 0;
+            max-width: 680px;
+            text-align: left;
+        }
+        .setup-banner-title { font-weight: 700; color: #e8611a; font-size: 15px; margin-bottom: 6px; }
+        .setup-banner-body  { font-size: 14px; color: #555; line-height: 1.6; }
+
+        /* ── Grid ── */
+        .scheduling-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+        @media (max-width: 768px) {
+            .scheduling-grid { grid-template-columns: 1fr; }
+            .page-title { font-size: 36px; }
+        }
+
+        /* ── Cards ── */
+        .calendar-section,
+        .time-slots-section,
+        .form-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--brand-gold-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title svg { width: 18px; height: 18px; }
+
+        /* ── Calendar ── */
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .calendar-month  { font-size: 16px; font-weight: 600; }
+        .calendar-nav    { display: flex; gap: 8px; }
+        .calendar-nav button {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .calendar-nav button:hover:not(:disabled) {
+            background: #fef9f3;
+            border-color: var(--brand-gold-dark);
+            color: var(--brand-gold-dark);
+        }
+        .calendar-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .calendar-day-header {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            padding: 8px 0;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+        }
+        .calendar-day:hover:not(.disabled):not(.other-month) {
+            background: #fef9f3;
+            border-color: var(--brand-gold-dark);
+            color: var(--brand-gold-dark);
+            transform: scale(1.05);
+        }
+        .calendar-day.selected { background: var(--brand-gold); color: var(--brand-black); font-weight: 600; border-color: var(--brand-gold-dark); }
+        .calendar-day.today    { border-color: var(--brand-gold-dark); border-width: 2px; font-weight: 600; }
+        .calendar-day.disabled { opacity: 0.3; cursor: not-allowed; }
+        .calendar-day.other-month { opacity: 0.2; cursor: default; }
+
+        /* ── Time Slots ── */
+        .time-slots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .time-slot {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .time-slot:hover:not(.disabled) {
+            background: #fef9f3;
+            border-color: var(--brand-gold-dark);
+            color: var(--brand-gold-dark);
+            transform: translateY(-1px);
+        }
+        .time-slot.selected  { background: var(--brand-gold); color: var(--brand-black); font-weight: 600; border-color: var(--brand-gold-dark); }
+        .time-slot.disabled  { opacity: 0.35; cursor: not-allowed; background: #f0f0f0; color: #aaa; font-size: 12px; }
+
+        /* ── Empty state ── */
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.3; }
+
+        /* ── Form ── */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+        .form-input, .form-textarea {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            font-size: 15px;
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--brand-gold-dark);
+            box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+        }
+        .form-textarea { resize: vertical; min-height: 100px; }
+
+        /* ── Selected datetime pill ── */
+        .selected-datetime {
+            background: #fef9f3;
+            border: 1px solid var(--brand-gold-dark);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .selected-datetime svg { width: 20px; height: 20px; color: var(--brand-gold-dark); flex-shrink: 0; }
+        .selected-datetime-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 2px; }
+        .selected-datetime-value { font-size: 15px; font-weight: 600; }
+
+        /* ── Button ── */
+        .btn {
+            background: var(--brand-gold);
+            color: var(--brand-black);
+            border: none;
+            border-radius: var(--radius);
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .btn:hover:not(:disabled) {
+            background: var(--brand-gold-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-light); }
+
+        /* ── Success ── */
+        .success-message {
+            background: var(--bg-primary);
+            border: 1px solid var(--status-success);
+            border-radius: var(--radius);
+            padding: 48px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .success-icon {
+            width: 64px; height: 64px;
+            margin: 0 auto 24px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .success-icon svg { width: 32px; height: 32px; color: var(--status-success); }
+        .success-title { font-family: var(--font-display); font-size: 32px; font-weight: 400; margin-bottom: 12px; color: var(--status-success); }
+        .success-text  { font-size: 16px; color: var(--text-secondary); margin-bottom: 32px; }
+        .success-details { background: var(--bg-secondary); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; text-align: left; }
+        .success-details-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+        .success-details-item:last-child { border-bottom: none; }
+        .success-details-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .success-details-value { font-size: 15px; font-weight: 600; }
+
+        /* ── Spinner ── */
+        .loading {
+            display: inline-block;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(0,0,0,0.2);
+            border-radius: 50%;
+            border-top-color: #000;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Footer ── */
+        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border-light); padding: 32px 24px; text-align: center; }
+        .footer-text  { font-size: 14px; color: var(--text-muted); }
+        .footer-link  { color: var(--brand-gold-dark); text-decoration: none; }
+        .footer-link:hover { color: var(--brand-gold); }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════ HEADER ════════════════ -->
+<header class="header">
+    <div class="container">
+        <a href="https://diamondbackcoding.com" class="logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3L3 7.5V16.5L12 21L21 16.5V7.5L12 3Z" stroke="white" stroke-width="1.5"/>
+                <path d="M12 12L3 7.5"  stroke="white" stroke-width="1.5"/>
+                <path d="M12 12V21"      stroke="white" stroke-width="1.5"/>
+                <path d="M12 12L21 7.5" stroke="white" stroke-width="1.5"/>
+            </svg>
+            <span class="logo-text">DIAMONDBACK CODING</span>
+        </a>
+    </div>
+</header>
+
+<!-- ════════════════ MAIN ════════════════ -->
+<main class="main">
+    <div class="container">
+        <div class="scheduling-container">
+
+            <!-- Page header (title/subtitle updated by JS if ?type=setup) -->
+            <div class="page-header">
+                <h1 class="page-title" id="pageTitle">Schedule Your Consultation</h1>
+                <p class="page-subtitle" id="pageSubtitle">
+                    Choose a date and time that works best for you. We'll discuss your project goals
+                    and how Diamondback Coding can help bring your vision to life.
+                </p>
+                <!-- Only shown for ?type=setup links from client portal -->
+                <div class="setup-banner" id="setupBanner">
+                    <div class="setup-banner-title">⚙️ CRM Setup Call</div>
+                    <div class="setup-banner-body">
+                        This call is specifically to configure your <strong>email sending, SMS messaging, and domain
+                        verification</strong> for your Diamondback CRM workspace. It takes about 15 minutes
+                        and we handle everything for you — no technical knowledge required.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Scheduling UI ── -->
+            <div id="schedulingInterface">
+                <div class="scheduling-grid">
+
+                    <!-- Calendar -->
+                    <div class="calendar-section">
+                        <h2 class="section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8"  y1="2" x2="8"  y2="6"/>
+                                <line x1="3"  y1="10" x2="21" y2="10"/>
+                            </svg>
+                            Select a Date
+                        </h2>
+                        <div class="calendar-header">
+                            <div class="calendar-month" id="calendarMonth"></div>
+                            <div class="calendar-nav">
+                                <button id="prevMonth" aria-label="Previous month">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="15 18 9 12 15 6"/>
+                                    </svg>
+                                </button>
+                                <button id="nextMonth" aria-label="Next month">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 18 15 12 9 6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="calendarGrid" class="calendar-grid"></div>
+                    </div>
+
+                    <!-- Time slots -->
+                    <div class="time-slots-section">
+                        <h2 class="section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            Select a Time
+                        </h2>
+                        <div id="timeSlotsContainer">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                <div>Please select a date first</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact form (shown after date + time selected) -->
+                <div class="form-section" id="formSection" style="display:none;">
+                    <h2 class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Your Information
+                    </h2>
+
+                    <!-- Selected date/time summary -->
+                    <div class="selected-datetime">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8"  y1="2" x2="8"  y2="6"/>
+                            <line x1="3"  y1="10" x2="21" y2="10"/>
+                        </svg>
+                        <div>
+                            <div class="selected-datetime-label">Selected Time</div>
+                            <div class="selected-datetime-value" id="selectedDateTimeText"></div>
+                        </div>
+                    </div>
+
+                    <form id="schedulingForm" novalidate>
+                        <div class="form-group">
+                            <label class="form-label" for="inputName">Full Name *</label>
+                            <input type="text" id="inputName" class="form-input" required placeholder="Jane Smith">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inputEmail">Email Address *</label>
+                            <input type="email" id="inputEmail" class="form-input" required placeholder="jane@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inputPhone">Phone Number</label>
+                            <input type="tel" id="inputPhone" class="form-input" placeholder="(555) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inputCompany">Company Name</label>
+                            <input type="text" id="inputCompany" class="form-input" placeholder="Your Company">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inputNotes" id="notesLabel">What would you like to discuss?</label>
+                            <textarea id="inputNotes" class="form-textarea" placeholder="Tell us about your project..."></textarea>
+                        </div>
+                        <button type="submit" class="btn" id="submitBtn">Confirm Appointment</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ── Success screen ── -->
+            <div id="successMessage" style="display:none;">
+                <div class="success-message">
+                    <div class="success-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <h2 class="success-title" id="successTitle">You're All Set!</h2>
+                    <p class="success-text" id="successText">
+                        Your consultation has been scheduled. We'll send you a confirmation email shortly.
+                    </p>
+                    <div class="success-details" id="successDetails"></div>
+                    <button class="btn btn-secondary" onclick="location.href='https://diamondbackcoding.com'">
+                        Return to Homepage
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer class="footer">
+    <div class="container">
+        <p class="footer-text">
+            &copy; 2026 Diamondback Coding. All rights reserved. &nbsp;|&nbsp;
+            <a href="mailto:contact@diamondbackcoding.com" class="footer-link">contact@diamondbackcoding.com</a>
+            &nbsp;|&nbsp;
+            <a href="tel:+15129800393" class="footer-link">(512) 980-0393</a>
+        </p>
+    </div>
+</footer>
+
+<!-- ════════════════ SCRIPT ════════════════ -->
+<script>
+'use strict';
+
+var API_URL = window.location.origin;
+
+// ── Detect ?type=setup (links from client portal setup call buttons) ──────────
+var urlParams    = new URLSearchParams(window.location.search);
+var IS_SETUP_CALL = urlParams.get('type') === 'setup';
+
+// ── Configuration ─────────────────────────────────────────────────────────────
+var ALL_TIME_SLOTS = [
+    '9:00 AM',  '9:30 AM',
+    '10:00 AM', '10:30 AM',
+    '11:00 AM', '11:30 AM',
+    '1:00 PM',  '1:30 PM',
+    '2:00 PM',  '2:30 PM',
+    '3:00 PM',  '3:30 PM',
+    '4:00 PM',  '4:30 PM'
+];
+
+// No same-day bookings after 3 PM CT
+var SAME_DAY_CUTOFF_HOUR = 15;
+
+// Must book at least 2 hours before the slot
+var MIN_NOTICE_HOURS = 2;
+
+// Business days: Mon=1 … Fri=5
+var BUSINESS_DAYS = [1, 2, 3, 4, 5];
+
+// State
+var currentMonth = new Date();
+var selectedDate = null;
+var selectedTime = null;
+var bookedTimes  = new Set();
+
+// ── DOM ready ─────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Apply setup-call customisations if needed
+    if (IS_SETUP_CALL) {
+        document.getElementById('pageTitle').textContent    = 'Schedule Your CRM Setup Call';
+        document.getElementById('pageSubtitle').textContent =
+            'Pick a time and we\'ll configure your email, SMS, and domain settings — usually takes 15 minutes.';
+        document.getElementById('setupBanner').style.display = 'block';
+        document.getElementById('notesLabel').textContent   = 'Anything you\'d like us to know beforehand?';
+        document.getElementById('successTitle').textContent = 'Setup Call Booked!';
+        document.getElementById('successText').textContent  =
+            'Your CRM setup call is confirmed. We\'ll send a confirmation email and take care of everything on the call.';
+    }
+
+    renderCalendar();
+
+    document.getElementById('prevMonth').addEventListener('click', function () {
+        currentMonth.setMonth(currentMonth.getMonth() - 1);
+        renderCalendar();
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', function () {
+        currentMonth.setMonth(currentMonth.getMonth() + 1);
+        renderCalendar();
+    });
+
+    document.getElementById('schedulingForm').addEventListener('submit', handleFormSubmit);
+});
+
+// ── Calendar ──────────────────────────────────────────────────────────────────
+function renderCalendar() {
+    var year  = currentMonth.getFullYear();
+    var month = currentMonth.getMonth();
+    var MONTH_NAMES = [
+        'January','February','March','April','May','June',
+        'July','August','September','October','November','December'
+    ];
+
+    document.getElementById('calendarMonth').textContent = MONTH_NAMES[month] + ' ' + year;
+
+    var nowCT   = getNowCT();
+    var todayCT = new Date(nowCT.getFullYear(), nowCT.getMonth(), nowCT.getDate());
+
+    // Disable previous-month nav when already on the current month
+    document.getElementById('prevMonth').disabled =
+        (year === todayCT.getFullYear() && month === todayCT.getMonth());
+
+    var firstDayOfWeek  = new Date(year, month, 1).getDay();
+    var daysInMonth     = new Date(year, month + 1, 0).getDate();
+    var daysInPrevMonth = new Date(year, month, 0).getDate();
+
+    var html = '';
+
+    // Day-of-week headers
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(function (d) {
+        html += '<div class="calendar-day-header">' + d + '</div>';
+    });
+
+    // Trailing days from previous month (greyed out)
+    for (var prev = firstDayOfWeek - 1; prev >= 0; prev--) {
+        html += '<div class="calendar-day other-month">' + (daysInPrevMonth - prev) + '</div>';
+    }
+
+    // Days of current month
+    for (var day = 1; day <= daysInMonth; day++) {
+        var date      = new Date(year, month, day);
+        var isToday   = (date.getTime() === todayCT.getTime());
+        var isPast    = (date < todayCT);
+        var isWeekend = (BUSINESS_DAYS.indexOf(date.getDay()) === -1);
+        // Block same-day if past 3 PM CT
+        var isCutoff  = (isToday && nowCT.getHours() >= SAME_DAY_CUTOFF_HOUR);
+        var isSelected = selectedDate !== null &&
+            date.getFullYear() === selectedDate.getFullYear() &&
+            date.getMonth()    === selectedDate.getMonth()    &&
+            date.getDate()     === selectedDate.getDate();
+
+        var cls = 'calendar-day';
+        if (isToday)                            cls += ' today';
+        if (isPast || isWeekend || isCutoff)    cls += ' disabled';
+        if (isSelected)                         cls += ' selected';
+
+        var clickable = !isPast && !isWeekend && !isCutoff;
+        var handler   = clickable
+            ? 'onclick="selectDate(' + year + ',' + month + ',' + day + ',this)"'
+            : '';
+
+        html += '<div class="' + cls + '" ' + handler + '>' + day + '</div>';
+    }
+
+    // Leading days for next month (greyed out) to fill the grid
+    var totalCells = firstDayOfWeek + daysInMonth;
+    var remainder  = (Math.ceil(totalCells / 7) * 7) - totalCells;
+    for (var next = 1; next <= remainder; next++) {
+        html += '<div class="calendar-day other-month">' + next + '</div>';
+    }
+
+    document.getElementById('calendarGrid').innerHTML = html;
+}
+
+// ── Date selection ────────────────────────────────────────────────────────────
+function selectDate(year, month, day, el) {
+    selectedDate = new Date(year, month, day);
+    selectedTime = null;
+
+    // Highlight selected day
+    document.querySelectorAll('.calendar-day').forEach(function (e) {
+        e.classList.remove('selected');
+    });
+    el.classList.add('selected');
+
+    // Hide form until a time is picked
+    document.getElementById('formSection').style.display = 'none';
+
+    // Show loading placeholder in time-slot panel
+    document.getElementById('timeSlotsContainer').innerHTML =
+        '<div class="empty-state"><p style="color:#999;">Loading available times\u2026</p></div>';
+
+    // Fetch already-booked slots from the server
+    var dateStr = formatDateYMD(selectedDate);
+    fetch(API_URL + '/api/public/booked-times?date=' + dateStr)
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            bookedTimes = new Set((data.booked || []).map(normalizeTime));
+            renderTimeSlots();
+        })
+        .catch(function (err) {
+            console.warn('Could not fetch booked times:', err);
+            bookedTimes = new Set();
+            renderTimeSlots();
+        });
+}
+
+// ── Time slots ────────────────────────────────────────────────────────────────
+function renderTimeSlots() {
+    var nowCT   = getNowCT();
+    var isToday = selectedDate !== null &&
+        selectedDate.getFullYear() === nowCT.getFullYear() &&
+        selectedDate.getMonth()    === nowCT.getMonth()    &&
+        selectedDate.getDate()     === nowCT.getDate();
+
+    var anyAvailable = false;
+    var html = '<div class="time-slots">';
+
+    ALL_TIME_SLOTS.forEach(function (time) {
+        var normalized = normalizeTime(time);
+        var isBooked   = bookedTimes.has(normalized);
+        var isTooSoon  = false;
+
+        if (isToday) {
+            var slotMin = parseSlotMinutes(time);
+            var nowMin  = nowCT.getHours() * 60 + nowCT.getMinutes();
+            isTooSoon   = (slotMin - nowMin) < (MIN_NOTICE_HOURS * 60);
+        }
+
+        var disabled   = isBooked || isTooSoon;
+        var isSelected = selectedTime && normalizeTime(selectedTime) === normalized;
+
+        var cls = 'time-slot';
+        if (disabled)            cls += ' disabled';
+        if (isSelected && !disabled) cls += ' selected';
+
+        var label   = isBooked ? (time + ' \u2014 Booked') : time;
+        var handler = disabled  ? '' : 'onclick="selectTime(\'' + time + '\',this)"';
+
+        if (!disabled) anyAvailable = true;
+        html += '<div class="' + cls + '" ' + handler + '>' + label + '</div>';
+    });
+
+    html += '</div>';
+
+    if (!anyAvailable) {
+        html =
+            '<div class="empty-state">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">' +
+            '<circle cx="12" cy="12" r="10"/>' +
+            '<line x1="12" y1="8" x2="12" y2="12"/>' +
+            '<line x1="12" y1="16" x2="12.01" y2="16"/>' +
+            '</svg>' +
+            '<p style="font-weight:600;margin-bottom:4px;">No times available</p>' +
+            '<p style="font-size:13px;color:#999;">Please select a different date.</p>' +
+            '</div>';
+    }
+
+    document.getElementById('timeSlotsContainer').innerHTML = html;
+}
+
+// ── Time selection ────────────────────────────────────────────────────────────
+function selectTime(time, el) {
+    selectedTime = time;
+
+    document.querySelectorAll('.time-slot').forEach(function (e) {
+        e.classList.remove('selected');
+    });
+    el.classList.add('selected');
+
+    var dateLabel = selectedDate.toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+    document.getElementById('selectedDateTimeText').textContent = dateLabel + ' at ' + time;
+    document.getElementById('formSection').style.display = 'block';
+    document.getElementById('formSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── Form submit ───────────────────────────────────────────────────────────────
+function handleFormSubmit(e) {
+    e.preventDefault();
+
+    if (!selectedDate || !selectedTime) {
+        alert('Please select a date and time first.');
+        return;
+    }
+
+    var nameVal    = document.getElementById('inputName').value.trim();
+    var emailVal   = document.getElementById('inputEmail').value.trim();
+    var phoneVal   = document.getElementById('inputPhone').value.trim();
+    var companyVal = document.getElementById('inputCompany').value.trim();
+    var notesVal   = document.getElementById('inputNotes').value.trim();
+
+    if (!nameVal)  { alert('Please enter your full name.');      return; }
+    if (!emailVal) { alert('Please enter your email address.'); return; }
+
+    var btn = document.getElementById('submitBtn');
+    btn.disabled    = true;
+    btn.innerHTML   = '<span class="loading"></span> Scheduling\u2026';
+
+    // Parse selected time into 24-hour hour + minutes
+    var timeMatch = selectedTime.match(/^(\d{1,2}):(\d{2})\s(AM|PM)$/);
+    if (!timeMatch) {
+        alert('Invalid time selected. Please choose a time and try again.');
+        btn.disabled  = false;
+        btn.innerHTML = 'Confirm Appointment';
+        return;
+    }
+
+    var hour    = parseInt(timeMatch[1], 10);
+    var minutes = timeMatch[2];
+    var period  = timeMatch[3];
+
+    if (period === 'PM' && hour !== 12) hour += 12;
+    if (period === 'AM' && hour === 12) hour  = 0;
+
+    // Build CT-aware ISO timestamp
+    var y  = selectedDate.getFullYear();
+    var mo = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    var d  = String(selectedDate.getDate()).padStart(2, '0');
+    var hh = String(hour).padStart(2, '0');
+    var mm = minutes;
+
+    // Detect CST (-06:00) vs CDT (-05:00) for the chosen date
+    var probeDate   = new Date(y + '-' + mo + '-' + d + 'T' + hh + ':' + mm + ':00');
+    var formatter   = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chicago',
+        timeZoneName: 'short'
+    });
+    var parts   = formatter.formatToParts(probeDate);
+    var tzPart  = parts.find(function (p) { return p.type === 'timeZoneName'; });
+    var tzName  = tzPart ? tzPart.value : 'CST';
+    var offset  = (tzName === 'CDT') ? '-05:00' : '-06:00';
+
+    var isoTimestamp = y + '-' + mo + '-' + d + 'T' + hh + ':' + mm + ':00' + offset;
+
+    // Tag as CRM Setup if opened via ?type=setup
+    var eventName  = IS_SETUP_CALL ? 'CRM Setup'    : 'Consultation';
+    var autoNotes  = IS_SETUP_CALL ? ('[CRM Setup Call] ' + notesVal).trim() : notesVal;
+    var apptSource = IS_SETUP_CALL ? 'crm_setup'    : 'website';
+
+    var payload = {
+        event: 'invitee.created',
+        payload: {
+            name:            nameVal,
+            email:           emailVal,
+            phone:           phoneVal,
+            company:         companyVal,
+            notes:           autoNotes,
+            scheduled_event: { start_time: isoTimestamp },
+            event_type:      { name: eventName },
+            appointment_source: apptSource
+        }
+    };
+
+    fetch(API_URL + '/api/scheduling/webhook', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload)
+    })
+    .then(function (res) {
+        return res.json().then(function (data) {
+            return { ok: res.ok, data: data };
+        });
+    })
+    .then(function (result) {
+        if (result.ok && result.data.processed) {
+            showSuccess(payload.payload);
+        } else {
+            throw new Error(result.data.error || 'Booking failed — please try again.');
+        }
+    })
+    .catch(function (err) {
+        console.error('Booking error:', err);
+        alert(err.message || 'Failed to schedule. Please try again or call us at (512) 980-0393.');
+        btn.disabled  = false;
+        btn.innerHTML = 'Confirm Appointment';
+    });
+}
+
+// ── Success screen ────────────────────────────────────────────────────────────
+function showSuccess(data) {
+    document.getElementById('schedulingInterface').style.display = 'none';
+    document.getElementById('successMessage').style.display      = 'block';
+
+    var dateLabel = selectedDate.toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+    var typeLabel = IS_SETUP_CALL ? 'CRM Setup Call' : 'Discovery Call';
+
+    document.getElementById('successDetails').innerHTML =
+        row('Name',        data.name    || '') +
+        row('Email',       data.email   || '') +
+        row('Date & Time', dateLabel + ' at ' + selectedTime) +
+        row('Type',        typeLabel);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function row(label, value) {
+    return '<div class="success-details-item">' +
+        '<span class="success-details-label">' + label + '</span>' +
+        '<span class="success-details-value">'  + value + '</span>' +
+        '</div>';
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Returns a Date object representing the current moment in America/Chicago time. */
+function getNowCT() {
+    var s = new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' });
+    return new Date(s);
+}
+
+/** Formats a Date as YYYY-MM-DD. */
+function formatDateYMD(date) {
+    var y = date.getFullYear();
+    var m = String(date.getMonth() + 1).padStart(2, '0');
+    var d = String(date.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + d;
+}
+
+/**
+ * Strips a leading zero from hour so that server values ("09:00 AM") and
+ * client display values ("9:00 AM") compare equal.
+ */
+function normalizeTime(t) {
+    if (!t) return '';
+    return t.trim().replace(/^0(\d)/, '$1');
+}
+
+/** Converts a display time like "9:30 AM" into minutes-since-midnight. */
+function parseSlotMinutes(time) {
+    var m = time.match(/^(\d{1,2}):(\d{2})\s(AM|PM)$/);
+    if (!m) return 0;
+    var h   = parseInt(m[1], 10);
+    var min = parseInt(m[2], 10);
+    if (m[3] === 'PM' && h !== 12) h += 12;
+    if (m[3] === 'AM' && h === 12) h  = 0;
+    return h * 60 + min;
+}
+</script>
+
+</body>
+</html>
