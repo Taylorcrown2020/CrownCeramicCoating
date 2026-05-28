@@ -1472,7 +1472,10 @@ async function initializeDatabase(){
         await client.query(`
     DO $$
     BEGIN
-        IF NOT EXISTS (
+        IF EXISTS (
+            SELECT 1 FROM information_schema.tables
+            WHERE table_name='support_tickets'
+        ) AND NOT EXISTS (
             SELECT 1 FROM information_schema.columns
             WHERE table_name='support_tickets'
             AND column_name='client_name'
