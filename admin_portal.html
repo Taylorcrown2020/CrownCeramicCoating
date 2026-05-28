@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamondback CRM | Admin Portal</title>
+    <title>Crown Care Maintenance Plan | Admin Portal</title>
     <meta name="description" content="Professional CRM & Project Management Dashboard">
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.js"></script>
@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
 :root {
-    /* Brand Colors - DIAMONDBACK */
+    /* Brand Colors - CROWN CERAMIC COATING */
     --brand-primary: #D4A574;
     --brand-gold: #D4A574;
     --brand-gold-light: #E5C4A0;
@@ -3581,7 +3581,7 @@ body.graffiti-mode .sidebar::after {
                 </svg>
             </div>
             <div class="logo-text">
-                <div class="logo-title">DIAMONDBACK</div>
+                <div class="logo-title">CROWN CERAMIC COATING</div>
                 <div class="logo-subtitle">Admin Portal</div>
             </div>
         </div>
@@ -3980,8 +3980,14 @@ body.graffiti-mode .sidebar::after {
 // ========================================
 const API_URL = window.location.origin;
 const API_BASE = API_URL; // Add this
-const FRONTEND_BASE_URL = 'https://diamondbackcoding.com';
-let authToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken') || localStorage.getItem('token') || sessionStorage.getItem('token');
+const FRONTEND_BASE_URL = 'https://crownceramiccoating.com';
+// Ensure the auth token is in localStorage regardless of how login stored it
+// (login uses sessionStorage when "remember me" is off; the portal reads localStorage).
+if (!localStorage.getItem('adminToken')) {
+    const _sessTok = sessionStorage.getItem('adminToken') || sessionStorage.getItem('token');
+    if (_sessTok) { localStorage.setItem('adminToken', _sessTok); }
+}
+let authToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || sessionStorage.getItem('token');
 
 // Helper function to get the current auth token
 function getAuthToken() {
@@ -3993,7 +3999,7 @@ function getAuthToken() {
     // Then check storage and cache it
     const token = localStorage.getItem('adminToken') || 
                   sessionStorage.getItem('adminToken') || 
-                  localStorage.getItem('token') || 
+                  localStorage.getItem('adminToken') || 
                   sessionStorage.getItem('token') ||
                   authToken;
     
@@ -4043,7 +4049,7 @@ const state = {
         useBrevo: false,
         brevoApiKey: '',
         brevoSenderEmail: '',
-        brevoSenderName: 'Diamondback Coding'
+        brevoSenderName: 'Crown Ceramic Coating'
     }
 };
 
@@ -5643,7 +5649,7 @@ function renderDashboard(content) {
 // Load and display upcoming appointments
 async function loadUpcomingAppointments() {
     try {
-        const token = state.authToken || localStorage.getItem('token');
+        const token = state.authToken || localStorage.getItem('adminToken');
         const response = await fetch(`${API_URL}/api/appointments/upcoming`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -6135,7 +6141,7 @@ async function assignProject(clientId) {
         // Load existing projects to show available ones
         const response = await fetch(`${API_BASE}/projects`, {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
         });
         
@@ -6324,7 +6330,7 @@ async function saveProject(clientId) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             },
             body: JSON.stringify(projectData)
         });
@@ -6360,7 +6366,7 @@ async function saveProject(clientId) {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
                     },
                     body: JSON.stringify(milestone)
                 });
@@ -6388,7 +6394,7 @@ async function openClientProjects(clientId) {
     try {
         const response = await fetch(`${API_BASE}/client/${clientId}/projects`, {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
         });
         
@@ -6621,7 +6627,7 @@ window.loadEmailTemplate = function(leadId, leadName, leadEmail) {
     const htmlTemplates = {
         valentinessale: {
             subject: `VALENTINE'S DAY: 25% OFF Everything for ${leadName}`,
-            preview: `[HTML EMAIL] Valentine's Day Sale — 25% off banner with pink design, shop-now CTA, Diamondback branding. Subject is editable.`
+            preview: `[HTML EMAIL] Valentine's Day Sale — 25% off banner with pink design, shop-now CTA, Crown Ceramic Coating branding. Subject is editable.`
         },
         springsale: {
             subject: `Spring Event: 25% OFF Everything for ${leadName}`,
@@ -6640,11 +6646,11 @@ window.loadEmailTemplate = function(leadId, leadName, leadEmail) {
             preview: `[HTML EMAIL] Valentine's 14% original promo template. Subject is editable.`
         },
         zerotransactionfees: {
-            subject: `Zero Transaction Fees | Diamondback Coding`,
+            subject: `Zero Transaction Fees | Crown Ceramic Coating`,
             preview: `[HTML EMAIL] Zero Transaction Fees — comparison tables, savings breakdown ($75K/$200K/$500K), "What sets us apart" section, CTA. Subject is editable.`
         },
         initial: {
-            subject: `Your Vision, Our Code — Diamondback Coding`,
+            subject: `Your Vision, Our Code — Crown Ceramic Coating`,
             preview: `[HTML EMAIL] Initial outreach — curved header, About Us, service cards (Web Dev, CRM, SEO), Get Started CTA. Subject is editable.`
         },
         followup1: {
@@ -6664,7 +6670,7 @@ window.loadEmailTemplate = function(leadId, leadName, leadEmail) {
             preview: `[HTML EMAIL] Indefinite Follow-Up — short re-engagement nudge, no pressure. Used for long-term nurturing cadence.`
         },
         proposal: {
-            subject: `Your Custom Proposal — Diamondback Coding`,
+            subject: `Your Custom Proposal — Crown Ceramic Coating`,
             preview: `[HTML EMAIL] Proposal — professional proposal framing with services overview and next-step CTA.`
         },
         thankyou: {
@@ -6672,7 +6678,7 @@ window.loadEmailTemplate = function(leadId, leadName, leadEmail) {
             preview: `[HTML EMAIL] Thank You — warm gratitude note, recap of what's next, invitation to reach out.`
         },
         projectupdate: {
-            subject: `Project Update — Diamondback Coding`,
+            subject: `Project Update — Crown Ceramic Coating`,
             preview: `[HTML EMAIL] Project Update — milestone summary format, progress notes section, next steps.`
         },
         invoicereminder: {
@@ -6868,7 +6874,7 @@ async function selectEmailTemplate(templateId, leadId) {
         clientName: lead.name,
         clientCompany: lead.company || '',
         projectType: lead.project_type || 'your project',
-        senderName: 'DIAMONDBACK Team'
+        senderName: 'CROWN CERAMIC COATING Team'
     };
     
     // Show preview modal
@@ -7088,13 +7094,13 @@ Looking forward to hearing from you!
 
 Best regards,
 {{senderName}}
-DIAMONDBACK`
+CROWN CERAMIC COATING`
     },
     
     blackFriday: {
         id: 'blackfriday',
         name: 'Black Friday Sale - 25% Off',
-        subject: 'BLACK FRIDAY: 25% OFF Everything | Diamondback Coding',
+        subject: 'BLACK FRIDAY: 25% OFF Everything | Crown Ceramic Coating',
         category: 'sales',
         description: 'Bold Black Friday promotional email with 4 stacked "25% OFF" rows, tech background, dramatic design',
         body: `Hi {{clientName}},
@@ -7121,16 +7127,16 @@ Limited Time Offer: Valid November 20 - December 3, 2026
 New clients only. 25% discount applies to initial project quote.
 
 Ready to get started?
-→ Visit: https://diamondbackcoding.com/contact.html
+→ Visit: https://crownceramiccoating.com/contact.html
 
 Best regards,
-DIAMONDBACK CODING`
+CROWN CERAMIC COATING`
     },
     
     initialSale: {
         id: 'initialsale',
         name: 'Initial Sale - 25% Off Spring Promo',
-        subject: 'Spring Sale - 25% OFF All Services | Diamondback Coding',
+        subject: 'Spring Sale - 25% OFF All Services | Crown Ceramic Coating',
         category: 'sales',
         description: 'Professional spring sale email with 25% discount, cyan background, benefits section, service icons',
         body: `Hi {{clientName}},
@@ -7160,18 +7166,18 @@ Limited Time Offer: Valid February 9 - April 30, 2026
 New clients only. 25% discount applies to initial project quote.
 
 Ready to get started?
-→ Visit: https://diamondbackcoding.com/contact.html
+→ Visit: https://crownceramiccoating.com/contact.html
 
 Best regards,
-DIAMONDBACK CODING
+CROWN CERAMIC COATING
 5000 Plaza on the Lake, Suite 100 PMB 2017 Austin, TX 78746
-(512) 980-0393 | contact@diamondbackcoding.com`
+(512) 980-0393 | contact@crownceramiccoating.com`
     },
     
     valentinesSale: {
         id: 'valentinessale',
         name: 'Valentine\'s Day Sale - 25% Off',
-        subject: 'VALENTINE\'S DAY: 25% OFF Everything | Diamondback Coding',
+        subject: 'VALENTINE\'S DAY: 25% OFF Everything | Crown Ceramic Coating',
         category: 'sales',
         description: 'Bold pink Valentine\'s Day sale email with 4 stacked "25% OFF" rows, colorful dots, festive design',
         body: `Hi {{clientName}},
@@ -7198,16 +7204,16 @@ Limited Time Offer: Valid February 1 - February 14, 2026
 New clients only. 25% discount applies to initial project quote.
 
 Ready to get started?
-→ Visit: https://diamondbackcoding.com/contact.html
+→ Visit: https://crownceramiccoating.com/contact.html
 
 Best regards,
-DIAMONDBACK CODING`
+CROWN CERAMIC COATING`
     },
     
     springSale: {
         id: 'springsale',
         name: 'Spring Sale - 25% Off Spring Event',
-        subject: 'Spring Event: 25% OFF Everything | Diamondback Coding',
+        subject: 'Spring Event: 25% OFF Everything | Crown Ceramic Coating',
         category: 'sales',
         description: 'Fresh spring-themed email with pastel colors, wavy borders, flower icons, flavor vibe showcase',
         body: `Hi {{clientName}},
@@ -7232,10 +7238,10 @@ Limited Time Offer: Valid March 1 - April 15, 2026
 New clients only. 25% discount applies to initial project quote.
 
 Ready to get started?
-→ Visit: https://diamondbackcoding.com/contact.html
+→ Visit: https://crownceramiccoating.com/contact.html
 
 Best regards,
-DIAMONDBACK CODING`
+CROWN CERAMIC COATING`
     },
     
     valentines14Promo: {
@@ -7261,13 +7267,13 @@ Our biggest sale of the year is here! Get 14% off your first month per user on:
 This 14% Valentine's discount is our way of spreading the love this season. We believe in building lasting partnerships and helping businesses like yours thrive with the right tools.
 
 READY TO BOOST YOUR BUSINESS?
-Click here to get started: https://diamondbackcoding.com/contact.html
+Click here to get started: https://crownceramiccoating.com/contact.html
 
 Offer expires 2/28/2026 - Don't miss out!
 
 Best regards,
 {{senderName}}
-DIAMONDBACK CODING`
+CROWN CERAMIC COATING`
     },
     
     proposal: {
@@ -7277,7 +7283,7 @@ DIAMONDBACK CODING`
         category: 'sales',
         body: `Hi {{clientName}},
 
-Thank you for considering DIAMONDBACK for {{projectType}}.
+Thank you for considering CROWN CERAMIC COATING for {{projectType}}.
 
 I've attached a detailed proposal outlining:
 - Project scope and deliverables
@@ -7289,17 +7295,17 @@ Please review at your convenience. I'm happy to answer any questions or schedule
 
 Best regards,
 {{senderName}}
-DIAMONDBACK`
+CROWN CERAMIC COATING`
     },
     
     thankYou: {
         id: 'thank-you',
         name: 'Thank You',
-        subject: 'Thank you for choosing DIAMONDBACK!',
+        subject: 'Thank you for choosing CROWN CERAMIC COATING!',
         category: 'onboarding',
         body: `Hi {{clientName}},
 
-Thank you for choosing DIAMONDBACK for {{projectType}}!
+Thank you for choosing CROWN CERAMIC COATING for {{projectType}}!
 
 We're excited to work with you and bring your vision to life. Here's what happens next:
 
@@ -7311,7 +7317,7 @@ I'll be your main point of contact throughout the project. Feel free to reach ou
 
 Best regards,
 {{senderName}}
-DIAMONDBACK`
+CROWN CERAMIC COATING`
     },
     
     projectUpdate: {
@@ -7332,7 +7338,7 @@ We're on track for delivery by {{deliveryDate}}. Let me know if you have any que
 
 Best regards,
 {{senderName}}
-DIAMONDBACK`
+CROWN CERAMIC COATING`
     },
     
     invoiceReminder: {
@@ -7352,7 +7358,7 @@ Thank you for your business!
 
 Best regards,
 {{senderName}}
-DIAMONDBACK`
+CROWN CERAMIC COATING`
     },
     
     projectComplete: {
@@ -7376,7 +7382,7 @@ Thank you for trusting us with your project. We'd love to hear your feedback!
 
 Best regards,
 {{senderName}}
-DIAMONDBACK`
+CROWN CERAMIC COATING`
     },
     
     checkIn: {
@@ -7394,7 +7400,7 @@ We're always here to support you and would love to discuss any future projects y
 
 Best regards,
 {{senderName}}
-DIAMONDBACK`
+CROWN CERAMIC COATING`
     },
     
     referralRequest: {
@@ -7412,15 +7418,15 @@ Thank you for being an amazing client!
 
 Best regards,
 {{senderName}}
-DIAMONDBACK`
+CROWN CERAMIC COATING`
     },
     
     zeroTransactionFees: {
         id: 'zerotransactionfees',
         name: 'Zero Transaction Fees',
-        subject: 'Zero Transaction Fees | Diamondback Coding',
+        subject: 'Zero Transaction Fees | Crown Ceramic Coating',
         category: 'sales',
-        description: 'Professional email showing cost comparison between platforms with transaction fees vs Diamondback. Includes detailed savings calculator.',
+        description: 'Professional email showing cost comparison between platforms with transaction fees vs Crown Ceramic Coating. Includes detailed savings calculator.',
         body: `Hi {{clientName}},
 
 EVERY SALE YOU MAKE, THEY TAKE A CUT.
@@ -7438,17 +7444,17 @@ HERE'S WHAT YOU'RE HANDING OVER EVERY YEAR:
 
 $75K/yr in sales:
   Other Platforms: You lose -$2,250
-  Diamondback: You keep $2,250
+  Crown Ceramic Coating: You keep $2,250
 
 $200K/yr in sales:
   Other Platforms: You lose -$6,000
-  Diamondback: You keep $6,000
+  Crown Ceramic Coating: You keep $6,000
 
 $500K/yr in sales:
   Other Platforms: You lose -$15,000
-  Diamondback: You keep $15,000
+  Crown Ceramic Coating: You keep $15,000
 
-✔ With Diamondback, every dollar in that green column stays in your pocket.
+✔ With Crown Ceramic Coating, every dollar in that green column stays in your pocket.
 
 WHAT SETS US APART:
 
@@ -7468,12 +7474,12 @@ Stop managing three different vendors. We handle your full digital stack — bui
 15 MINUTES. FIND OUT WHAT YOU'RE LOSING.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Schedule a call: https://diamondbackcoding.com/contact.html
+Schedule a call: https://crownceramiccoating.com/contact.html
 Or call us directly: (512) 980-0393
 
 Best regards,
 {{senderName}}
-DIAMONDBACK CODING
+CROWN CERAMIC COATING
 5000 Plaza on the Lake, Suite 100 PMB 2017
 Austin, TX 78746`
     }
@@ -7530,7 +7536,7 @@ async function sendTemplatedEmail(templateId, leadId, customVariables = {}) {
             clientName: lead.lead.name,
             clientCompany: lead.lead.company || '',
             projectType: lead.lead.project_type || 'your project',
-            senderName: 'DIAMONDBACK Team',
+            senderName: 'CROWN CERAMIC COATING Team',
             ...customVariables
         };
         
@@ -10609,7 +10615,7 @@ function renderSettingsTabContent(tab) {
                 <div class="setting-row">
                     <div class="setting-info">
                         <div class="setting-label">Email</div>
-                        <div class="setting-desc">admin@craftedcode.dev</div>
+                        <div class="setting-desc">admin@crownceramiccoating.dev</div>
                     </div>
                 </div>
             </div>
@@ -10687,7 +10693,7 @@ function renderSettingsTabContent(tab) {
                     
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 13px;">Sender Name</label>
-                        <input type="text" id="brevoSenderName" value="${state.settings.brevoSenderName || 'Diamondback Coding'}" placeholder="Your Company Name" style="width: 100%; padding: 10px; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary); font-size: 13px;">
+                        <input type="text" id="brevoSenderName" value="${state.settings.brevoSenderName || 'Crown Ceramic Coating'}" placeholder="Your Company Name" style="width: 100%; padding: 10px; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary); font-size: 13px;">
                     </div>
                     
                     <button class="btn btn-primary" onclick="saveBrevoConfig()" style="width: 100%;">
@@ -11493,7 +11499,7 @@ async function renderInvoicePreview(invoice) {
                         </svg>
                     </div>
                     <div>
-                        <div class="invoice-company-name">DIAMONDBACK</div>
+                        <div class="invoice-company-name">CROWN CERAMIC COATING</div>
                         <div class="invoice-company-tagline">Premium Development Services</div>
                     </div>
                 </div>
@@ -11507,11 +11513,11 @@ async function renderInvoicePreview(invoice) {
                 <div class="invoice-parties">
                     <div>
                         <div class="invoice-party-label">From</div>
-                        <div class="invoice-party-name">DIAMONDBACK</div>
+                        <div class="invoice-party-name">CROWN CERAMIC COATING</div>
                         <div class="invoice-party-details">
                             5000 Plaza on the Lake, Suite 100 PMB 2017
                             Austin, TX 78746<br>
-                            contact@diamondbackcoding.com
+                            contact@crownceramiccoating.com
                         </div>
                     </div>
                     <div>
@@ -13103,7 +13109,7 @@ async function saveBrevoConfig() {
     
     state.settings.brevoApiKey = apiKey;
     state.settings.brevoSenderEmail = senderEmail;
-    state.settings.brevoSenderName = senderName || 'Diamondback Coding';
+    state.settings.brevoSenderName = senderName || 'Crown Ceramic Coating';
     
     await saveSettings();
     showToast('Brevo configuration saved successfully', 'success');
@@ -13446,10 +13452,10 @@ function printInvoice() {
             <div class="container">
                 <div class="header">
                     <div class="company-info">
-                        <h1>DIAMONDBACK</h1>
+                        <h1>CROWN CERAMIC COATING</h1>
                         <p>Premium Development Services</p>
                         <p>5000 Plaza on the Lake, Suite 100 PMB 2017 Austin, TX 78746</p>
-                        <p>contact@diamondbackcoding.com</p>
+                        <p>contact@crownceramiccoating.com</p>
                     </div>
                     <div style="text-align: right;">
                         <div class="invoice-title">INVOICE</div>
@@ -13460,7 +13466,7 @@ function printInvoice() {
                 <div class="parties">
                     <div>
                         <div class="party-label">From</div>
-                        <div class="party-name">DIAMONDBACK</div>
+                        <div class="party-name">CROWN CERAMIC COATING</div>
                         <div class="party-details">5000 Plaza on the Lake, Suite 100 PMB 2017<br>Austin, TX 78746</div>
                     </div>
                     <div>
@@ -15845,23 +15851,23 @@ function generateTimelineHTML(timeline) {
                 <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-amber); margin-bottom: 12px;">Agreement Overview</div>
                 <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.7;">
                     This Service Level Agreement is entered into as of <strong>${companySignatureDate}</strong> by and between 
-                    <strong>DIAMONDBACK</strong> and <strong>${timeline.clientName}${timeline.clientCompany ? ' / ' + timeline.clientCompany : ''}</strong>.
+                    <strong>CROWN CERAMIC COATING</strong> and <strong>${timeline.clientName}${timeline.clientCompany ? ' / ' + timeline.clientCompany : ''}</strong>.
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 32px;">
                 <div>
                     <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 6px;">Service Provider</div>
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">DIAMONDBACK</div>
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">CROWN CERAMIC COATING</div>
                     <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.5;">
                         5000 Plaza on the Lake, Suite 100 PMB 2017<br>
                         Austin, TX 78746<br>
-                        contact@diamondbackcoding.com<br>
+                        contact@crownceramiccoating.com<br>
                         (512) 980-0393
                     </div>
                     <div style="margin-top: 16px; padding: 12px; background: var(--bg-hover); border-radius: var(--radius-sm);">
                         <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Company Signature</div>
-                        <div style="font-family: cursive; font-size: 20px; color: var(--accent-amber); margin-bottom: 4px;">DIAMONDBACK</div>
+                        <div style="font-family: cursive; font-size: 20px; color: var(--accent-amber); margin-bottom: 4px;">CROWN CERAMIC COATING</div>
                         <div style="font-size: 10px; color: var(--text-muted);">Digitally Signed: ${companySignatureDate}</div>
                     </div>
                 </div>
@@ -16256,7 +16262,7 @@ function exportTimelineAsPDF() {
                     '<div style="background: #000; padding: 30px 40px; margin: -50px -50px 40px -50px; border-radius: 0;">' +
                         '<div style="display: flex; justify-content: space-between; align-items: center;">' +
                             '<div>' +
-                                '<div style="font-size: 32px; font-weight: 800; color: white; letter-spacing: -0.5px; margin-bottom: 4px;">DIAMONDBACK CODING</div>' +
+                                '<div style="font-size: 32px; font-weight: 800; color: white; letter-spacing: -0.5px; margin-bottom: 4px;">CROWN CERAMIC COATING</div>' +
                                 '<div style="font-size: 12px; color: rgba(255,255,255,0.95); font-weight: 500; letter-spacing: 1px;">PREMIUM DEVELOPMENT SERVICES</div>' +
                             '</div>' +
                             '<div style="text-align: right;">' +
@@ -16275,7 +16281,7 @@ function exportTimelineAsPDF() {
                     // AGREEMENT OVERVIEW
                     '<div style="background: #f8f9fa; padding: 24px; border-left: 4px solid #D4A574; border-radius: 4px; margin-bottom: 40px;">' +
                         '<div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #D4A574; margin-bottom: 12px;">Agreement Overview</div>' +
-                        '<div style="font-size: 12px; color: #444; line-height: 1.7;">This Service Level Agreement ("Agreement") is entered into as of <strong>' + companySignatureDate + '</strong> by and between <strong>DIAMONDBACK</strong> ("Provider"), a Texas-based web development company, and <strong>' + timeline.clientName + (timeline.clientCompany ? ' / ' + timeline.clientCompany : '') + '</strong> ("Client").</div>' +
+                        '<div style="font-size: 12px; color: #444; line-height: 1.7;">This Service Level Agreement ("Agreement") is entered into as of <strong>' + companySignatureDate + '</strong> by and between <strong>CROWN CERAMIC COATING</strong> ("Provider"), a Texas-based web development company, and <strong>' + timeline.clientName + (timeline.clientCompany ? ' / ' + timeline.clientCompany : '') + '</strong> ("Client").</div>' +
                     '</div>' +
                     
                     // PARTIES (TWO COLUMNS)
@@ -16283,16 +16289,16 @@ function exportTimelineAsPDF() {
                         // PROVIDER
                         '<div style="background: white; border: 2px solid #e0e0e0; border-radius: 4px; padding: 24px;">' +
                             '<div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #D4A574; margin-bottom: 12px;">Service Provider</div>' +
-                            '<div style="font-size: 16px; font-weight: 700; color: #000; margin-bottom: 8px;">DIAMONDBACK</div>' +
+                            '<div style="font-size: 16px; font-weight: 700; color: #000; margin-bottom: 8px;">CROWN CERAMIC COATING</div>' +
                             '<div style="font-size: 11px; color: #666; line-height: 1.6; margin-bottom: 16px;">' +
                                 '5000 Plaza on the Lake, Suite 100 PMB 2017<br>' +
                                 'Austin, TX 78746<br>' +
-                                'contact@diamondbackcoding.com<br>' +
+                                'contact@crownceramiccoating.com<br>' +
                                 '(512) 980-0393' +
                             '</div>' +
                             '<div style="background: #f8f9fa; padding: 16px; border-radius: 4px; border: 1px solid #e0e0e0;">' +
                                 '<div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px;">Authorized Signature</div>' +
-                                '<div style="font-family: Brush Script MT, cursive; font-size: 28px; color: #D4A574; margin-bottom: 4px; line-height: 1;">DIAMONDBACK</div>' +
+                                '<div style="font-family: Brush Script MT, cursive; font-size: 28px; color: #D4A574; margin-bottom: 4px; line-height: 1;">CROWN CERAMIC COATING</div>' +
                                 '<div style="height: 1px; background: #D4A574; margin: 8px 0;"></div>' +
                                 '<div style="font-size: 10px; color: #666;">Date: ' + companySignatureDate + '</div>' +
                                 '<div style="font-size: 9px; color: #999; margin-top: 4px;">Digitally Authorized Representative</div>' +
@@ -16414,7 +16420,7 @@ function exportTimelineAsPDF() {
                     // FOOTER
                     '<div style="text-align: center; padding-top: 30px; border-top: 2px solid #e0e0e0;">' +
                         '<div style="font-size: 12px; color: #666; margin-bottom: 6px;">Questions about this SLA?</div>' +
-                        '<div style="font-size: 11px; color: #999; margin-bottom: 12px;">Contact us at contact@diamondbackcoding.com or (512) 980-0393</div>' +
+                        '<div style="font-size: 11px; color: #999; margin-bottom: 12px;">Contact us at contact@crownceramiccoating.com or (512) 980-0393</div>' +
                         '<div style="font-size: 10px; color: #bbb;">Document ID: ' + documentId + ' • Generated: ' + companySignatureDate + '</div>' +
                     '</div>' +
                 '</div>' +
@@ -18694,7 +18700,7 @@ function renderProjectsList(filtered, allTimelines) {
 async function loadLeadProjects(leadId) {
     try {
         const response = await fetch(`${API_BASE}/api/client/${leadId}/projects`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
         });
         
         const data = await response.json();
@@ -18794,7 +18800,7 @@ async function handleCreateProject(event, leadId) {
         const response = await fetch(`${API_BASE}/api/projects`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(projectData)
@@ -18878,7 +18884,7 @@ async function handleCreateMilestone(event, projectId, projectName, leadId) {
         const response = await fetch(`${API_BASE}/api/projects/${projectId}/milestones`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(milestoneData)
@@ -18902,7 +18908,7 @@ async function editMilestone(milestoneId, projectId, projectName, leadId) {
     try {
         // Load current milestone data
         const response = await fetch(`${API_BASE}/api/client/projects/${projectId}`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
         });
         
         const data = await response.json();
@@ -18979,7 +18985,7 @@ async function handleUpdateMilestone(event, milestoneId, projectId, projectName,
         const response = await fetch(`${API_BASE}/api/milestones/${milestoneId}`, {
             method: 'PUT',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(milestoneData)
@@ -19935,7 +19941,7 @@ async function assignProject(clientId) {
         
         // Get the lead info for this client
         const leadResponse = await fetch(`${API_BASE}/api/leads?email=${encodeURIComponent(client.email)}`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
         });
         
         if (!leadResponse.ok) {
@@ -20004,7 +20010,7 @@ async function renderFollowUps(content) {
     try {
         content.innerHTML = '<div style="text-align: center; padding: 40px;">Loading follow-ups...</div>';
         
-        const token = state.authToken || localStorage.getItem('token');
+        const token = state.authToken || localStorage.getItem('adminToken');
         const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
 
         // Fetch leads due for follow-up AND all leads to get total counts
@@ -20563,7 +20569,7 @@ async function markFollowedUp(leadId) {
     try {
         console.log('[FOLLOW-UP] Marking lead as followed up:', leadId);
         
-        const token = state.authToken || localStorage.getItem('token');
+        const token = state.authToken || localStorage.getItem('adminToken');
         
         if (!token) {
             console.error('[FOLLOW-UP] ❌ No authentication token found');
@@ -20676,7 +20682,7 @@ async function markFollowedUp(leadId) {
     try {
         console.log('[FOLLOW-UP] Marking lead as followed up:', leadId);
         
-        const token = state.authToken || localStorage.getItem('token');
+        const token = state.authToken || localStorage.getItem('adminToken');
         
         if (!token) {
             console.error('[FOLLOW-UP] ❌ No authentication token found');
@@ -21289,7 +21295,7 @@ async function deleteJob(jobId) {
 async function renderMarketing(content) {
     content.innerHTML = '<div style="text-align:center;padding:40px;">Loading...</div>';
 
-    const token = state.authToken || localStorage.getItem('token');
+    const token = state.authToken || localStorage.getItem('adminToken');
     const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
 
     // Fetch ALL leads and calculate audience counts
@@ -21430,14 +21436,14 @@ function onMktTemplateChange() {
     const subjectEl = document.getElementById('mktSubject');
 
     const htmlTemplates = {
-        zerotransactionfees: 'Zero Transaction Fees | Diamondback Coding',
-        initial: 'Your Vision, Our Code — Diamondback Coding',
-        valentinessale: "VALENTINE'S DAY: 25% OFF — Diamondback Coding",
-        springsale: 'Spring Event: 25% OFF — Diamondback Coding',
-        blackfriday: 'BLACK FRIDAY: 25% OFF — Diamondback Coding',
+        zerotransactionfees: 'Zero Transaction Fees | Crown Ceramic Coating',
+        initial: 'Your Vision, Our Code — Crown Ceramic Coating',
+        valentinessale: "VALENTINE'S DAY: 25% OFF — Crown Ceramic Coating",
+        springsale: 'Spring Event: 25% OFF — Crown Ceramic Coating',
+        blackfriday: 'BLACK FRIDAY: 25% OFF — Crown Ceramic Coating',
         initialsale: 'Spring Sale: 25% OFF All Services',
         valentines14: "Valentine's Special: 14% Off",
-        checkin: 'Checking In — Diamondback Coding',
+        checkin: 'Checking In — Crown Ceramic Coating',
         referralrequest: 'Know Someone Who Could Use Us?',
     };
 
@@ -21474,7 +21480,7 @@ async function sendMarketingBlast() {
     if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
 
     try {
-        const token = state.authToken || localStorage.getItem('token');
+        const token = state.authToken || localStorage.getItem('adminToken');
         const res = await fetch(`${API_URL}/api/marketing/blast`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },

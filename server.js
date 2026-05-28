@@ -1,5 +1,5 @@
 // ========================================
-// server.js - Complete CraftedCode Co. Backend
+// server.js - Complete Crown Ceramic Coating Backend
 // ========================================
 
 const express = require('express');
@@ -39,7 +39,7 @@ require('dotenv').config();
 
 // ========================================
 // PLATFORM BREVO — ALL client portal emails/SMS route through here
-// Diamondback Coding's own Brevo account key. Per-portal keys are IGNORED for sending.
+// Crown Ceramic Coating's own Brevo account key. Per-portal keys are IGNORED for sending.
 // ========================================
 const PLATFORM_BREVO_KEY = process.env.BREVO_API_KEY || process.env.PLATFORM_BREVO_KEY;
 if (!PLATFORM_BREVO_KEY) {
@@ -52,8 +52,8 @@ if (!PLATFORM_BREVO_KEY) {
     console.error('╚══════════════════════════════════════════════════════════════╝');
     console.error('');
 }
-const PLATFORM_SENDER_EMAIL = process.env.PLATFORM_SENDER_EMAIL || 'contact@diamondbackcoding.com';
-const PLATFORM_SENDER_NAME  = process.env.PLATFORM_SENDER_NAME  || 'Diamondback Coding';
+const PLATFORM_SENDER_EMAIL = process.env.PLATFORM_SENDER_EMAIL || 'contact@crownceramiccoating.com';
+const PLATFORM_SENDER_NAME  = process.env.PLATFORM_SENDER_NAME  || 'Crown Ceramic Coating';
 
 // Billing rates — 2× what Brevo charges
 const BREVO_COST_EMAIL  = 0.00150;   // Brevo charges $0.0015/email
@@ -272,8 +272,8 @@ function currentBillingMonth() {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const BASE_URL = process.env.BASE_URL || 'https://diamondbackcoding.com';
-const SCHEDULING_URL = process.env.SCHEDULING_URL || 'https://diamondbackcoding.com/schedule.html';
+const BASE_URL = process.env.BASE_URL || 'https://crownceramiccoating.com';
+const SCHEDULING_URL = process.env.SCHEDULING_URL || 'https://crownceramiccoating.com/schedule.html';
 
 // Service Packages Definition (matching pricing page)
 const servicePackages = {
@@ -805,7 +805,7 @@ function generateBookingWidgetHTML(leadEmail = '') {
 // SHARED EMAIL TEMPLATE
 // ========================================
 // Single source of truth for all outgoing email styling.
-// Matches the diamondbackcoding.com brand: black / gold / white.
+// Matches the crownceramiccoating.com brand: black / gold / white.
 // Modern email template matching follow-up design
 // Usage: buildEmailHTML(bodyHTML, { eyebrow, headline, ctaLabel, ctaUrl, accentColor, tagline, unsubscribeUrl })
 
@@ -823,7 +823,7 @@ function buildEmailHTML(bodyHTML, opts = {}) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diamondback Coding</title>
+<title>Crown Ceramic Coating</title>
 <style>
 @media only screen and (max-width: 620px) {
   .wrap { width: 100% !important; }
@@ -846,7 +846,7 @@ table td { border-collapse: collapse; }
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <td valign="middle">
-      <span style="font-size:12px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#111111;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">DIAMONDBACK CODING</span>
+      <span style="font-size:12px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#111111;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">CROWN CERAMIC COATING</span>
     </td>
     <td align="right" valign="middle">
       <table cellpadding="0" cellspacing="0" border="0" style="background:${accentColor};border-radius:2px;">
@@ -888,7 +888,7 @@ ${ctaLabel && ctaUrl ? `
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <td valign="top">
-      <p style="margin:0 0 6px;font-size:11px;font-weight:800;color:#FFFFFF;letter-spacing:2.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Diamondback Coding</p>
+      <p style="margin:0 0 6px;font-size:11px;font-weight:800;color:#FFFFFF;letter-spacing:2.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Crown Ceramic Coating</p>
       <p style="margin:0;font-size:12px;color:#B8B8B8;line-height:1.8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
         Web Development &amp; CRM Solutions<br>
         Austin, TX 78746<br>
@@ -896,13 +896,13 @@ ${ctaLabel && ctaUrl ? `
       </p>
     </td>
     <td align="right" valign="top">
-      <p style="margin:0 0 8px;"><a href="https://diamondbackcoding.com" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Website</a></p>
-      <p style="margin:0;"><a href="https://instagram.com/diamondbackcoding" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Instagram</a></p>
+      <p style="margin:0 0 8px;"><a href="https://crownceramiccoating.com" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Website</a></p>
+      <p style="margin:0;"><a href="https://instagram.com/crownceramiccoating" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Instagram</a></p>
     </td>
   </tr>
   ${unsubscribeUrl ? `<tr><td colspan="2" style="padding-top:22px;border-top:1px solid #454B5F;">
     <p style="margin:0;font-size:11px;color:#7A7F8F;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-      You received this because you previously connected with Diamondback Coding. &nbsp;
+      You received this because you previously connected with Crown Ceramic Coating. &nbsp;
       <a href="${unsubscribeUrl}" style="color:#7A7F8F;text-decoration:underline;">Unsubscribe</a>
     </p>
   </td></tr>` : ''}
@@ -957,7 +957,7 @@ async function sendViaBrevo(brevoApiKey, senderEmail, senderName, to, subject, h
     // the client's address so replies go directly to them, and include their
     // identity in the display name so recipients know who it's from.
     //
-    // Recipients see:  "Taylor Crownover via Diamondback CRM <contact@diamondbackcoding.com>"
+    // Recipients see:  "Taylor Crownover via Crown Ceramic Coating CRM <contact@crownceramiccoating.com>"
     // Replies go to:   taylor.crownover2024@gmail.com
     // ── Sender verification logic ─────────────────────────────────────────
     // If the sender's email domain is verified in Brevo, send directly from
@@ -979,8 +979,8 @@ async function sendViaBrevo(brevoApiKey, senderEmail, senderName, to, subject, h
         // Unverified — use platform address, show client name, set reply-to
         actualSenderEmail = PLATFORM_SENDER_EMAIL;
         displayName = (senderEmail && senderEmail.toLowerCase() !== PLATFORM_SENDER_EMAIL.toLowerCase())
-            ? `${senderName || senderEmail.split('@')[0]} via Diamondback CRM`
-            : (senderName || 'Diamondback CRM');
+            ? `${senderName || senderEmail.split('@')[0]} via Crown Ceramic Coating CRM`
+            : (senderName || 'Crown Ceramic Coating CRM');
         replyTo = (senderEmail && senderEmail.toLowerCase() !== PLATFORM_SENDER_EMAIL.toLowerCase())
             ? { email: senderEmail, name: senderName || senderEmail.split('@')[0] }
             : null;
@@ -1102,9 +1102,9 @@ async function sendSystemEmail({ to, subject, html }) {
     // Always use the platform-level (admin portal) Brevo credentials
     const emailSettings = await getEmailSettings();
 
-    // Hard-coded platform sender — always Diamondback, never the admin's personal email
-    const PLATFORM_SENDER_EMAIL = 'contact@diamondbackcoding.com';
-    const PLATFORM_SENDER_NAME  = 'Diamondback Coding';
+    // Hard-coded platform sender — always Crown Ceramic Coating, never the admin's personal email
+    const PLATFORM_SENDER_EMAIL = 'contact@crownceramiccoating.com';
+    const PLATFORM_SENDER_NAME  = 'Crown Ceramic Coating';
 
     try {
         if (emailSettings.useBrevo && emailSettings.brevoApiKey) {
@@ -1243,10 +1243,10 @@ async function sendTrackedEmail({ leadId, to, subject, html, isMarketing = false
         console.log(`[EMAIL] When this email is opened, the pixel will load and trigger the tracking endpoint`);
     }
 
-    // 5. Wrap ALL diamondbackcoding.com links with tracking (makes leads hot when clicked, skip for confirmation emails)
+    // 5. Wrap ALL crownceramiccoating.com links with tracking (makes leads hot when clicked, skip for confirmation emails)
     if (leadId && emailLogId && shouldTrack) {
-        // Replace all diamondbackcoding.com links with tracked versions
-        const websiteUrlPattern = /(https?:\/\/(?:www\.)?diamondbackcoding\.com[^"'\s]*)/gi;
+        // Replace all crownceramiccoating.com links with tracked versions
+        const websiteUrlPattern = /(https?:\/\/(?:www\.)?crownceramiccoating\.com[^"'\s]*)/gi;
         html = html.replace(websiteUrlPattern, (match) => {
             // Don't double-wrap or wrap tracking URLs
             if (match.includes('/api/track/click/')) return match;
@@ -1267,7 +1267,7 @@ async function sendTrackedEmail({ leadId, to, subject, html, isMarketing = false
             const brevoResult = await sendViaBrevo(
                 emailSettings.brevoApiKey,
                 emailSettings.brevoSenderEmail || process.env.EMAIL_USER,
-                emailSettings.brevoSenderName || 'Diamondback Coding',
+                emailSettings.brevoSenderName || 'Crown Ceramic Coating',
                 to,
                 subject,
                 html
@@ -1284,7 +1284,7 @@ async function sendTrackedEmail({ leadId, to, subject, html, isMarketing = false
         } else {
             console.log('[EMAIL] Sending via Nodemailer...');
             const info = await transporter.sendMail({
-                from: `"Diamondback Coding" <${process.env.EMAIL_USER}>`,
+                from: `"Crown Ceramic Coating" <${process.env.EMAIL_USER}>`,
                 to,
                 subject,
                 html
@@ -1390,7 +1390,7 @@ async function sendDirectEmail({ to, subject, html, attachments = [], leadId = n
             const brevoResult = await sendViaBrevo(
                 emailSettings.brevoApiKey,
                 emailSettings.brevoSenderEmail || process.env.EMAIL_USER,
-                emailSettings.brevoSenderName || 'Diamondback Coding',
+                emailSettings.brevoSenderName || 'Crown Ceramic Coating',
                 to,
                 subject,
                 html,
@@ -1410,7 +1410,7 @@ async function sendDirectEmail({ to, subject, html, attachments = [], leadId = n
             // Use Nodemailer for attachments or when Brevo is not configured
             console.log('[EMAIL] Sending via Nodemailer...');
             const info = await transporter.sendMail({
-                from: `"Diamondback Coding" <${process.env.EMAIL_USER}>`,
+                from: `"Crown Ceramic Coating" <${process.env.EMAIL_USER}>`,
                 to,
                 subject,
                 html,
@@ -2633,7 +2633,7 @@ console.log(' Recruitment tables (jobs, applications) initialized');
             
             await pool.query(
                 'INSERT INTO admin_users (username, email, password_hash) VALUES ($1, $2, $3)',
-                ['admin', 'admin@CraftedCode Co..dev', hashedPassword]
+                ['admin', 'admin@crownceramiccoating.dev', hashedPassword]
             );
             
             console.log('');
@@ -3033,7 +3033,7 @@ app.post('/api/scheduling/webhook', async (req, res) => {
         const confirmationEmail = buildEmailHTML(`
             <p>Hi ${inviteeName || 'there'},</p>
             
-            <p>Thank you for scheduling a consultation with Diamondback Coding. We're excited to discuss your project and explore how we can help bring your vision to life.</p>
+            <p>Thank you for scheduling a consultation with Crown Ceramic Coating. We're excited to discuss your project and explore how we can help bring your vision to life.</p>
             
             <p style="margin: 24px 0; padding: 20px; background: #F7F9FB; border-radius: 6px; border-left: 4px solid #FF6B35;">
                 <strong style="display: block; margin-bottom: 8px; color: #2D3142;">Appointment Details</strong>
@@ -3047,7 +3047,7 @@ app.post('/api/scheduling/webhook', async (req, res) => {
             <ul style="margin: 12px 0; padding-left: 24px;">
                 <li>Your project goals and requirements</li>
                 <li>Timeline and budget expectations</li>
-                <li>How Diamondback Coding can help bring your vision to life</li>
+                <li>How Crown Ceramic Coating can help bring your vision to life</li>
             </ul>
             
             <p style="margin-top: 24px; text-align: center; font-size: 13px; color: #666;">
@@ -3064,7 +3064,7 @@ app.post('/api/scheduling/webhook', async (req, res) => {
         
         try {
             await transporter.sendMail({
-                from: process.env.SMTP_FROM || 'Diamondback Coding <noreply@diamondbackcoding.com>',
+                from: process.env.SMTP_FROM || 'Crown Ceramic Coating <noreply@crownceramiccoating.com>',
                 to: inviteeEmail,
                 subject: `Consultation Confirmed - ${formattedDate} at ${formattedTime}`,
                 html: confirmationEmail
@@ -3318,7 +3318,7 @@ app.post('/api/appointments/admin-create', authenticateToken, async (req, res) =
 
                 const confirmHtml = buildEmailHTML(`
                     <p>Hi ${leadName},</p>
-                    <p>An appointment has been scheduled for you with Diamondback Coding. We look forward to connecting with you.</p>
+                    <p>An appointment has been scheduled for you with Crown Ceramic Coating. We look forward to connecting with you.</p>
 
                     <p style="margin:24px 0;padding:20px;background:#F7F9FB;border-radius:6px;border-left:4px solid #FF6B35;">
                         <strong style="display:block;margin-bottom:10px;color:#2D3142;font-size:15px;">Appointment Details</strong>
@@ -3329,7 +3329,7 @@ app.post('/api/appointments/admin-create', authenticateToken, async (req, res) =
                     </p>
 
                     <p><strong>What to Expect:</strong></p>
-                    <p>We will reach out at the scheduled time to discuss your project goals, timeline, and how Diamondback Coding can help bring your vision to life.</p>
+                    <p>We will reach out at the scheduled time to discuss your project goals, timeline, and how Crown Ceramic Coating can help bring your vision to life.</p>
 
                     <p style="margin-top:24px;font-size:13px;color:#666;text-align:center;">
                         Need to reschedule or have questions?
@@ -3340,7 +3340,7 @@ app.post('/api/appointments/admin-create', authenticateToken, async (req, res) =
                     eyebrow:     'APPOINTMENT CONFIRMED',
                     headline:    'Your appointment is scheduled.',
                     ctaLabel:    'Reschedule',
-                    ctaUrl:      process.env.SCHEDULING_URL || 'https://diamondbackcoding.com/schedule.html',
+                    ctaUrl:      process.env.SCHEDULING_URL || 'https://crownceramiccoating.com/schedule.html',
                     accentColor: '#FF6B35',
                     tagline:     'YOUR VISION. OUR CODE.'
                 });
@@ -3419,7 +3419,7 @@ app.put('/api/appointments/:id/reschedule', authenticateToken, async (req, res) 
         const confirmationEmail = buildEmailHTML(`
             <p>Hi ${appointment.lead_name || 'there'},</p>
             
-            <p>Your consultation with Diamondback Coding has been successfully rescheduled.</p>
+            <p>Your consultation with Crown Ceramic Coating has been successfully rescheduled.</p>
             
             <p style="margin: 24px 0; padding: 20px; background: #F7F9FB; border-radius: 6px; border-left: 4px solid #1A7A3A;">
                 <strong style="display: block; margin-bottom: 8px; color: #2D3142;">Updated Appointment Details</strong>
@@ -3444,7 +3444,7 @@ app.put('/api/appointments/:id/reschedule', authenticateToken, async (req, res) 
         
         try {
             await transporter.sendMail({
-                from: process.env.SMTP_FROM || 'Diamondback Coding <noreply@diamondbackcoding.com>',
+                from: process.env.SMTP_FROM || 'Crown Ceramic Coating <noreply@crownceramiccoating.com>',
                 to: appointment.lead_email,
                 subject: `Consultation Rescheduled - ${formattedDate} at ${formattedTime}`,
                 html: confirmationEmail
@@ -3501,7 +3501,7 @@ app.put('/api/appointments/:id/cancel', authenticateToken, async (req, res) => {
                 const cancelEmail = buildEmailHTML(`
                     <p><strong>Hi ${appt.lead_name || 'there'},</strong></p>
 
-                    <p>Your consultation with Diamondback Coding has been cancelled. We're sorry we weren't able to connect this time.</p>
+                    <p>Your consultation with Crown Ceramic Coating has been cancelled. We're sorry we weren't able to connect this time.</p>
 
                     <p style="margin: 24px 0; padding: 20px; background: #F7F9FB; border-radius: 6px; border-left: 4px solid #EF4444;">
                         <strong style="display: block; margin-bottom: 8px; color: #2D3142;">Cancelled Appointment</strong>
@@ -3526,7 +3526,7 @@ app.put('/api/appointments/:id/cancel', authenticateToken, async (req, res) => {
 
                 await sendDirectEmail({
                     to: appt.lead_email,
-                    subject: 'Your Consultation Has Been Cancelled — Diamondback Coding',
+                    subject: 'Your Consultation Has Been Cancelled — Crown Ceramic Coating',
                     html: cancelEmail,
                     leadId: appt.lead_id || null,
                     emailType: 'appointment_cancelled'
@@ -4437,7 +4437,7 @@ app.get('/book', (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book a Consultation - Diamondback Coding</title>
+    <title>Book a Consultation - Crown Ceramic Coating</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -5413,7 +5413,7 @@ app.post('/api/leads', async (req, res) => {
                 `);
 
                 const mailOptions = {
-                    from: `"Diamondback Coding CRM" <${process.env.EMAIL_USER}>`,
+                    from: `"Crown Ceramic Coating CRM" <${process.env.EMAIL_USER}>`,
                     to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
                     subject: ` Lead Re-Engaged: ${fullName} submitted contact form again`,
                     html: notificationHTML
@@ -6708,7 +6708,7 @@ app.post('/api/email/send-timeline', authenticateToken, async (req, res) => {
             size: 'LETTER',
             info: {
                 Title: `SLA - ${timeline.clientName}`,
-                Author: 'Diamondback Coding'
+                Author: 'Crown Ceramic Coating'
             }
         });
         
@@ -6726,7 +6726,7 @@ app.post('/api/email/send-timeline', authenticateToken, async (req, res) => {
         doc.fontSize(11).text('Premium Web Development & CRM Solutions', 50, 42);
         doc.fillColor('#ffffff')
            .fontSize(28)
-           .text('Diamondback Coding®', 50, 65, { characterSpacing: 2 });
+           .text('Crown Ceramic Coating®', 50, 65, { characterSpacing: 2 });
 
         // Reset to black text
         doc.fillColor('#000000');
@@ -6794,7 +6794,7 @@ app.post('/api/email/send-timeline', authenticateToken, async (req, res) => {
         doc.fontSize(11)
            .font('Helvetica')
            .fillColor('#666666')
-           .text(`Diamondback Coding ("Provider") agrees to deliver the following services to ${timeline.clientName}${timeline.clientCompany ? ' / ' + timeline.clientCompany : ''} ("Client"):`, { width: 500 });
+           .text(`Crown Ceramic Coating ("Provider") agrees to deliver the following services to ${timeline.clientName}${timeline.clientCompany ? ' / ' + timeline.clientCompany : ''} ("Client"):`, { width: 500 });
         doc.moveDown(0.5);
 
         // Deliverables box
@@ -6986,7 +6986,7 @@ app.post('/api/email/send-timeline', authenticateToken, async (req, res) => {
         doc.fontSize(11)
            .font('Helvetica')
            .fillColor('#666666')
-           .text('Diamondback Coding', rightSig, sigY + 25);
+           .text('Crown Ceramic Coating', rightSig, sigY + 25);
         doc.fontSize(10).text('Authorized Representative', rightSig, sigY + 40);
         doc.fontSize(9).text(`Date: ${new Date().toLocaleDateString()}`, rightSig, sigY + 55);
 
@@ -6995,11 +6995,11 @@ app.post('/api/email/send-timeline', authenticateToken, async (req, res) => {
         doc.fontSize(8)
            .font('Helvetica-Bold')
            .fillColor('#FFC15E')
-           .text('DIAMONDBACK CODING', { align: 'center' });
+           .text('CROWN CERAMIC COATING', { align: 'center' });
         doc.fontSize(9)
            .font('Helvetica')
            .fillColor('#999999')
-           .text('940-217-8680 | hello@diamondbackcoding.com | diamondbackcoding.com', { align: 'center' });
+           .text('940-217-8680 | hello@crownceramiccoating.com | crownceramiccoating.com', { align: 'center' });
 
         // End PDF
         doc.end();
@@ -7177,9 +7177,9 @@ app.post('/api/email/test', authenticateToken, async (req, res) => {
         console.log('To:', process.env.EMAIL_USER);
         
         const info = await transporter.sendMail({
-            from: `"Diamondback Coding Test" <${process.env.EMAIL_USER}>`,
+            from: `"Crown Ceramic Coating Test" <${process.env.EMAIL_USER}>`,
             to: process.env.EMAIL_USER,
-            subject: 'Email Test - Diamondback Coding',
+            subject: 'Email Test - Crown Ceramic Coating',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <div style="background: #22c55e; color: white; padding: 30px; text-align: center;">
@@ -7197,7 +7197,7 @@ app.post('/api/email/test', authenticateToken, async (req, res) => {
                         <p>You can now send invoices and SLAs to your clients.</p>
                     </div>
                     <div style="padding: 20px; text-align: center; background: #333; color: white; font-size: 12px;">
-                        <p>Diamondback Coding Email System</p>
+                        <p>Crown Ceramic Coating Email System</p>
                     </div>
                 </div>
             `
@@ -7258,7 +7258,7 @@ function generateInvoiceEmailHTML(invoice) {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>Diamondback Coding</h1>
+                    <h1>Crown Ceramic Coating</h1>
                     <p>Invoice ${invoice.invoice_number}</p>
                 </div>
                 <div class="invoice-details">
@@ -7349,7 +7349,7 @@ app.post('/api/email/send-invoice', authenticateToken, async (req, res) => {
 
             <div class="sign-off">
                 <p>Best regards,</p>
-                <p class="team-name">The Diamondback Coding Team</p>
+                <p class="team-name">The Crown Ceramic Coating Team</p>
             </div>
         `);
         
@@ -7358,7 +7358,7 @@ app.post('/api/email/send-invoice', authenticateToken, async (req, res) => {
         
         await sendDirectEmail({
             to: clientEmail,
-            subject: `Invoice ${invoice.invoice_number} from Diamondback Coding`,
+            subject: `Invoice ${invoice.invoice_number} from Crown Ceramic Coating`,
             html: emailHTML,
             attachments: [
                 {
@@ -11447,7 +11447,7 @@ async function processSubscriptionWebhook(event) {
                 try {
                     const welcomeHtml = buildEmailHTML(`
                         <p>Hi ${leadForPortal?.name || 'there'},</p>
-                        <p>Welcome to Diamondback Coding! Your <strong>${pkg.name}</strong> subscription is now active.</p>
+                        <p>Welcome to Crown Ceramic Coating! Your <strong>${pkg.name}</strong> subscription is now active.</p>
                         
                         <div style="background:#f7f9fb;border:1px solid #e8e8e8;border-radius:8px;padding:20px 24px;margin:28px 0;">
                             <div style="font-size:12px;font-weight:800;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">
@@ -11502,7 +11502,7 @@ async function processSubscriptionWebhook(event) {
                             Questions? Call us at <strong>(512) 980-0393</strong> or reply to this email.
                         </p>
                     `, {
-                        eyebrow:     'WELCOME TO DIAMONDBACK CRM',
+                        eyebrow:     'WELCOME TO CROWN CERAMIC COATING CRM',
                         headline:    'Your account is ready.',
                         accentColor: '#FF6B35',
                         tagline:     'MANAGE LEADS. CLOSE DEALS.',
@@ -11513,7 +11513,7 @@ async function processSubscriptionWebhook(event) {
                     await sendTrackedEmail({
                         leadId:    leadForPortal?.id || null,
                         to:        leadEmail,
-                        subject:   'Welcome to Diamondback CRM — Your Portal Access',
+                        subject:   'Welcome to Crown Ceramic Coating CRM — Your Portal Access',
                         html:      welcomeHtml,
                         emailType: 'subscription_welcome'
                     });
@@ -11635,8 +11635,8 @@ async function processSubscriptionWebhook(event) {
                 const receiptHtml = buildEmailHTML(`
                     <p>Hi ${leadName},</p>
                     <p>${isFirstPayment
-                        ? 'Thank you for subscribing to the Diamondback Coding CRM. Your subscription is now active and your first payment has been processed.'
-                        : 'Your Diamondback Coding CRM subscription has renewed successfully. Here is your receipt.'
+                        ? 'Thank you for subscribing to the Crown Ceramic Coating CRM. Your subscription is now active and your first payment has been processed.'
+                        : 'Your Crown Ceramic Coating CRM subscription has renewed successfully. Here is your receipt.'
                     }</p>
 
                     <table width="100%" cellpadding="0" cellspacing="0" border="0"
@@ -11704,8 +11704,8 @@ async function processSubscriptionWebhook(event) {
                 });
 
                 const subject = isFirstPayment
-                    ? `Receipt — $${amount.toFixed(2)} | Diamondback CRM Subscription`
-                    : `Renewal Receipt — $${amount.toFixed(2)} | Diamondback CRM`;
+                    ? `Receipt — $${amount.toFixed(2)} | Crown Ceramic Coating CRM Subscription`
+                    : `Renewal Receipt — $${amount.toFixed(2)} | Crown Ceramic Coating CRM`;
 
                 await sendTrackedEmail({
                     leadId:    leadDbId,
@@ -13426,7 +13426,7 @@ app.post('/api/email/send-custom', authenticateToken, async (req, res) => {
 
             <div class="sign-off">
                 <p>Warm regards,</p>
-                <p class="team-name">The Diamondback Coding Team</p>
+                <p class="team-name">The Crown Ceramic Coating Team</p>
             </div>
         `, { unsubscribeUrl });
         
@@ -14484,7 +14484,7 @@ app.post('/api/admin/client-accounts', authenticateToken, async (req, res) => {
                 ON CONFLICT (client_portal_id) DO NOTHING
             `, [clientPortalId, companyName, email || lead.email]).catch(() => {});
 
-            // Auto-register the admin's email as a verified sender in Diamondback's platform Brevo account
+            // Auto-register the admin's email as a verified sender in Crown Ceramic Coating's platform Brevo account
             // so emails from this portal can be sent with their address as the "from" field.
             brevoRegisterSender(email || lead.email, lead.name).catch(() => {});
 
@@ -16756,9 +16756,9 @@ app.get('/api/client/invoice/:id/payment-link', authenticateClient, async (req, 
 
 async function sendClientWelcomeEmail(email, name, temporaryPassword) {
     const mailOptions = {
-        from: `"Diamondback Coding" <${process.env.EMAIL_USER}>`,
+        from: `"Crown Ceramic Coating" <${process.env.EMAIL_USER}>`,
         to: email,
-        subject: 'Welcome to Diamondback Coding Client Portal',
+        subject: 'Welcome to Crown Ceramic Coating Client Portal',
         html: `
             <!DOCTYPE html>
             <html>
@@ -16800,7 +16800,7 @@ async function sendClientWelcomeEmail(email, name, temporaryPassword) {
                 <div class="container">
                     <div class="header">
                         <h1>Welcome to Your Client Portal</h1>
-                        <p>Diamondback Coding</p>
+                        <p>Crown Ceramic Coating</p>
                     </div>
                     
                     <div class="content">
@@ -16816,7 +16816,7 @@ async function sendClientWelcomeEmail(email, name, temporaryPassword) {
                             
                             <div class="credential-item">
                                 <span class="credential-label">Portal URL</span>
-                                <span class="credential-value">https://diamondbackcoding.com/client_portal.html</span>
+                                <span class="credential-value">https://crownceramiccoating.com/client_portal.html</span>
                             </div>
                             
                             <div class="credential-item">
@@ -16837,7 +16837,7 @@ async function sendClientWelcomeEmail(email, name, temporaryPassword) {
                         </div>
                         
                         <div class="btn-container">
-                            <a href="https://diamondbackcoding.com/client_portal.html" class="btn">
+                            <a href="https://crownceramiccoating.com/client_portal.html" class="btn">
                                 Access Your Portal
                             </a>
                         </div>
@@ -16860,19 +16860,19 @@ async function sendClientWelcomeEmail(email, name, temporaryPassword) {
                         
                         <p style="margin-top: 24px;">
                             <strong>Best regards,</strong><br>
-                            The Diamondback Coding Team
+                            The Crown Ceramic Coating Team
                         </p>
                     </div>
                     
                     <div class="footer">
-                        <p><strong>Diamondback Coding</strong></p>
+                        <p><strong>Crown Ceramic Coating</strong></p>
                         <p>15709 Spillman Ranch Loop, Austin, TX 78738</p>
                         <p>
-                            <a href="mailto:contact@diamondbackcoding.com">contact@diamondbackcoding.com</a> | 
+                            <a href="mailto:contact@crownceramiccoating.com">contact@crownceramiccoating.com</a> | 
                             <a href="tel:+19402178680">(940) 217-8680</a>
                         </p>
                         <p class="footer-copy">
-                            &copy; ${new Date().getFullYear()} Diamondback Coding. All rights reserved.
+                            &copy; ${new Date().getFullYear()} Crown Ceramic Coating. All rights reserved.
                         </p>
                     </div>
                 </div>
@@ -16949,7 +16949,7 @@ app.post('/api/follow-ups/:leadId/send-email', authenticateToken, async (req, re
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Welcome to Diamondback Coding</title>
+<title>Welcome to Crown Ceramic Coating</title>
 </head>
 <body style="margin:0;padding:0;background-color:#F5F5F5;">
 
@@ -16962,7 +16962,7 @@ app.post('/api/follow-ups/:leadId/send-email', authenticateToken, async (req, re
 <tr><td style="background-color:#2C3E50;padding:60px 40px 70px 40px;text-align:center">
 <span style="color:#F59E0B;font-size:11px;font-weight:600;letter-spacing:2px;font-family:Arial,sans-serif;text-transform:uppercase;display:block;margin-bottom:12px">YOUR VISION. OUR CODE. ENDLESS POSSIBILITIES.</span>
 <span style="color:#F59E0B;font-size:12px;font-weight:600;letter-spacing:2.5px;font-family:Arial,sans-serif;text-transform:uppercase;display:block;margin-bottom:20px">Premium Web Development & CRM Solutions</span>
-<span style="color:#ffffff;font-size:36px;font-weight:300;letter-spacing:3px;font-family:Georgia,serif;font-style:italic;display:block">Diamondback Coding®</span>
+<span style="color:#ffffff;font-size:36px;font-weight:300;letter-spacing:3px;font-family:Georgia,serif;font-style:italic;display:block">Crown Ceramic Coating®</span>
 </td></tr>
 
 <!-- White curve overlap -->
@@ -16978,7 +16978,7 @@ app.post('/api/follow-ups/:leadId/send-email', authenticateToken, async (req, re
 </td></tr>
 <tr><td align="center" style="padding-bottom:20px">
 <span style="color:#6B7280;font-size:15px;font-family:Arial,sans-serif;line-height:1.8;display:block;max-width:520px;margin:0 auto">
-My name is Taylor and I am the founder of Diamondback Coding, LLC, offering business solutions for custom website development, custom CRM (Customer Relationship Management) platforms, and search optimization to enhance online business communications and customer relationships.
+My name is Taylor and I am the founder of Crown Ceramic Coating, LLC, offering business solutions for custom website development, custom CRM (Customer Relationship Management) platforms, and search optimization to enhance online business communications and customer relationships.
 </span>
 </td></tr>
 <tr><td align="center" style="padding-bottom:20px">
@@ -17160,8 +17160,8 @@ Our objective is to provide businesses with the best and most cost-effective web
 <span style="color:#2C3E50;font-size:16px;font-weight:700;font-family:Arial,sans-serif;display:block;margin-bottom:15px">Contact Us</span>
 <span style="color:#6B7280;font-size:14px;font-family:Arial,sans-serif;line-height:2;display:block">
 <strong>Phone:</strong> <a href="tel:+15129800393" style="color:#F59E0B;text-decoration:none">(512) 980-0393</a><br>
-<strong>Email:</strong> <a href="mailto:contact@diamondbackcoding.com" style="color:#F59E0B;text-decoration:none">contact@diamondbackcoding.com</a><br>
-<strong>Web:</strong> <a href="https://www.diamondbackcoding.com" style="color:#F59E0B;text-decoration:none">www.diamondbackcoding.com</a><br>
+<strong>Email:</strong> <a href="mailto:contact@crownceramiccoating.com" style="color:#F59E0B;text-decoration:none">contact@crownceramiccoating.com</a><br>
+<strong>Web:</strong> <a href="https://www.crownceramiccoating.com" style="color:#F59E0B;text-decoration:none">www.crownceramiccoating.com</a><br>
 <strong>Address:</strong> 5000 Plaza on the Lake, Suite 100 PMB 2017<br>Austin, TX 78746
 </span>
 </td></tr>
@@ -17177,24 +17177,24 @@ ${generateBookingWidgetHTML(lead.email)}
 <table cellpadding="0" cellspacing="0" border="0" style="display:inline-block">
 <tr>
 <td style="padding:0 15px">
-<a href="https://instagram.com/diamondbackcoding" style="color:#F59E0B;font-size:13px;font-weight:600;text-decoration:none;font-family:Arial,sans-serif">Instagram</a>
+<a href="https://instagram.com/crownceramiccoating" style="color:#F59E0B;font-size:13px;font-weight:600;text-decoration:none;font-family:Arial,sans-serif">Instagram</a>
 </td>
 <td style="padding:0 15px;color:#6B7280">|</td>
 <td style="padding:0 15px">
-<a href="https://facebook.com/diamondbackcoding" style="color:#F59E0B;font-size:13px;font-weight:600;text-decoration:none;font-family:Arial,sans-serif">Facebook</a>
+<a href="https://facebook.com/crownceramiccoating" style="color:#F59E0B;font-size:13px;font-weight:600;text-decoration:none;font-family:Arial,sans-serif">Facebook</a>
 </td>
 <td style="padding:0 15px;color:#6B7280">|</td>
 <td style="padding:0 15px">
-<a href="https://twitter.com/diamondbackcoding" style="color:#F59E0B;font-size:13px;font-weight:600;text-decoration:none;font-family:Arial,sans-serif">Twitter</a>
+<a href="https://twitter.com/crownceramiccoating" style="color:#F59E0B;font-size:13px;font-weight:600;text-decoration:none;font-family:Arial,sans-serif">Twitter</a>
 </td>
 </tr>
 </table>
 </td></tr>
 <tr><td align="center" style="font-size:11px;color:#9CA3AF;padding:0 0 12px 0;font-family:Arial,sans-serif">
-<a href="${unsubUrl}" style="color:#9CA3AF;text-decoration:underline">Unsubscribe</a> | <a href="https://diamondbackcoding.com/preferences" style="color:#9CA3AF;text-decoration:underline">Update Preferences</a>
+<a href="${unsubUrl}" style="color:#9CA3AF;text-decoration:underline">Unsubscribe</a> | <a href="https://crownceramiccoating.com/preferences" style="color:#9CA3AF;text-decoration:underline">Update Preferences</a>
 </td></tr>
 <tr><td align="center" style="font-size:11px;color:#E5E7EB;font-family:Arial,sans-serif;line-height:1.8">
-<strong>Diamondback Coding, LLC</strong><br>
+<strong>Crown Ceramic Coating, LLC</strong><br>
 5000 Plaza on the Lake, Suite 100 PMB 2017 · Austin, TX 78746
 </td></tr>
 </table>
@@ -17232,7 +17232,7 @@ ${generateBookingWidgetHTML(lead.email)}
 <table width="600" cellpadding="0" cellspacing="0" border="0" style="background:#FF6B9D;max-width:600px">
 
 <tr><td align="center" style="padding:20px 30px 10px 30px;background:#FF6B9D">
-<span style="color:#ffffff;font-size:28px;font-weight:400;letter-spacing:1px;font-family:Georgia,serif;font-style:italic">Diamondback Coding®</span>
+<span style="color:#ffffff;font-size:28px;font-weight:400;letter-spacing:1px;font-family:Georgia,serif;font-style:italic">Crown Ceramic Coating®</span>
 </td></tr>
 
 <tr><td align="center" style="padding:0 30px 15px 30px;background:#FF6B9D">
@@ -17309,7 +17309,7 @@ ${generateBookingWidgetHTML(lead.email)}
 <tr><td align="center" style="padding:0 40px 30px 40px;background:#FF6B9D">
 <table cellpadding="0" cellspacing="0" border="0" style="background:#FFD93D;border-radius:40px;border:3px solid #ffffff">
 <tr><td style="padding:14px 50px">
-<a href="https://diamondbackcoding.com/contact.html" style="color:#FF6B9D;font-size:15px;font-weight:900;text-decoration:none;text-transform:uppercase;letter-spacing:1.3px;font-family:Arial Black,Arial,sans-serif;display:block">SHOP NOW</a>
+<a href="https://crownceramiccoating.com/contact.html" style="color:#FF6B9D;font-size:15px;font-weight:900;text-decoration:none;text-transform:uppercase;letter-spacing:1.3px;font-family:Arial Black,Arial,sans-serif;display:block">SHOP NOW</a>
 </td></tr>
 </table>
 </td></tr>
@@ -17328,13 +17328,13 @@ New clients only. 25% discount applies to initial project quote.
 <table cellpadding="0" cellspacing="0" border="0">
 <tr>
 <td style="padding:0 15px">
-<a href="https://instagram.com/diamondbackcoding" style="color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Instagram</a>
+<a href="https://instagram.com/crownceramiccoating" style="color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Instagram</a>
 </td>
 <td style="padding:0 15px;border-left:2px solid #ffffff">
-<a href="https://facebook.com/diamondbackcoding" style="color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Facebook</a>
+<a href="https://facebook.com/crownceramiccoating" style="color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Facebook</a>
 </td>
 <td style="padding:0 15px;border-left:2px solid #ffffff">
-<a href="https://twitter.com/diamondbackcoding" style="color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Twitter</a>
+<a href="https://twitter.com/crownceramiccoating" style="color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Twitter</a>
 </td>
 </tr>
 </table>
@@ -17345,8 +17345,8 @@ No longer want to receive these emails? <a href="${unsubUrl}" style="color:#ffff
 </td></tr>
 
 <tr><td align="center" style="font-size:10px;color:#ffffff;padding:0;font-family:Arial,sans-serif;line-height:1.5">
-<strong>Diamondback Coding</strong> · 15709 Spillman Ranch Loop, Austin, TX 78738<br>
-<a href="tel:+19402178680" style="color:#ffffff;text-decoration:none">940-217-8680</a> | <a href="mailto:hello@diamondbackcoding.com" style="color:#ffffff;text-decoration:none">hello@diamondbackcoding.com</a>
+<strong>Crown Ceramic Coating</strong> · 15709 Spillman Ranch Loop, Austin, TX 78738<br>
+<a href="tel:+19402178680" style="color:#ffffff;text-decoration:none">940-217-8680</a> | <a href="mailto:hello@crownceramiccoating.com" style="color:#ffffff;text-decoration:none">hello@crownceramiccoating.com</a>
 </td></tr>
 
 </table>
@@ -17383,7 +17383,7 @@ No longer want to receive these emails? <a href="${unsubUrl}" style="color:#ffff
 <table width="600" cellpadding="0" cellspacing="0" border="0" style="background:#FFF8E7;max-width:600px">
 
 <tr><td align="center" style="padding:20px 30px 15px 30px;background:#FFF8E7">
-<span style="color:#2D5F5D;font-size:30px;font-weight:600;letter-spacing:2px;font-family:Georgia,serif;font-style:italic">Diamondback Coding®</span>
+<span style="color:#2D5F5D;font-size:30px;font-weight:600;letter-spacing:2px;font-family:Georgia,serif;font-style:italic">Crown Ceramic Coating®</span>
 </td></tr>
 
 <tr><td align="center" style="padding:0 30px 18px 30px;background:#FFF8E7">
@@ -17484,7 +17484,7 @@ No longer want to receive these emails? <a href="${unsubUrl}" style="color:#ffff
 <tr><td align="center" style="padding:0 40px 22px 40px;background:#FFF8E7">
 <table cellpadding="0" cellspacing="0" border="0" style="background:#F7B5CA;border-radius:50px">
 <tr><td style="padding:15px 55px">
-<a href="https://diamondbackcoding.com/contact.html" style="color:#ffffff;font-size:15px;font-weight:900;text-decoration:none;text-transform:uppercase;letter-spacing:1.8px;font-family:Arial Black,Arial,sans-serif;display:block">Shop Spring Sale</a>
+<a href="https://crownceramiccoating.com/contact.html" style="color:#ffffff;font-size:15px;font-weight:900;text-decoration:none;text-transform:uppercase;letter-spacing:1.8px;font-family:Arial Black,Arial,sans-serif;display:block">Shop Spring Sale</a>
 </td></tr>
 </table>
 </td></tr>
@@ -17501,13 +17501,13 @@ New clients only. 25% discount applies to initial project quote.
 <table cellpadding="0" cellspacing="0" border="0">
 <tr>
 <td style="padding:0 15px">
-<a href="https://instagram.com/diamondbackcoding" style="color:#2D5F5D;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Instagram</a>
+<a href="https://instagram.com/crownceramiccoating" style="color:#2D5F5D;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Instagram</a>
 </td>
 <td style="padding:0 15px;border-left:2px solid #2D5F5D">
-<a href="https://facebook.com/diamondbackcoding" style="color:#2D5F5D;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Facebook</a>
+<a href="https://facebook.com/crownceramiccoating" style="color:#2D5F5D;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Facebook</a>
 </td>
 <td style="padding:0 15px;border-left:2px solid #2D5F5D">
-<a href="https://twitter.com/diamondbackcoding" style="color:#2D5F5D;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Twitter</a>
+<a href="https://twitter.com/crownceramiccoating" style="color:#2D5F5D;text-decoration:none;font-size:13px;font-weight:700;font-family:Arial,sans-serif">Twitter</a>
 </td>
 </tr>
 </table>
@@ -17518,8 +17518,8 @@ New clients only. 25% discount applies to initial project quote.
 </td></tr>
 
 <tr><td align="center" style="font-size:10px;color:#2D5F5D;padding:0;font-family:Arial,sans-serif;line-height:1.5">
-<strong>Diamondback Coding</strong> · 15709 Spillman Ranch Loop, Austin, TX 78738<br>
-<a href="tel:+19402178680" style="color:#2D5F5D;text-decoration:none">940-217-8680</a> | <a href="mailto:hello@diamondbackcoding.com" style="color:#2D5F5D;text-decoration:none">hello@diamondbackcoding.com</a>
+<strong>Crown Ceramic Coating</strong> · 15709 Spillman Ranch Loop, Austin, TX 78738<br>
+<a href="tel:+19402178680" style="color:#2D5F5D;text-decoration:none">940-217-8680</a> | <a href="mailto:hello@crownceramiccoating.com" style="color:#2D5F5D;text-decoration:none">hello@crownceramiccoating.com</a>
 </td></tr>
 
 </table>
@@ -17558,7 +17558,7 @@ New clients only. 25% discount applies to initial project quote.
 <table width="600" cellpadding="0" cellspacing="0" border="0" style="background:#000000;max-width:600px">
 
 <tr><td align="center" style="padding:40px 20px 20px 20px">
-<span style="color:#fff;font-size:36px;font-weight:400;letter-spacing:1px;font-family:Georgia,serif;font-style:italic">Diamondback Coding®</span>
+<span style="color:#fff;font-size:36px;font-weight:400;letter-spacing:1px;font-family:Georgia,serif;font-style:italic">Crown Ceramic Coating®</span>
 </td></tr>
 
 <tr><td align="center" style="padding:0 20px 30px 20px">
@@ -17599,7 +17599,7 @@ New clients only. 25% discount applies to initial project quote.
 <tr><td align="center" style="padding:0 0 60px 0">
 <table cellpadding="0" cellspacing="0" border="0" style="background:#FF4057;border-radius:45px;border:5px solid #fff">
 <tr><td style="padding:16px 60px">
-<a href="https://diamondbackcoding.com/contact.html" style="color:#fff;font-size:18px;font-weight:900;text-decoration:none;text-transform:uppercase;letter-spacing:2px;font-family:'Arial Black',Arial,sans-serif">SHOP NOW</a>
+<a href="https://crownceramiccoating.com/contact.html" style="color:#fff;font-size:18px;font-weight:900;text-decoration:none;text-transform:uppercase;letter-spacing:2px;font-family:'Arial Black',Arial,sans-serif">SHOP NOW</a>
 </td></tr>
 </table>
 </td></tr>
@@ -17626,13 +17626,13 @@ New clients only. 25% discount applies to initial project quote.
 <table cellpadding="0" cellspacing="0" border="0">
 <tr>
 <td style="padding:0 15px">
-<a href="https://instagram.com/diamondbackcoding" style="color:#000;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Instagram</a>
+<a href="https://instagram.com/crownceramiccoating" style="color:#000;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Instagram</a>
 </td>
 <td style="padding:0 15px;border-left:2px solid #000">
-<a href="https://facebook.com/diamondbackcoding" style="color:#000;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Facebook</a>
+<a href="https://facebook.com/crownceramiccoating" style="color:#000;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Facebook</a>
 </td>
 <td style="padding:0 15px;border-left:2px solid #000">
-<a href="https://twitter.com/diamondbackcoding" style="color:#000;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Twitter</a>
+<a href="https://twitter.com/crownceramiccoating" style="color:#000;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Twitter</a>
 </td>
 </tr>
 </table>
@@ -17643,8 +17643,8 @@ No longer want to receive these emails? <a href="${unsubUrl}" style="color:#000;
 </td></tr>
 
 <tr><td align="center" style="font-size:13px;color:#000;padding:0;font-family:Arial,sans-serif;line-height:1.6">
-<strong>Diamondback Coding</strong> · 15709 Spillman Ranch Loop, Austin, TX 78738<br>
-<a href="tel:+19402178680" style="color:#000;text-decoration:none">940-217-8680</a> | <a href="mailto:hello@diamondbackcoding.com" style="color:#000;text-decoration:none">hello@diamondbackcoding.com</a>
+<strong>Crown Ceramic Coating</strong> · 15709 Spillman Ranch Loop, Austin, TX 78738<br>
+<a href="tel:+19402178680" style="color:#000;text-decoration:none">940-217-8680</a> | <a href="mailto:hello@crownceramiccoating.com" style="color:#000;text-decoration:none">hello@crownceramiccoating.com</a>
 </td></tr>
 
 </table>
@@ -17673,7 +17673,7 @@ No longer want to receive these emails? <a href="${unsubUrl}" style="color:#000;
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spring Sale - 25% OFF All Services | Diamondback Coding</title>
+<title>Spring Sale - 25% OFF All Services | Crown Ceramic Coating</title>
 </head>
 <body style="margin:0;padding:0;background-color:#06B6D4">
 
@@ -17683,7 +17683,7 @@ No longer want to receive these emails? <a href="${unsubUrl}" style="color:#000;
 <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color:#06B6D4;max-width:600px">
 
 <tr><td align="center" style="padding:30px 30px 15px 30px;background-color:#06B6D4">
-<span style="color:#ffffff;font-size:36px;font-weight:400;letter-spacing:1.5px;font-family:Georgia,serif;font-style:italic">Diamondback Coding®</span>
+<span style="color:#ffffff;font-size:36px;font-weight:400;letter-spacing:1.5px;font-family:Georgia,serif;font-style:italic">Crown Ceramic Coating®</span>
 </td></tr>
 
 <tr><td align="center" style="padding:0 30px 25px 30px;background-color:#06B6D4">
@@ -17874,7 +17874,7 @@ Valid for all packages. Choose one option per customer.
 
 <tr><td align="center" style="padding:0 40px 30px 40px;background-color:#06B6D4">
 <span style="color:#ffffff;font-size:13px;font-family:Arial,sans-serif;line-height:1.6">
-Not ready yet? <a href="https://diamondbackcoding.com/contact.html" style="color:#FEF3C7;font-weight:700;text-decoration:underline">Schedule a free consultation</a>
+Not ready yet? <a href="https://crownceramiccoating.com/contact.html" style="color:#FEF3C7;font-weight:700;text-decoration:underline">Schedule a free consultation</a>
 </span>
 </td></tr>
 
@@ -17890,26 +17890,26 @@ New clients only. 25% discount applies to initial project quote. Terms apply.
 <table cellpadding="0" cellspacing="0" border="0">
 <tr>
 <td style="padding:0 15px">
-<a href="https://instagram.com/diamondbackcoding" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Instagram</a>
+<a href="https://instagram.com/crownceramiccoating" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Instagram</a>
 </td>
 <td style="padding:0 15px;border-left:2px solid #ffffff">
-<a href="https://facebook.com/diamondbackcoding" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Facebook</a>
+<a href="https://facebook.com/crownceramiccoating" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Facebook</a>
 </td>
 <td style="padding:0 15px;border-left:2px solid #ffffff">
-<a href="https://twitter.com/diamondbackcoding" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Twitter</a>
+<a href="https://twitter.com/crownceramiccoating" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;font-family:Arial,sans-serif">Twitter</a>
 </td>
 </tr>
 </table>
 </td></tr>
 
 <tr><td align="center" style="font-size:10px;color:#ffffff;padding:0 0 12px 0;font-family:Arial,sans-serif">
-No longer want to receive these emails? <a href="${unsubUrl}" style="color:#ffffff;text-decoration:underline">Unsubscribe</a> | <a href="https://diamondbackcoding.com/preferences" style="color:#ffffff;text-decoration:underline">Update Preferences</a>
+No longer want to receive these emails? <a href="${unsubUrl}" style="color:#ffffff;text-decoration:underline">Unsubscribe</a> | <a href="https://crownceramiccoating.com/preferences" style="color:#ffffff;text-decoration:underline">Update Preferences</a>
 </td></tr>
 
 <tr><td align="center" style="font-size:10px;color:#ffffff;padding:0;font-family:Arial,sans-serif;line-height:1.7">
-<strong>Diamondback Coding</strong> · Web Development & CRM Solutions<br>
+<strong>Crown Ceramic Coating</strong> · Web Development & CRM Solutions<br>
 15709 Spillman Ranch Loop · Austin, TX 78738<br>
-<a href="tel:+19402178680" style="color:#ffffff;text-decoration:none">940-217-8680</a> | <a href="mailto:hello@diamondbackcoding.com" style="color:#ffffff;text-decoration:none">hello@diamondbackcoding.com</a>
+<a href="tel:+19402178680" style="color:#ffffff;text-decoration:none">940-217-8680</a> | <a href="mailto:hello@crownceramiccoating.com" style="color:#ffffff;text-decoration:none">hello@crownceramiccoating.com</a>
 </td></tr>
 
 </table>
@@ -17942,7 +17942,7 @@ No longer want to receive these emails? <a href="${unsubUrl}" style="color:#ffff
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spring Sale - 25% OFF All Services | Diamondbackcoding</title>
+<title>Spring Sale - 25% OFF All Services | Crown Ceramic Coatingcoding</title>
 <style type="text/css">
 /* Mobile Styles */
 @media only screen and (max-width: 600px) {
@@ -18056,7 +18056,7 @@ No longer want to receive these emails? <a href="${unsubUrl}" style="color:#ffff
 
 <!-- Center content -->
 <td width="64%" align="center" style="padding:20px 10px 10px 10px" class="mobile-padding">
-<span class="brand" style="color:#ffffff;font-size:30px;font-weight:400;letter-spacing:1px;font-family:Georgia,serif;font-style:italic">Diamondbackcoding®</span>
+<span class="brand" style="color:#ffffff;font-size:30px;font-weight:400;letter-spacing:1px;font-family:Georgia,serif;font-style:italic">Crown Ceramic Coatingcoding®</span>
 <br>
 <span style="color:#ffffff;font-size:11px;font-weight:600;letter-spacing:2px;font-family:Arial,sans-serif;text-transform:uppercase;margin-top:8px;display:inline-block">Web Development • CRM Solutions</span>
 </td>
@@ -18425,7 +18425,7 @@ Transform your business with cutting-edge development and CRM solutions. <strong
 <!-- Secondary CTA Text Link -->
 <tr><td align="center" style="padding:0 35px 20px 35px;background:#06B6D4" class="mobile-padding">
 <span style="color:#ffffff;font-size:13px;font-family:Arial,sans-serif;line-height:1.5">
-Not ready yet? <a href="https://diamondbackcoding.com/schedule?utm_source=email&utm_medium=spring-sale&utm_campaign=25off" style="color:#FEF3C7;font-weight:700;text-decoration:underline">Schedule a free consultation</a>
+Not ready yet? <a href="https://crownceramiccoating.com/schedule?utm_source=email&utm_medium=spring-sale&utm_campaign=25off" style="color:#FEF3C7;font-weight:700;text-decoration:underline">Schedule a free consultation</a>
 </span>
 </td></tr>
 
@@ -18514,7 +18514,7 @@ New clients only. 25% discount applies to initial project quote. Terms apply.
 <tr>
 <!-- Instagram -->
 <td style="padding:0 10px">
-<a href="https://instagram.com/diamondbackcoding" style="display:block;text-decoration:none;line-height:0">
+<a href="https://instagram.com/crownceramiccoating" style="display:block;text-decoration:none;line-height:0">
 <table cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;border-radius:8px;width:40px;height:40px">
 <tr><td align="center" valign="middle">
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -18528,7 +18528,7 @@ New clients only. 25% discount applies to initial project quote. Terms apply.
 </td>
 <!-- TikTok -->
 <td style="padding:0 10px">
-<a href="https://tiktok.com/@diamondbackcoding" style="display:block;text-decoration:none;line-height:0">
+<a href="https://tiktok.com/@crownceramiccoating" style="display:block;text-decoration:none;line-height:0">
 <table cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;border-radius:8px;width:40px;height:40px">
 <tr><td align="center" valign="middle">
 <svg width="20" height="24" viewBox="0 0 20 24" fill="#FB923C" xmlns="http://www.w3.org/2000/svg">
@@ -18540,7 +18540,7 @@ New clients only. 25% discount applies to initial project quote. Terms apply.
 </td>
 <!-- Facebook -->
 <td style="padding:0 10px">
-<a href="https://facebook.com/diamondbackcoding" style="display:block;text-decoration:none;line-height:0">
+<a href="https://facebook.com/crownceramiccoating" style="display:block;text-decoration:none;line-height:0">
 <table cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;border-radius:8px;width:40px;height:40px">
 <tr><td align="center" valign="middle">
 <svg width="12" height="24" viewBox="0 0 12 24" fill="#FB923C" xmlns="http://www.w3.org/2000/svg">
@@ -18556,14 +18556,14 @@ New clients only. 25% discount applies to initial project quote. Terms apply.
 
 <!-- Unsubscribe -->
 <tr><td align="center" style="font-size:10px;color:#ffffff;padding:0 0 6px 0;font-family:Arial,sans-serif">
-No longer want to receive these emails? <a href="https://diamondbackcoding.com/unsubscribe?email={{EMAIL}}" style="color:#ffffff;text-decoration:underline;font-weight:400">Unsubscribe</a> | <a href="https://diamondbackcoding.com/preferences?email={{EMAIL}}" style="color:#ffffff;text-decoration:underline;font-weight:400">Update Preferences</a>
+No longer want to receive these emails? <a href="https://crownceramiccoating.com/unsubscribe?email={{EMAIL}}" style="color:#ffffff;text-decoration:underline;font-weight:400">Unsubscribe</a> | <a href="https://crownceramiccoating.com/preferences?email={{EMAIL}}" style="color:#ffffff;text-decoration:underline;font-weight:400">Update Preferences</a>
 </td></tr>
 
 <!-- Company Info -->
 <tr><td align="center" style="font-size:10px;color:#ffffff;padding:0;font-family:Arial,sans-serif;line-height:1.5">
-<strong>Diamondbackcoding</strong> · Web Development & CRM Solutions<br>
+<strong>Crown Ceramic Coatingcoding</strong> · Web Development & CRM Solutions<br>
 15709 Spillman Ranch Loop · Austin, TX 78738<br>
-<a href="tel:+15125121234" style="color:#ffffff;text-decoration:none">512-512-1234</a> | <a href="mailto:hello@diamondbackcoding.com" style="color:#ffffff;text-decoration:none">hello@diamondbackcoding.com</a>
+<a href="tel:+15125121234" style="color:#ffffff;text-decoration:none">512-512-1234</a> | <a href="mailto:hello@crownceramiccoating.com" style="color:#ffffff;text-decoration:none">hello@crownceramiccoating.com</a>
 </td></tr>
 
 </table>
@@ -18591,7 +18591,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zero Transaction Fees | Diamondback Coding</title>
+<title>Zero Transaction Fees | Crown Ceramic Coating</title>
 <style>
 @media only screen and (max-width: 620px) {
   .wrap { width: 100% !important; }
@@ -18622,7 +18622,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <td valign="middle">
-      <span class="brand-size" style="font-size:12px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#111111;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">DIAMONDBACK CODING</span>
+      <span class="brand-size" style="font-size:12px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#111111;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">CROWN CERAMIC COATING</span>
     </td>
     <td align="right" valign="middle">
       <table cellpadding="0" cellspacing="0" border="0" style="background:#FF6B35;border-radius:2px;">
@@ -18676,7 +18676,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
   <tr>
     <td width="34%" style="padding-bottom:10px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#AAAAAA;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Your Sales</td>
     <td width="33%" align="center" style="padding-bottom:10px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#CC2222;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Other Platforms</td>
-    <td width="33%" align="center" style="padding-bottom:10px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1A7A3A;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Diamondback</td>
+    <td width="33%" align="center" style="padding-bottom:10px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1A7A3A;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Crown Ceramic Coating</td>
   </tr>
   </table>
 
@@ -18762,7 +18762,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
           <circle cx="10" cy="10" r="9" stroke="#D4A847" stroke-width="1.5"/>
           <polyline points="5.5,10.5 8.5,13.5 14.5,7.5" stroke="#D4A847" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span style="font-size:14px;font-weight:600;color:#FFFFFF;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;vertical-align:middle;">With Diamondback, every dollar in that green column stays in your pocket.</span>
+        <span style="font-size:14px;font-weight:600;color:#FFFFFF;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;vertical-align:middle;">With Crown Ceramic Coating, every dollar in that green column stays in your pocket.</span>
       </td>
     </tr>
     </table>
@@ -18852,7 +18852,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
     <p style="margin:0 0 28px;font-size:36px;font-weight:800;color:#2D3142;line-height:1.05;letter-spacing:-1.2px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">15 minutes.<br>Find out what you're losing.</p>
     <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;" class="cta-btn">
     <tr><td style="background:#FF6B35;border-radius:2px;">
-      <a href="https://diamondbackcoding.com/contact.html" style="display:block;padding:18px 52px;font-size:15px;font-weight:800;color:#FFFFFF;text-decoration:none;letter-spacing:1px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Schedule a Call</a>
+      <a href="https://crownceramiccoating.com/contact.html" style="display:block;padding:18px 52px;font-size:15px;font-weight:800;color:#FFFFFF;text-decoration:none;letter-spacing:1px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Schedule a Call</a>
     </td></tr>
     </table>
     <p style="margin:20px 0 0;font-size:13px;color:#664D00;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Or call us directly: <a href="tel:+15129800393" style="color:#2D3142;font-weight:700;text-decoration:none;">(512) 980-0393</a></p>
@@ -18865,7 +18865,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <td valign="top">
-      <p style="margin:0 0 6px;font-size:11px;font-weight:800;color:#FFFFFF;letter-spacing:2.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Diamondback Coding</p>
+      <p style="margin:0 0 6px;font-size:11px;font-weight:800;color:#FFFFFF;letter-spacing:2.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Crown Ceramic Coating</p>
       <p style="margin:0;font-size:12px;color:#B8B8B8;line-height:1.8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
         5000 Plaza on the Lake, Suite 100 PMB 2017<br>
         Austin, TX 78746<br>
@@ -18873,13 +18873,13 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
       </p>
     </td>
     <td align="right" valign="top">
-      <p style="margin:0 0 8px;"><a href="https://diamondbackcoding.com" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Website</a></p>
-      <p style="margin:0;"><a href="https://instagram.com/diamondbackcoding" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Instagram</a></p>
+      <p style="margin:0 0 8px;"><a href="https://crownceramiccoating.com" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Website</a></p>
+      <p style="margin:0;"><a href="https://instagram.com/crownceramiccoating" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Instagram</a></p>
     </td>
   </tr>
   <tr><td colspan="2" style="padding-top:22px;border-top:1px solid #454B5F;">
     <p style="margin:0;font-size:11px;color:#7A7F8F;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-      You received this because you previously connected with Diamondback Coding. &nbsp;
+      You received this because you previously connected with Crown Ceramic Coating. &nbsp;
       <a href="${unsubUrl}" style="color:#7A7F8F;text-decoration:underline;">Unsubscribe</a>
     </p>
   </td></tr>
@@ -18920,7 +18920,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
                     eyebrow: 'Following up again',
                     headline: 'You keep 100% of your revenue.',
                     subhead: `Hi ${lead.name || 'there'} — just circling back one more time.`,
-                    body: `Platforms like Shopify and Squarespace quietly take 2–5% of every sale you make. With a custom Diamondback site, that money stays in your pocket — forever. For a business doing $200K/year, that's up to $10,000 back in your pocket annually.`,
+                    body: `Platforms like Shopify and Squarespace quietly take 2–5% of every sale you make. With a custom Crown Ceramic Coating site, that money stays in your pocket — forever. For a business doing $200K/year, that's up to $10,000 back in your pocket annually.`,
                     ctaLabel: 'Schedule a Consultation',
                     ctaUrl: SCHEDULING_URL,
                     accentColor: '#1A7A3A',
@@ -18944,7 +18944,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
                     ctaLabel: 'Schedule a Call',
                     ctaUrl: SCHEDULING_URL,
                     accentColor: '#FF6B35',
-                    tagline: 'DIAMONDBACK CODING.',
+                    tagline: 'CROWN CERAMIC COATING.',
                 },
             };
 
@@ -18977,7 +18977,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <td valign="middle">
-      <span style="font-size:12px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#111111;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">DIAMONDBACK CODING</span>
+      <span style="font-size:12px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#111111;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">CROWN CERAMIC COATING</span>
     </td>
     <td align="right" valign="middle">
       <table cellpadding="0" cellspacing="0" border="0" style="background:${fc.accentColor};border-radius:2px;">
@@ -19016,7 +19016,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <td valign="top">
-      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#FFFFFF;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Diamondback Coding</p>
+      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#FFFFFF;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Crown Ceramic Coating</p>
       <p style="margin:0;font-size:11px;color:#B8B8B8;line-height:1.6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
         Web Development &amp; CRM Solutions<br>
         Austin, TX 78746<br>
@@ -19024,13 +19024,13 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
       </p>
     </td>
     <td align="right" valign="top">
-      <p style="margin:0 0 8px;"><a href="https://diamondbackcoding.com" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Website</a></p>
-      <p style="margin:0;"><a href="https://instagram.com/diamondbackcoding" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Instagram</a></p>
+      <p style="margin:0 0 8px;"><a href="https://crownceramiccoating.com" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Website</a></p>
+      <p style="margin:0;"><a href="https://instagram.com/crownceramiccoating" style="color:#B8B8B8;font-size:11px;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">Instagram</a></p>
     </td>
   </tr>
   <tr><td colspan="2" style="padding-top:22px;border-top:1px solid #454B5F;">
     <p style="margin:0;font-size:11px;color:#7A7F8F;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-      You received this because you previously connected with Diamondback Coding. &nbsp;
+      You received this because you previously connected with Crown Ceramic Coating. &nbsp;
       <a href="${unsubUrl}" style="color:#7A7F8F;text-decoration:underline;">Unsubscribe</a>
     </p>
   </td></tr>
@@ -19051,7 +19051,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
                 <div style="white-space: pre-wrap; font-size: 15px; line-height: 1.75; color: #3d3d3d;">${emailBody.replace(/\n/g, '<br>').replace(/^ +/gm, '')}</div>
                 <div class="sign-off">
                     <p>Warm regards,</p>
-                    <p class="team-name">The Diamondback Coding Team</p>
+                    <p class="team-name">The Crown Ceramic Coating Team</p>
                 </div>
             `, { unsubscribeUrl });
 
@@ -19062,7 +19062,7 @@ No longer want to receive these emails? <a href="https://diamondbackcoding.com/u
 
                 <div class="sign-off">
                     <p>Warm regards,</p>
-                    <p class="team-name">The Diamondback Coding Team</p>
+                    <p class="team-name">The Crown Ceramic Coating Team</p>
                 </div>
             `, { unsubscribeUrl });
         }
@@ -19198,7 +19198,7 @@ app.post('/api/follow-ups/send-bulk', authenticateToken, async (req, res) => {
 
                     <div class="sign-off">
                         <p>Warm regards,</p>
-                        <p class="team-name">The Diamondback Coding Team</p>
+                        <p class="team-name">The Crown Ceramic Coating Team</p>
                     </div>
                 `, { unsubscribeUrl });
 
@@ -19324,7 +19324,7 @@ app.post('/api/follow-ups/send-by-category', authenticateToken, async (req, res)
 
                     <div class="sign-off">
                         <p>Warm regards,</p>
-                        <p class="team-name">The Diamondback Coding Team</p>
+                        <p class="team-name">The Crown Ceramic Coating Team</p>
                     </div>
                 `, { unsubscribeUrl });
 
@@ -19480,7 +19480,7 @@ app.post('/api/follow-ups/email-category', authenticateToken, async (req, res) =
 
                     <div class="sign-off">
                         <p>Warm regards,</p>
-                        <p class="team-name">The Diamondback Coding Team</p>
+                        <p class="team-name">The Crown Ceramic Coating Team</p>
                     </div>
                 `, { unsubscribeUrl });
 
@@ -19594,7 +19594,7 @@ app.post('/api/auto-campaigns', authenticateToken, async (req, res) => {
         // Send first email with tracking
         const emailHTML = buildEmailHTML(`
             <div style="white-space: pre-wrap; font-size: 15px; line-height: 1.75; color: #3d3d3d;">${personalizedBody.replace(/\n/g, '<br>')}</div>
-            <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Diamondback Coding Team</p></div>
+            <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Crown Ceramic Coating Team</p></div>
         `, { unsubscribeUrl });
 
         await sendTrackedEmail({ leadId, to: lead.email, subject, html: emailHTML, emailType: 'follow-up' });
@@ -19744,7 +19744,7 @@ app.post('/api/auto-campaigns/run-due', authenticateToken, async (req, res) => {
                     
                     emailHTML = buildEmailHTML(`
                         <div style="white-space: pre-wrap; font-size: 15px; line-height: 1.75; color: #3d3d3d;">${personalizedBody.replace(/\n/g, '<br>')}</div>
-                        <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Diamondback Coding Team</p></div>
+                        <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Crown Ceramic Coating Team</p></div>
                     `, { unsubscribeUrl: `${BASE_URL}/api/unsubscribe/${unsub}` });
                     
                 } else {
@@ -19772,7 +19772,7 @@ app.post('/api/auto-campaigns/run-due', authenticateToken, async (req, res) => {
                             eyebrow: 'Following up again',
                             headline: 'You keep 100% of your revenue.',
                             subhead: `Hi ${c.lead_name || 'there'} — just circling back one more time.`,
-                            body: `Platforms like Shopify and Squarespace quietly take 2–5% of every sale you make. With a custom Diamondback site, that money stays in your pocket — forever. For a business doing $200K/year, that's up to $10,000 back in your pocket annually.`,
+                            body: `Platforms like Shopify and Squarespace quietly take 2–5% of every sale you make. With a custom Crown Ceramic Coating site, that money stays in your pocket — forever. For a business doing $200K/year, that's up to $10,000 back in your pocket annually.`,
                             ctaLabel: 'Schedule a Consultation',
                             ctaUrl: SCHEDULING_URL,
                             accentColor: '#1A7A3A',
@@ -19798,7 +19798,7 @@ app.post('/api/auto-campaigns/run-due', authenticateToken, async (req, res) => {
                             ctaLabel: 'Schedule a Call',
                             ctaUrl: SCHEDULING_URL,
                             accentColor: '#FF6B35',
-                            tagline: 'DIAMONDBACK CODING.',
+                            tagline: 'CROWN CERAMIC COATING.',
                         },
                     };
                     
@@ -19849,10 +19849,10 @@ app.post('/api/auto-campaigns/run-due', authenticateToken, async (req, res) => {
 <!-- Footer -->
 <tr><td style="background-color:#f9f9f9;padding:30px 40px;text-align:center;border-top:1px solid #e5e5e5">
 <p style="font-size:12px;color:#888;margin:0 0 8px;letter-spacing:1px">${fc.tagline}</p>
-<p style="font-size:13px;color:#666;margin:0 0 12px;font-weight:600">Diamondback Coding</p>
+<p style="font-size:13px;color:#666;margin:0 0 12px;font-weight:600">Crown Ceramic Coating</p>
 <p style="font-size:11px;color:#999;margin:0">
 <a href="tel:+19402178680" style="color:#999;text-decoration:none">940-217-8680</a> | 
-<a href="mailto:hello@diamondbackcoding.com" style="color:#999;text-decoration:none">hello@diamondbackcoding.com</a>
+<a href="mailto:hello@crownceramiccoating.com" style="color:#999;text-decoration:none">hello@crownceramiccoating.com</a>
 </p>
 <p style="font-size:10px;color:#aaa;margin:12px 0 0">
 <a href="${BASE_URL}/api/unsubscribe/${unsub}" style="color:#aaa;text-decoration:underline">Unsubscribe</a>
@@ -19931,7 +19931,7 @@ app.post('/api/send-email', authenticateToken, async (req, res) => {
     }
     const emailHTML = buildEmailHTML(`
         <div style="white-space: pre-wrap; font-size: 15px; line-height: 1.75; color: #3d3d3d;">${body.replace(/\n/g, '<br>')}</div>
-        <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Diamondback Coding Team</p></div>
+        <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Crown Ceramic Coating Team</p></div>
     `, { unsubscribeUrl });
     try {
         await sendTrackedEmail({ leadId: leadId || null, to, subject, html: emailHTML, emailType: 'follow-up' });
@@ -20034,11 +20034,11 @@ app.get('/api/unsubscribe/:token', async (req, res) => {
                     </div>
                     <h2 style="color: #166534; margin: 0 0 12px;">Successfully Unsubscribed</h2>
                     <p style="color: #4ade80; margin: 0 0 8px; font-size: 15px;">
-                        You have been removed from Diamondback Coding's follow-up email list.
+                        You have been removed from Crown Ceramic Coating's follow-up email list.
                     </p>
                     <p style="color: #6b7280; margin: 0; font-size: 13px;">
                         You will no longer receive follow-up emails from us. If you change your mind, 
-                        please reach out to <a href="mailto:contact@diamondbackcoding.com" style="color: #16a34a;">contact@diamondbackcoding.com</a>.
+                        please reach out to <a href="mailto:contact@crownceramiccoating.com" style="color: #16a34a;">contact@crownceramiccoating.com</a>.
                     </p>
                 </div>
             </body>
@@ -20051,7 +20051,7 @@ app.get('/api/unsubscribe/:token', async (req, res) => {
             <!DOCTYPE html><html><head><title>Error</title></head>
             <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 80px auto; text-align: center; padding: 0 20px;">
                 <h2 style="color: #ef4444;">Something Went Wrong</h2>
-                <p style="color: #666;">Please try again later or contact us at <a href="mailto:contact@diamondbackcoding.com">contact@diamondbackcoding.com</a>.</p>
+                <p style="color: #666;">Please try again later or contact us at <a href="mailto:contact@crownceramiccoating.com">contact@crownceramiccoating.com</a>.</p>
             </body></html>
         `);
     }
@@ -20263,7 +20263,7 @@ async function sendApplicationStatusEmail(app, jobTitle, newStatus) {
             bodyHTML: `
                 <p>Hi ${firstName},</p>
                 <p>Thank you for submitting your application for the <strong>${jobTitle}</strong> position. We've received everything and our team will begin reviewing your materials shortly.</p>
-                <p>We appreciate your interest in joining Diamondback Coding and will be in touch with next steps.</p>
+                <p>We appreciate your interest in joining Crown Ceramic Coating and will be in touch with next steps.</p>
             `
         },
         reviewing: {
@@ -20278,15 +20278,15 @@ async function sendApplicationStatusEmail(app, jobTitle, newStatus) {
             subject: `You've been selected for an interview — ${jobTitle}`,
             bodyHTML: `
                 <p>Hi ${firstName},</p>
-                <p>Congratulations! We'd like to invite you to interview for the <strong>${jobTitle}</strong> position at Diamondback Coding.</p>
+                <p>Congratulations! We'd like to invite you to interview for the <strong>${jobTitle}</strong> position at Crown Ceramic Coating.</p>
                 <p>A member of our team will be reaching out shortly with scheduling details. In the meantime, please feel free to reply to this email with any questions.</p>
             `
         },
         hired: {
-            subject: `Congratulations — Welcome to Diamondback Coding!`,
+            subject: `Congratulations — Welcome to Crown Ceramic Coating!`,
             bodyHTML: `
                 <p>Hi ${firstName},</p>
-                <p>We are thrilled to let you know that you have been selected for the <strong>${jobTitle}</strong> position at Diamondback Coding.</p>
+                <p>We are thrilled to let you know that you have been selected for the <strong>${jobTitle}</strong> position at Crown Ceramic Coating.</p>
                 <p>We'll be sending you onboarding details and next steps shortly. We're truly excited to have you on the team!</p>
             `
         },
@@ -20294,7 +20294,7 @@ async function sendApplicationStatusEmail(app, jobTitle, newStatus) {
             subject: `Your application for ${jobTitle} — Update`,
             bodyHTML: `
                 <p>Hi ${firstName},</p>
-                <p>Thank you for taking the time to apply for the <strong>${jobTitle}</strong> position at Diamondback Coding. We truly appreciate your interest in our team.</p>
+                <p>Thank you for taking the time to apply for the <strong>${jobTitle}</strong> position at Crown Ceramic Coating. We truly appreciate your interest in our team.</p>
                 <p>After careful consideration, we have decided to move forward with other candidates at this time. This was not an easy decision, and we want you to know that your application was given thorough and serious consideration.</p>
                 <p>We encourage you to keep an eye on future openings — we'd love to see you apply again.</p>
             `
@@ -20320,12 +20320,12 @@ async function sendApplicationStatusEmail(app, jobTitle, newStatus) {
 
         <div class="sign-off">
             <p>Warm regards,</p>
-            <p class="team-name">The Diamondback Coding Team</p>
+            <p class="team-name">The Crown Ceramic Coating Team</p>
         </div>
     `);
 
     const mailOptions = {
-        from: `"Diamondback Coding" <${process.env.EMAIL_USER}>`,
+        from: `"Crown Ceramic Coating" <${process.env.EMAIL_USER}>`,
         to: app.email,
         subject: config.subject,
         html: emailHTML
@@ -20652,7 +20652,7 @@ app.post('/api/marketing/blast', authenticateToken, async (req, res) => {
                         </div>
                         <div class="sign-off">
                             <p>Warm regards,</p>
-                            <p class="team-name">The Diamondback Coding Team</p>
+                            <p class="team-name">The Crown Ceramic Coating Team</p>
                         </div>
                     `, { unsubscribeUrl: unsubUrl });
                 }
@@ -21351,7 +21351,7 @@ app.put('/api/client/email-settings', authenticateClient, async (req, res) => {
                 ).catch(() => {});
             }
         }
-        if (!portalId) return res.status(403).json({ success: false, message: 'Company account required. Make sure your account has been fully set up by Diamondback Coding.' });
+        if (!portalId) return res.status(403).json({ success: false, message: 'Company account required. Make sure your account has been fully set up by Crown Ceramic Coating.' });
 
         const {
             brevo_api_key, sender_email, sender_name,
@@ -21564,7 +21564,7 @@ app.get('/api/client/test-email-config', authenticateClient, async (req, res) =>
 
 // POST /api/client/leads/:id/send-email
 // Quick-compose email from the message thread modal.
-// ALWAYS uses Diamondback Coding's platform Brevo account — never per-portal keys.
+// ALWAYS uses Crown Ceramic Coating's platform Brevo account — never per-portal keys.
 // Usage is recorded to portal_usage_log for monthly billing at 2× Brevo rates.
 app.post('/api/client/leads/:id/send-email', authenticateClient, async (req, res) => {
     try {
@@ -21587,7 +21587,7 @@ app.post('/api/client/leads/:id/send-email', authenticateClient, async (req, res
             }
         }
 
-        // Always use Diamondback's platform Brevo key — NOT per-portal key
+        // Always use Crown Ceramic Coating's platform Brevo key — NOT per-portal key
         console.log('[SEND-EMAIL] portalId:', portalId, '| PLATFORM_BREVO_KEY set:', !!PLATFORM_BREVO_KEY);
         if (!PLATFORM_BREVO_KEY) {
             console.error('[SEND-EMAIL] CRITICAL: BREVO_API_KEY env var is not set on Render!');
@@ -21613,7 +21613,7 @@ app.post('/api/client/leads/:id/send-email', authenticateClient, async (req, res
 
         const emailSubject = subject || `Message from ${fromName}`;
 
-        // Send via Diamondback's platform Brevo account
+        // Send via Crown Ceramic Coating's platform Brevo account
         const verifiedDomain = (settings?.domain_status === 'verified') ? settings.verified_domain : null;
         const brevoResult = await sendViaBrevo(PLATFORM_BREVO_KEY, fromEmail, fromName, toEmail, emailSubject, html, [], verifiedDomain);
 
@@ -21662,7 +21662,7 @@ app.post('/api/client/leads/:id/send-email', authenticateClient, async (req, res
 });
 
 // POST /api/client/leads/:id/send-sms  — Send SMS to a lead
-// ALWAYS uses Diamondback Coding's platform Brevo account — never per-portal keys.
+// ALWAYS uses Crown Ceramic Coating's platform Brevo account — never per-portal keys.
 app.post('/api/client/leads/:id/send-sms', authenticateClient, async (req, res) => {
     try {
         const leadId = parseInt(req.params.id);
@@ -21679,7 +21679,7 @@ app.post('/api/client/leads/:id/send-sms', authenticateClient, async (req, res) 
             });
         }
 
-        // Always use Diamondback's platform Brevo key
+        // Always use Crown Ceramic Coating's platform Brevo key
         if (!PLATFORM_BREVO_KEY) {
             return res.status(500).json({ success: false, message: 'SMS service not configured. The BREVO_API_KEY environment variable must be set on your Render server. Go to Render → your service → Environment, and add BREVO_API_KEY.' });
         }
@@ -22816,7 +22816,7 @@ app.post('/api/client/invoice/:id/email', authenticateClient, async (req, res) =
 
         await sendDirectEmail({
             to: toEmail,
-            subject: `Invoice ${invoice.invoice_number} from Diamondback Coding`,
+            subject: `Invoice ${invoice.invoice_number} from Crown Ceramic Coating`,
             html: emailHTML,
             leadId: req.user.id,
             emailType: 'invoice'
@@ -24404,8 +24404,8 @@ app.post('/api/integrations/webhooks/test/:id', authenticateClient, async (req, 
             : await pool.query(`SELECT * FROM crm_integration_webhooks WHERE id=$1 AND lead_id=$2`, [req.params.id, leadId]);
         if (!r.rows[0]) return res.status(404).json({ success: false, message: 'Webhook not found' });
         const webhook = r.rows[0];
-        const payload = { event: 'test', timestamp: new Date().toISOString(), data: { message: 'This is a test webhook from Diamondback CRM', lead: { id: 0, name: 'Test Lead', email: 'test@example.com', status: 'new' } } };
-        const resp = await fetch(webhook.url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Diamondback-Event': 'test' }, body: JSON.stringify(payload) });
+        const payload = { event: 'test', timestamp: new Date().toISOString(), data: { message: 'This is a test webhook from Crown Ceramic Coating CRM', lead: { id: 0, name: 'Test Lead', email: 'test@example.com', status: 'new' } } };
+        const resp = await fetch(webhook.url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Crown Ceramic Coating-Event': 'test' }, body: JSON.stringify(payload) });
         res.json({ success: true, statusCode: resp.status });
     } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
@@ -24420,7 +24420,7 @@ async function fireWebhooks(userId, portalId, event, data) {
         for (const wh of r.rows) {
             fetch(wh.url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Diamondback-Event': event },
+                headers: { 'Content-Type': 'application/json', 'X-Crown Ceramic Coating-Event': event },
                 body: JSON.stringify({ event, timestamp: new Date().toISOString(), data })
             }).catch(() => {});
             pool.query(`UPDATE crm_integration_webhooks SET last_fired_at=NOW(), fire_count=fire_count+1 WHERE id=$1`, [wh.id]).catch(() => {});
@@ -25293,7 +25293,7 @@ async function initializeUsageTables() {
     }
 }
 
-// ── Auto-register a sender email in Diamondback's platform Brevo account ────
+// ── Auto-register a sender email in Crown Ceramic Coating's platform Brevo account ────
 // Called on portal creation and when a new company user is added.
 // Brevo requires senders to be registered before sending FROM that address.
 async function brevoRegisterSender(email, name) {
@@ -25316,7 +25316,7 @@ async function brevoRegisterSender(email, name) {
     }
 }
 
-// ── Remove a sender from Diamondback's platform Brevo account ───────────────
+// ── Remove a sender from Crown Ceramic Coating's platform Brevo account ───────────────
 // Called when a portal is hard-deleted or a company user is fully cancelled.
 async function brevoRemoveSender(email) {
     if (!PLATFORM_BREVO_KEY || !email) return;
@@ -26518,7 +26518,7 @@ app.post('/api/client/ai-chat', authenticateClient, async (req, res) => {
         app.listen(PORT, () => {
             console.log('');
             console.log('========================================');
-            console.log(' Diamondback Coding Server Running');
+            console.log(' Crown Ceramic Coating Server Running');
             console.log('========================================');
             console.log(` Port: ${PORT}`);
             console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
@@ -26556,16 +26556,16 @@ async function buildMarketingTemplateHTML(template, name, subject, bodyText, uns
             <p>Hi ${name},</p>
             <h2 style="font-size:24px;color:#2D3142;letter-spacing:-0.5px;">Every sale you make, they take a cut.</h2>
             <p>Shopify, Squarespace, and Wix charge 2–5% on every transaction. On $200K in annual sales, that's up to <strong>$10,000 quietly disappearing</strong> every year.</p>
-            <p>At Diamondback Coding, we charge <strong>zero transaction fees</strong> — ever. You get a fully custom website you own outright, with no platform dependencies and no revenue leaks.</p>
+            <p>At Crown Ceramic Coating, we charge <strong>zero transaction fees</strong> — ever. You get a fully custom website you own outright, with no platform dependencies and no revenue leaks.</p>
             <div style="background:#FFF8F0;border-left:3px solid #FF6B35;padding:18px 20px;border-radius:4px;margin:20px 0;">
                 <strong>What $200K/yr looks like:</strong><br>
-                Other platforms: <span style="color:#CC2222;font-weight:700;">−$6,000/yr</span> in fees &nbsp;|&nbsp; Diamondback: <span style="color:#1A7A3A;font-weight:700;">$0</span>
+                Other platforms: <span style="color:#CC2222;font-weight:700;">−$6,000/yr</span> in fees &nbsp;|&nbsp; Crown Ceramic Coating: <span style="color:#1A7A3A;font-weight:700;">$0</span>
             </div>
             <p>Ready to stop losing revenue to your own platform?</p>
             <div style="margin:28px 0;">
                 <a href="${SCHEDULING_URL}" style="background:#FF6B35;color:#fff;padding:14px 32px;border-radius:3px;font-weight:700;text-decoration:none;font-size:15px;">Schedule a Free Consultation</a>
             </div>
-            <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Diamondback Coding Team</p></div>
+            <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Crown Ceramic Coating Team</p></div>
         `, { unsubscribeUrl: unsubUrl });
     }
 
@@ -26581,7 +26581,7 @@ async function buildMarketingTemplateHTML(template, name, subject, bodyText, uns
         referralrequest: { headline: 'Know Someone Who Could Use Us?', body: `If you know a business owner looking for a custom website or CRM, we'd love an introduction. We take care of your referrals like they're our own.` },
     };
 
-    const pd = promoDetails[template] || { headline: 'Diamondback Coding', body: bodyText || '' };
+    const pd = promoDetails[template] || { headline: 'Crown Ceramic Coating', body: bodyText || '' };
 
     return buildEmailHTML(`
         <p>Hi ${name},</p>
@@ -26590,7 +26590,7 @@ async function buildMarketingTemplateHTML(template, name, subject, bodyText, uns
         <div style="margin:28px 0;">
             <a href="${schedulingUrl}" style="background:${accentColor};color:#fff;padding:14px 32px;border-radius:3px;font-weight:700;text-decoration:none;font-size:15px;">Schedule a Call</a>
         </div>
-        <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Diamondback Coding Team</p></div>
+        <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Crown Ceramic Coating Team</p></div>
     `, { unsubscribeUrl: unsubUrl });
 }
 
@@ -27037,7 +27037,7 @@ async function sendClientEmail({ portalId, leadId, leadEmail, senderUserEmail, a
         });
     }
 
-    // ── Use Diamondback's platform Brevo key — never per-portal keys ─
+    // ── Use Crown Ceramic Coating's platform Brevo key — never per-portal keys ─
     const masterBrevoKey = PLATFORM_BREVO_KEY;
     if (!masterBrevoKey) {
         await pool.query(`UPDATE client_email_log SET status='failed', error_message='BREVO_API_KEY env var not set on server' WHERE id=$1`, [logId]);

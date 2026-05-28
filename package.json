@@ -1,0 +1,31 @@
+{
+  "name": "crown-ceramic-coating",
+  "version": "1.0.0",
+  "description": "Crown Ceramic Coating — website backend, client portal, CRM, billing, and email/SMS platform.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "@getbrevo/brevo": "^2.2.0",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
+    "pdfkit": "^0.15.2",
+    "pg": "^8.13.1",
+    "puppeteer": "^23.11.1",
+    "stripe": "^17.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "private": true
+}
