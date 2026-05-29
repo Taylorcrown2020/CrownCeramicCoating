@@ -1597,141 +1597,6 @@ await client.query(`
 
 console.log(' Follow-up tracking columns initialized');
 
-// Support tickets table
-await client.query(`
-    CREATE TABLE IF NOT EXISTS support_tickets (
-        id SERIAL PRIMARY KEY,
-        lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-        client_name VARCHAR(255),
-        client_email VARCHAR(255),
-        subject VARCHAR(500) NOT NULL,
-        message TEXT NOT NULL,
-        priority VARCHAR(50) DEFAULT 'medium',
-        category VARCHAR(100) DEFAULT 'general',
-        status VARCHAR(50) DEFAULT 'open',
-        assigned_to INTEGER REFERENCES admin_users(id),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-`);
-
-        // Client uploads table
-await client.query(`
-    CREATE TABLE IF NOT EXISTS client_uploads (
-        id SERIAL PRIMARY KEY,
-        lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-        project_id INTEGER,
-        filename VARCHAR(500) NOT NULL,
-        filepath TEXT NOT NULL,
-        file_size BIGINT,
-        mime_type VARCHAR(100),
-        description TEXT,
-        shared_by_admin BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-`);
-
-// Client projects table
-await client.query(`
-    CREATE TABLE IF NOT EXISTS client_projects (
-        id SERIAL PRIMARY KEY,
-        lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-        project_name VARCHAR(500) NOT NULL,
-        description TEXT,
-        start_date DATE,
-        end_date DATE,
-        status VARCHAR(50) DEFAULT 'in_progress',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-`);
-
-// Project milestones table
-await client.query(`
-    CREATE TABLE IF NOT EXISTS project_milestones (
-        id SERIAL PRIMARY KEY,
-        project_id INTEGER REFERENCES client_projects(id) ON DELETE CASCADE,
-        title VARCHAR(500) NOT NULL,
-        description TEXT,
-        due_date DATE,
-        order_index INTEGER DEFAULT 0,
-        approval_required BOOLEAN DEFAULT FALSE,
-        status VARCHAR(50) DEFAULT 'pending',
-        client_feedback TEXT,
-        completed_at TIMESTAMP,
-        approved_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-`);
-
-// Ticket responses table
-await client.query(`
-    CREATE TABLE IF NOT EXISTS ticket_responses (
-        id SERIAL PRIMARY KEY,
-        ticket_id INTEGER REFERENCES support_tickets(id) ON DELETE CASCADE,
-        user_id INTEGER,
-        user_type VARCHAR(50) NOT NULL,
-        user_name VARCHAR(255) NOT NULL,
-        message TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-`);
-
-// Client tasks table (used by client portal task management)
-await client.query(`
-    CREATE TABLE IF NOT EXISTS client_tasks (
-        id SERIAL PRIMARY KEY,
-        client_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-        title VARCHAR(500) NOT NULL,
-        description TEXT,
-        due_date TIMESTAMP,
-        priority VARCHAR(50) DEFAULT 'medium',
-        status VARCHAR(50) DEFAULT 'pending',
-        completed BOOLEAN DEFAULT FALSE,
-        completed_at TIMESTAMP,
-        related_to_type VARCHAR(100),
-        related_to_id INTEGER,
-        assigned_to_name VARCHAR(255),
-        created_by_name VARCHAR(255),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-`);
-
-await client.query(`
-    CREATE INDEX IF NOT EXISTS idx_client_tasks_client
-    ON client_tasks(client_id, created_at DESC)
-`);
-
-// Migrate client_tasks: add columns that may not exist in older DB instances
-// NOTE: Run OUTSIDE the transaction via pool.query to avoid poisoning the transaction
-// if any earlier statement failed. These are safe to run multiple times.
-// Create indexes for better performance
-await client.query(`
-    CREATE INDEX IF NOT EXISTS idx_client_uploads_lead 
-    ON client_uploads(lead_id, created_at DESC)
-`);
-
-await client.query(`
-    CREATE INDEX IF NOT EXISTS idx_client_projects_lead 
-    ON client_projects(lead_id, created_at DESC)
-`);
-
-await client.query(`
-    CREATE INDEX IF NOT EXISTS idx_project_milestones_project 
-    ON project_milestones(project_id, order_index)
-`);
-
-await client.query(`
-    CREATE INDEX IF NOT EXISTS idx_support_tickets_lead 
-    ON support_tickets(lead_id, created_at DESC)
-`);
-
-await client.query(`
-    CREATE INDEX IF NOT EXISTS idx_ticket_responses_ticket 
-    ON ticket_responses(ticket_id, created_at ASC)
-`);
-
         // Create admin_users table
         await client.query(`
             CREATE TABLE IF NOT EXISTS admin_users (
@@ -1782,6 +1647,116 @@ await client.query(`
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+
+        // ── Tables that depend on leads + admin_users (must come after both are created) ──
+
+        // Support tickets table
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS support_tickets (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                client_name VARCHAR(255),
+                client_email VARCHAR(255),
+                subject VARCHAR(500) NOT NULL,
+                message TEXT NOT NULL,
+                priority VARCHAR(50) DEFAULT 'medium',
+                category VARCHAR(100) DEFAULT 'general',
+                status VARCHAR(50) DEFAULT 'open',
+                assigned_to INTEGER REFERENCES admin_users(id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Client uploads table
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS client_uploads (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                project_id INTEGER,
+                filename VARCHAR(500) NOT NULL,
+                filepath TEXT NOT NULL,
+                file_size BIGINT,
+                mime_type VARCHAR(100),
+                description TEXT,
+                shared_by_admin BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Client projects table
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS client_projects (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                project_name VARCHAR(500) NOT NULL,
+                description TEXT,
+                start_date DATE,
+                end_date DATE,
+                status VARCHAR(50) DEFAULT 'in_progress',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Project milestones table
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS project_milestones (
+                id SERIAL PRIMARY KEY,
+                project_id INTEGER REFERENCES client_projects(id) ON DELETE CASCADE,
+                title VARCHAR(500) NOT NULL,
+                description TEXT,
+                due_date DATE,
+                order_index INTEGER DEFAULT 0,
+                approval_required BOOLEAN DEFAULT FALSE,
+                status VARCHAR(50) DEFAULT 'pending',
+                client_feedback TEXT,
+                completed_at TIMESTAMP,
+                approved_at TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Ticket responses table
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS ticket_responses (
+                id SERIAL PRIMARY KEY,
+                ticket_id INTEGER REFERENCES support_tickets(id) ON DELETE CASCADE,
+                user_id INTEGER,
+                user_type VARCHAR(50) NOT NULL,
+                user_name VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Client tasks table
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS client_tasks (
+                id SERIAL PRIMARY KEY,
+                client_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                title VARCHAR(500) NOT NULL,
+                description TEXT,
+                due_date TIMESTAMP,
+                priority VARCHAR(50) DEFAULT 'medium',
+                status VARCHAR(50) DEFAULT 'pending',
+                completed BOOLEAN DEFAULT FALSE,
+                completed_at TIMESTAMP,
+                related_to_type VARCHAR(100),
+                related_to_id INTEGER,
+                assigned_to_name VARCHAR(255),
+                created_by_name VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_client_tasks_client ON client_tasks(client_id, created_at DESC)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_client_uploads_lead ON client_uploads(lead_id, created_at DESC)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_client_projects_lead ON client_projects(lead_id, created_at DESC)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_project_milestones_project ON project_milestones(project_id, order_index)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_support_tickets_lead ON support_tickets(lead_id, created_at DESC)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_ticket_responses_ticket ON ticket_responses(ticket_id, created_at ASC)`);
 
         // Update leads table structure - ADD new columns first
         await client.query(`
