@@ -1469,135 +1469,10 @@ async function initializeDatabase(){
     try {
         await client.query('BEGIN');
 
-        await client.query(`
-    DO $$
-    BEGIN
-        IF EXISTS (
-            SELECT 1 FROM information_schema.tables
-            WHERE table_name='support_tickets'
-        ) AND NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name='support_tickets'
-            AND column_name='client_name'
-        ) THEN
-            ALTER TABLE support_tickets
-            ADD COLUMN client_name TEXT;
-        END IF;
-    END $$;
-`);
+        // ══════════════════════════════════════════════════════
+        // TIER 1 — No dependencies (standalone tables)
+        // ══════════════════════════════════════════════════════
 
-// Add follow_up_step column to leads table (PostgreSQL syntax)
-await client.query(`
-    DO $$ 
-    BEGIN
-        -- ── leads table migrations (skip entirely on fresh DB; CREATE TABLE below adds all columns) ──
-        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='leads') THEN
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='leads' AND column_name='follow_up_step'
-            ) THEN
-                ALTER TABLE leads ADD COLUMN follow_up_step INTEGER DEFAULT 0;
-                RAISE NOTICE 'Added follow_up_step column to leads table';
-            END IF;
-            
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='leads' AND column_name='last_contact_date'
-            ) THEN
-                ALTER TABLE leads ADD COLUMN last_contact_date DATE;
-                RAISE NOTICE 'Added last_contact_date column to leads table';
-            END IF;
-            
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='leads' AND column_name='lead_temperature'
-            ) THEN
-                ALTER TABLE leads ADD COLUMN lead_temperature VARCHAR(20) DEFAULT 'cold';
-                RAISE NOTICE 'Added lead_temperature column to leads table';
-            END IF;
-            
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='leads' AND column_name='became_hot_at'
-            ) THEN
-                ALTER TABLE leads ADD COLUMN became_hot_at TIMESTAMP;
-                RAISE NOTICE 'Added became_hot_at column to leads table';
-            END IF;
-            
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='leads' AND column_name='last_engagement_at'
-            ) THEN
-                ALTER TABLE leads ADD COLUMN last_engagement_at TIMESTAMP;
-                RAISE NOTICE 'Added last_engagement_at column to leads table';
-            END IF;
-            
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='leads' AND column_name='engagement_score'
-            ) THEN
-                ALTER TABLE leads ADD COLUMN engagement_score INTEGER DEFAULT 0;
-                RAISE NOTICE 'Added engagement_score column to leads table';
-            END IF;
-            
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='leads' AND column_name='engagement_history'
-            ) THEN
-                ALTER TABLE leads ADD COLUMN engagement_history JSONB DEFAULT '[]'::jsonb;
-                RAISE NOTICE 'Added engagement_history column to leads table';
-            END IF;
-            
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='leads' AND column_name='follow_up_count'
-            ) THEN
-                ALTER TABLE leads ADD COLUMN follow_up_count INTEGER DEFAULT 0;
-                RAISE NOTICE 'Added follow_up_count column to leads table';
-            END IF;
-        END IF;
-
-        -- ── email_log table migrations (skip entirely on fresh DB) ──
-        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='email_log') THEN
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='email_log' AND column_name='error_message'
-            ) THEN
-                ALTER TABLE email_log ADD COLUMN error_message TEXT;
-                RAISE NOTICE 'Added error_message column to email_log table';
-            END IF;
-            
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='email_log' AND column_name='created_at'
-            ) THEN
-                ALTER TABLE email_log ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-                UPDATE email_log SET created_at = COALESCE(sent_at, CURRENT_TIMESTAMP) WHERE created_at IS NULL;
-                RAISE NOTICE 'Added created_at column to email_log table';
-            END IF;
-
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='email_log' AND column_name='brevo_message_id'
-            ) THEN
-                ALTER TABLE email_log ADD COLUMN brevo_message_id TEXT;
-                RAISE NOTICE 'Added brevo_message_id column to email_log table';
-            END IF;
-
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_name='email_log' AND column_name='email_type'
-            ) THEN
-                ALTER TABLE email_log ADD COLUMN email_type VARCHAR(50) DEFAULT 'follow-up';
-                RAISE NOTICE 'Added email_type column to email_log table';
-            END IF;
-        END IF;
-    END $$;
-`);
-
-console.log(' Follow-up tracking columns initialized');
-
-        // Create admin_users table
         await client.query(`
             CREATE TABLE IF NOT EXISTS admin_users (
                 id SERIAL PRIMARY KEY,
@@ -1609,7 +1484,85 @@ console.log(' Follow-up tracking columns initialized');
             )
         `);
 
-        // Create leads table with customer columns
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS employees (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                phone VARCHAR(50),
+                role VARCHAR(100),
+                start_date DATE,
+                end_date DATE,
+                notes TEXT,
+                is_active BOOLEAN DEFAULT TRUE,
+                projects_assigned INTEGER DEFAULT 0,
+                tasks_completed INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS cookie_consent (
+                id SERIAL PRIMARY KEY,
+                session_id VARCHAR(255),
+                ip_address VARCHAR(50),
+                consent_given BOOLEAN DEFAULT FALSE,
+                analytics_consent BOOLEAN DEFAULT FALSE,
+                marketing_consent BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS pipeline_stages (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(200) NOT NULL,
+                description TEXT,
+                color VARCHAR(50),
+                position INTEGER NOT NULL,
+                probability INTEGER DEFAULT 50,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS scoring_rules (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(200) NOT NULL,
+                description TEXT,
+                rule_type VARCHAR(50),
+                field_name VARCHAR(100),
+                operator VARCHAR(50),
+                value VARCHAR(255),
+                points INTEGER,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS jobs (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                department VARCHAR(100) NOT NULL,
+                type VARCHAR(50) NOT NULL DEFAULT 'Full-time',
+                location VARCHAR(100) NOT NULL DEFAULT 'Remote',
+                description TEXT,
+                duties TEXT[] DEFAULT '{}',
+                requirements TEXT[] DEFAULT '{}',
+                published BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_jobs_published ON jobs(published)`);
+
+        // ══════════════════════════════════════════════════════
+        // TIER 2 — Depends on admin_users + employees only
+        // ══════════════════════════════════════════════════════
+
         await client.query(`
             CREATE TABLE IF NOT EXISTS leads (
                 id SERIAL PRIMARY KEY,
@@ -1629,28 +1582,236 @@ console.log(' Follow-up tracking columns initialized');
             )
         `);
 
-        // Create employees table
         await client.query(`
-            CREATE TABLE IF NOT EXISTS employees (
+            CREATE TABLE IF NOT EXISTS tasks (
                 id SERIAL PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                email VARCHAR(255) UNIQUE NOT NULL,
-                phone VARCHAR(50),
-                role VARCHAR(100),
-                start_date DATE,
-                end_date DATE,
-                notes TEXT,
+                title VARCHAR(500) NOT NULL,
+                description TEXT,
+                due_date DATE,
+                priority VARCHAR(20) DEFAULT 'medium',
+                status VARCHAR(50) DEFAULT 'pending',
+                completed BOOLEAN DEFAULT FALSE,
+                assigned_to INTEGER REFERENCES employees(id),
+                created_by VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                completed_at TIMESTAMP
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_tasks_assigned_to ON tasks(assigned_to)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks(completed)`);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS admin_sessions (
+                id SERIAL PRIMARY KEY,
+                user_email VARCHAR(255),
+                token TEXT UNIQUE NOT NULL,
+                ip_address VARCHAR(50),
+                user_agent TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                expires_at TIMESTAMP,
                 is_active BOOLEAN DEFAULT TRUE,
-                projects_assigned INTEGER DEFAULT 0,
-                tasks_completed INTEGER DEFAULT 0,
+                CONSTRAINT admin_sessions_user_email_fkey
+                    FOREIGN KEY (user_email)
+                    REFERENCES admin_users(email)
+                    ON DELETE CASCADE
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_user_email ON admin_sessions(user_email)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_token ON admin_sessions(token)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_active ON admin_sessions(is_active)`);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS activity_log (
+                id SERIAL PRIMARY KEY,
+                user_email VARCHAR(255),
+                action VARCHAR(100) NOT NULL,
+                resource_type VARCHAR(50),
+                resource_id INTEGER,
+                details JSONB,
+                ip_address VARCHAR(50),
+                user_agent TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_activity_user_email ON activity_log(user_email)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_activity_action ON activity_log(action)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_activity_created_at ON activity_log(created_at)`);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS applications (
+                id SERIAL PRIMARY KEY,
+                job_id INTEGER REFERENCES jobs(id) ON DELETE SET NULL,
+                first_name VARCHAR(150) NOT NULL,
+                last_name VARCHAR(150) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                phone VARCHAR(50),
+                city VARCHAR(100),
+                state VARCHAR(100),
+                linkedin_url TEXT,
+                portfolio_url TEXT,
+                experience VARCHAR(20),
+                cover_letter TEXT,
+                start_date VARCHAR(50),
+                expected_salary VARCHAR(100),
+                referral_source VARCHAR(100),
+                resume_path TEXT,
+                resume_original_name TEXT,
+                status VARCHAR(50) DEFAULT 'new',
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_applications_job ON applications(job_id)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status)`);
+
+        // ══════════════════════════════════════════════════════
+        // TIER 3 — Depends on leads + admin_users
+        // ══════════════════════════════════════════════════════
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS lead_notes (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                note TEXT NOT NULL,
+                created_by INTEGER REFERENCES admin_users(id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS email_log (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                email_type VARCHAR(50),
+                subject VARCHAR(500),
+                status VARCHAR(50) DEFAULT 'sent',
+                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                opened_at TIMESTAMP,
+                clicked_at TIMESTAMP
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS lead_scores (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE UNIQUE,
+                total_score INTEGER DEFAULT 0,
+                last_calculated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS score_history (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                rule_id INTEGER REFERENCES scoring_rules(id),
+                points INTEGER,
+                reason TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_lead_scores_total ON lead_scores(total_score DESC)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_score_history_lead ON score_history(lead_id, created_at DESC)`);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS documents (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                filename VARCHAR(500) NOT NULL,
+                original_filename VARCHAR(500) NOT NULL,
+                file_path TEXT NOT NULL,
+                file_size BIGINT,
+                mime_type VARCHAR(100),
+                document_type VARCHAR(100),
+                description TEXT,
+                uploaded_by INTEGER REFERENCES admin_users(id),
+                is_shared BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
 
-        // ── Tables that depend on leads + admin_users (must come after both are created) ──
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS document_versions (
+                id SERIAL PRIMARY KEY,
+                document_id INTEGER REFERENCES documents(id) ON DELETE CASCADE,
+                version_number INTEGER NOT NULL,
+                filename VARCHAR(500) NOT NULL,
+                file_path TEXT NOT NULL,
+                file_size BIGINT,
+                uploaded_by INTEGER REFERENCES admin_users(id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
 
-        // Support tickets table
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS document_shares (
+                id SERIAL PRIMARY KEY,
+                document_id INTEGER REFERENCES documents(id) ON DELETE CASCADE,
+                shared_with_email VARCHAR(255),
+                share_token VARCHAR(255) UNIQUE,
+                expires_at TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_documents_lead ON documents(lead_id, created_at DESC)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_document_shares_token ON document_shares(share_token)`);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS pipeline_deals (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                stage_id INTEGER REFERENCES pipeline_stages(id),
+                title VARCHAR(500) NOT NULL,
+                value DECIMAL(10, 2),
+                expected_close_date DATE,
+                probability INTEGER DEFAULT 50,
+                position INTEGER DEFAULT 0,
+                notes TEXT,
+                assigned_to INTEGER REFERENCES admin_users(id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS deal_activities (
+                id SERIAL PRIMARY KEY,
+                deal_id INTEGER REFERENCES pipeline_deals(id) ON DELETE CASCADE,
+                activity_type VARCHAR(100) NOT NULL,
+                description TEXT,
+                metadata JSONB,
+                created_by INTEGER REFERENCES admin_users(id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_pipeline_deals_stage ON pipeline_deals(stage_id, position)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_deal_activities_deal ON deal_activities(deal_id, created_at DESC)`);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS bookings (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE SET NULL,
+                contact_name VARCHAR(255) NOT NULL,
+                contact_email VARCHAR(255) NOT NULL,
+                contact_phone VARCHAR(50),
+                booking_date DATE NOT NULL,
+                booking_time TIME NOT NULL,
+                duration_minutes INTEGER DEFAULT 30,
+                service_type VARCHAR(100),
+                notes TEXT,
+                status VARCHAR(50) DEFAULT 'scheduled',
+                booked_from VARCHAR(50) DEFAULT 'email',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_bookings_date_time ON bookings(booking_date, booking_time)`);
+
         await client.query(`
             CREATE TABLE IF NOT EXISTS support_tickets (
                 id SERIAL PRIMARY KEY,
@@ -1667,8 +1828,8 @@ console.log(' Follow-up tracking columns initialized');
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_support_tickets_lead ON support_tickets(lead_id, created_at DESC)`);
 
-        // Client uploads table
         await client.query(`
             CREATE TABLE IF NOT EXISTS client_uploads (
                 id SERIAL PRIMARY KEY,
@@ -1683,8 +1844,8 @@ console.log(' Follow-up tracking columns initialized');
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_client_uploads_lead ON client_uploads(lead_id, created_at DESC)`);
 
-        // Client projects table
         await client.query(`
             CREATE TABLE IF NOT EXISTS client_projects (
                 id SERIAL PRIMARY KEY,
@@ -1698,39 +1859,8 @@ console.log(' Follow-up tracking columns initialized');
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_client_projects_lead ON client_projects(lead_id, created_at DESC)`);
 
-        // Project milestones table
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS project_milestones (
-                id SERIAL PRIMARY KEY,
-                project_id INTEGER REFERENCES client_projects(id) ON DELETE CASCADE,
-                title VARCHAR(500) NOT NULL,
-                description TEXT,
-                due_date DATE,
-                order_index INTEGER DEFAULT 0,
-                approval_required BOOLEAN DEFAULT FALSE,
-                status VARCHAR(50) DEFAULT 'pending',
-                client_feedback TEXT,
-                completed_at TIMESTAMP,
-                approved_at TIMESTAMP,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-
-        // Ticket responses table
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS ticket_responses (
-                id SERIAL PRIMARY KEY,
-                ticket_id INTEGER REFERENCES support_tickets(id) ON DELETE CASCADE,
-                user_id INTEGER,
-                user_type VARCHAR(50) NOT NULL,
-                user_name VARCHAR(255) NOT NULL,
-                message TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-
-        // Client tasks table
         await client.query(`
             CREATE TABLE IF NOT EXISTS client_tasks (
                 id SERIAL PRIMARY KEY,
@@ -1750,321 +1880,245 @@ console.log(' Follow-up tracking columns initialized');
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-
         await client.query(`CREATE INDEX IF NOT EXISTS idx_client_tasks_client ON client_tasks(client_id, created_at DESC)`);
-        await client.query(`CREATE INDEX IF NOT EXISTS idx_client_uploads_lead ON client_uploads(lead_id, created_at DESC)`);
-        await client.query(`CREATE INDEX IF NOT EXISTS idx_client_projects_lead ON client_projects(lead_id, created_at DESC)`);
-        await client.query(`CREATE INDEX IF NOT EXISTS idx_project_milestones_project ON project_milestones(project_id, order_index)`);
-        await client.query(`CREATE INDEX IF NOT EXISTS idx_support_tickets_lead ON support_tickets(lead_id, created_at DESC)`);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS auto_campaigns (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                subject VARCHAR(500) NOT NULL,
+                body TEXT NOT NULL,
+                is_active BOOLEAN DEFAULT TRUE,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_sent_at TIMESTAMP,
+                stopped_at TIMESTAMP,
+                stop_reason TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_auto_campaigns_lead ON auto_campaigns(lead_id)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_auto_campaigns_active ON auto_campaigns(is_active) WHERE is_active = TRUE`);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS message_log (
+                id SERIAL PRIMARY KEY,
+                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                client_portal_id VARCHAR(255),
+                direction VARCHAR(10) NOT NULL DEFAULT 'outbound',
+                channel VARCHAR(10) NOT NULL DEFAULT 'email',
+                content TEXT,
+                subject VARCHAR(500),
+                status VARCHAR(50) DEFAULT 'sent',
+                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                from_number VARCHAR(50),
+                to_number VARCHAR(50),
+                from_email VARCHAR(255),
+                to_email VARCHAR(255),
+                brevo_message_id VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_message_log_lead_id ON message_log(lead_id)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_message_log_portal ON message_log(client_portal_id)`);
+
+        // ══════════════════════════════════════════════════════
+        // TIER 4 — Depends on Tier 3 tables
+        // ══════════════════════════════════════════════════════
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS ticket_responses (
+                id SERIAL PRIMARY KEY,
+                ticket_id INTEGER REFERENCES support_tickets(id) ON DELETE CASCADE,
+                user_id INTEGER,
+                user_type VARCHAR(50) NOT NULL,
+                user_name VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_ticket_responses_ticket ON ticket_responses(ticket_id, created_at ASC)`);
 
-        // Update leads table structure - ADD new columns first
         await client.query(`
-            DO $$ 
-            BEGIN 
-                -- Add name column if it doesn't exist
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='name') THEN
-                    ALTER TABLE leads ADD COLUMN name VARCHAR(255);
-                END IF;
-                
-                -- Add company column if it doesn't exist
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='company') THEN
-                    ALTER TABLE leads ADD COLUMN company VARCHAR(255);
-                END IF;
-                
-                -- Add project_type column if it doesn't exist
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='project_type') THEN
-                    ALTER TABLE leads ADD COLUMN project_type VARCHAR(255);
-                END IF;
-
-                -- Add lifetime_value column if it doesn't exist
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='lifetime_value') THEN
-                    ALTER TABLE leads ADD COLUMN lifetime_value DECIMAL(10, 2) DEFAULT 0;
-                END IF;
-
-                -- Add last_payment_date column if it doesn't exist
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='last_payment_date') THEN
-                    ALTER TABLE leads ADD COLUMN last_payment_date TIMESTAMP;
-                END IF;
-                
-                -- Add message column if it doesn't exist
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='message') THEN
-                    ALTER TABLE leads ADD COLUMN message TEXT;
-                END IF;
-                
-                -- Add timeline column if it doesn't exist
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='timeline') THEN
-                    ALTER TABLE leads ADD COLUMN timeline VARCHAR(100);
-                END IF;
-                
-                -- Add notes column if it doesn't exist
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='notes') THEN
-                    ALTER TABLE leads ADD COLUMN notes TEXT;
-                END IF;
-                
-                -- Add assigned_to column if it doesn't exist
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='assigned_to') THEN
-                    ALTER TABLE leads ADD COLUMN assigned_to INTEGER REFERENCES employees(id);
-                END IF;
-
-                -- Add address columns if they don't exist
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='address_line1') THEN
-                    ALTER TABLE leads ADD COLUMN address_line1 VARCHAR(255);
-                END IF;
-
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='address_line2') THEN
-                    ALTER TABLE leads ADD COLUMN address_line2 VARCHAR(255);
-                END IF;
-
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='city') THEN
-                    ALTER TABLE leads ADD COLUMN city VARCHAR(100);
-                END IF;
-
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='state') THEN
-                    ALTER TABLE leads ADD COLUMN state VARCHAR(100);
-                END IF;
-
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='zip_code') THEN
-                    ALTER TABLE leads ADD COLUMN zip_code VARCHAR(20);
-                END IF;
-
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='country') THEN
-                    ALTER TABLE leads ADD COLUMN country VARCHAR(100) DEFAULT 'USA';
-                END IF;
-
-                -- Add client portal columns
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='client_password') THEN
-                    ALTER TABLE leads ADD COLUMN client_password TEXT;
-                END IF;
-
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='client_account_created_at') THEN
-                    ALTER TABLE leads ADD COLUMN client_account_created_at TIMESTAMP;
-                END IF;
-
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='client_last_login') THEN
-                    ALTER TABLE leads ADD COLUMN client_last_login TIMESTAMP;
-                END IF;
-
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='password_reset_required') THEN
-                    ALTER TABLE leads ADD COLUMN password_reset_required BOOLEAN DEFAULT FALSE;
-                END IF;
-
-                -- Add unsubscribe columns for email opt-out
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='unsubscribed') THEN
-                    ALTER TABLE leads ADD COLUMN unsubscribed BOOLEAN DEFAULT FALSE;
-                END IF;
-
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='unsubscribe_token') THEN
-                    ALTER TABLE leads ADD COLUMN unsubscribe_token VARCHAR(255);
-                END IF;
-            END $$;
-        `);
-
-        // Create index on unsubscribe_token for fast lookups
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_leads_unsubscribe_token 
-            ON leads(unsubscribe_token) 
-            WHERE unsubscribe_token IS NOT NULL
-        `);
-
-        // Migrate existing data from first_name/last_name to name
-        await client.query(`
-            UPDATE leads 
-            SET name = CONCAT(first_name, ' ', last_name) 
-            WHERE name IS NULL AND first_name IS NOT NULL
-        `);
-
-        // NOW make first_name and last_name nullable and drop NOT NULL constraint
-        await client.query(`
-            DO $$ 
-            BEGIN 
-                -- Make first_name nullable
-                ALTER TABLE leads ALTER COLUMN first_name DROP NOT NULL;
-                
-                -- Make last_name nullable  
-                ALTER TABLE leads ALTER COLUMN last_name DROP NOT NULL;
-            EXCEPTION
-                WHEN OTHERS THEN
-                    -- Ignore errors if constraints already don't exist
-                    NULL;
-            END $$;
-        `);
-
-        // Add customer-related columns if they don't exist
-        await client.query(`
-            DO $$ 
-            BEGIN 
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='is_customer') THEN
-                    ALTER TABLE leads ADD COLUMN is_customer BOOLEAN DEFAULT FALSE;
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='customer_status') THEN
-                    ALTER TABLE leads ADD COLUMN customer_status VARCHAR(50);
-                END IF;
-            END $$;
-        `);
-
-        // Create notes table
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS lead_notes (
+            CREATE TABLE IF NOT EXISTS project_milestones (
                 id SERIAL PRIMARY KEY,
-                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-                note_text TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                created_by INTEGER REFERENCES admin_users(id)
-            )
-        `);
-
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS cookie_consent (
-                id SERIAL PRIMARY KEY,
-                user_id VARCHAR(255),
-                consent_type VARCHAR(50) NOT NULL,
-                preferences JSONB,
-                ip_address VARCHAR(45),
-                user_agent TEXT,
+                project_id INTEGER REFERENCES client_projects(id) ON DELETE CASCADE,
+                title VARCHAR(500) NOT NULL,
+                description TEXT,
+                due_date DATE,
+                order_index INTEGER DEFAULT 0,
+                approval_required BOOLEAN DEFAULT FALSE,
+                status VARCHAR(50) DEFAULT 'pending',
+                client_feedback TEXT,
+                completed_at TIMESTAMP,
+                approved_at TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_project_milestones_project ON project_milestones(project_id, order_index)`);
 
-        // Lead source tracking
+        // SMS chain tables (.catch so they never kill startup)
         await client.query(`
-            DO $$ 
-            BEGIN
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='source') THEN
-                    ALTER TABLE leads ADD COLUMN source VARCHAR(100);
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='source_details') THEN
-                    ALTER TABLE leads ADD COLUMN source_details TEXT;
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='last_contact_date') THEN
-                    ALTER TABLE leads ADD COLUMN last_contact_date TIMESTAMP;
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='win_loss_reason') THEN
-                    ALTER TABLE leads ADD COLUMN win_loss_reason TEXT;
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='deal_value') THEN
-                    ALTER TABLE leads ADD COLUMN deal_value DECIMAL(10, 2);
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='probability') THEN
-                    ALTER TABLE leads ADD COLUMN probability INTEGER DEFAULT 50;
-                END IF;
-                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                              WHERE table_name='leads' AND column_name='expected_close_date') THEN
-                    ALTER TABLE leads ADD COLUMN expected_close_date DATE;
-                END IF;
-            END $$;
-        `);
-
-        // Activity log table
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS activity_log (
+            CREATE TABLE IF NOT EXISTS client_sms_chains (
                 id SERIAL PRIMARY KEY,
-                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-                user_id INTEGER REFERENCES admin_users(id),
-                activity_type VARCHAR(100) NOT NULL,
-                description TEXT,
-                metadata JSONB,
+                client_portal_id VARCHAR(255),
+                name VARCHAR(255) NOT NULL,
+                loop BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        `);
+        `).catch(()=>{});
 
-        // Email tracking
         await client.query(`
-            CREATE TABLE IF NOT EXISTS email_log (
+            CREATE TABLE IF NOT EXISTS client_sms_chain_queue (
                 id SERIAL PRIMARY KEY,
+                chain_id INTEGER REFERENCES client_sms_chains(id) ON DELETE CASCADE,
                 lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-                template_id INTEGER,
-                subject VARCHAR(500),
-                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                opened_at TIMESTAMP,
-                clicked_at TIMESTAMP,
-                status VARCHAR(50) DEFAULT 'sent'
-            )
-        `);
-
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS scoring_rules (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(200) NOT NULL,
-                description TEXT,
-                rule_type VARCHAR(50) NOT NULL,
-                field_name VARCHAR(100),
-                operator VARCHAR(20),
-                value TEXT,
-                points INTEGER NOT NULL,
+                client_portal_id VARCHAR(255),
+                current_step INTEGER DEFAULT 0,
+                next_send_at TIMESTAMP,
                 is_active BOOLEAN DEFAULT TRUE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
+            )
+        `).catch(()=>{});
 
+        // ══════════════════════════════════════════════════════
+        // COLUMN MIGRATIONS — run after all tables exist
+        // (all wrapped in IF EXISTS guards so safe on fresh DB)
+        // ══════════════════════════════════════════════════════
+        console.log(' Running database migrations...');
+
+        // leads — backfill columns added over time
         await client.query(`
-            CREATE TABLE IF NOT EXISTS lead_scores (
-                id SERIAL PRIMARY KEY,
-                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE UNIQUE,
-                total_score INTEGER DEFAULT 0,
-                engagement_score INTEGER DEFAULT 0,
-                demographic_score INTEGER DEFAULT 0,
-                behavioral_score INTEGER DEFAULT 0,
-                grade VARCHAR(1),
-                last_calculated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT unique_lead_score UNIQUE (lead_id)
-            );
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='name') THEN ALTER TABLE leads ADD COLUMN name VARCHAR(255); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='company') THEN ALTER TABLE leads ADD COLUMN company VARCHAR(255); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='project_type') THEN ALTER TABLE leads ADD COLUMN project_type VARCHAR(255); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='lifetime_value') THEN ALTER TABLE leads ADD COLUMN lifetime_value DECIMAL(10,2) DEFAULT 0; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='last_payment_date') THEN ALTER TABLE leads ADD COLUMN last_payment_date TIMESTAMP; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='message') THEN ALTER TABLE leads ADD COLUMN message TEXT; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='timeline') THEN ALTER TABLE leads ADD COLUMN timeline VARCHAR(100); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='notes') THEN ALTER TABLE leads ADD COLUMN notes TEXT; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='assigned_to') THEN ALTER TABLE leads ADD COLUMN assigned_to INTEGER REFERENCES employees(id); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='address_line1') THEN ALTER TABLE leads ADD COLUMN address_line1 VARCHAR(255); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='address_line2') THEN ALTER TABLE leads ADD COLUMN address_line2 VARCHAR(255); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='city') THEN ALTER TABLE leads ADD COLUMN city VARCHAR(100); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='state') THEN ALTER TABLE leads ADD COLUMN state VARCHAR(100); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='zip_code') THEN ALTER TABLE leads ADD COLUMN zip_code VARCHAR(20); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='country') THEN ALTER TABLE leads ADD COLUMN country VARCHAR(100) DEFAULT 'USA'; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='client_password') THEN ALTER TABLE leads ADD COLUMN client_password TEXT; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='client_account_created_at') THEN ALTER TABLE leads ADD COLUMN client_account_created_at TIMESTAMP; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='client_last_login') THEN ALTER TABLE leads ADD COLUMN client_last_login TIMESTAMP; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='password_reset_required') THEN ALTER TABLE leads ADD COLUMN password_reset_required BOOLEAN DEFAULT FALSE; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='unsubscribed') THEN ALTER TABLE leads ADD COLUMN unsubscribed BOOLEAN DEFAULT FALSE; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='unsubscribe_token') THEN ALTER TABLE leads ADD COLUMN unsubscribe_token VARCHAR(255); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='is_customer') THEN ALTER TABLE leads ADD COLUMN is_customer BOOLEAN DEFAULT FALSE; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='customer_status') THEN ALTER TABLE leads ADD COLUMN customer_status VARCHAR(50); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='source') THEN ALTER TABLE leads ADD COLUMN source VARCHAR(100); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='source_details') THEN ALTER TABLE leads ADD COLUMN source_details TEXT; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='win_loss_reason') THEN ALTER TABLE leads ADD COLUMN win_loss_reason TEXT; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='deal_value') THEN ALTER TABLE leads ADD COLUMN deal_value DECIMAL(10,2); END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='probability') THEN ALTER TABLE leads ADD COLUMN probability INTEGER DEFAULT 50; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='expected_close_date') THEN ALTER TABLE leads ADD COLUMN expected_close_date DATE; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='follow_up_step') THEN ALTER TABLE leads ADD COLUMN follow_up_step INTEGER DEFAULT 0; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='last_contact_date') THEN ALTER TABLE leads ADD COLUMN last_contact_date DATE; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='lead_temperature') THEN ALTER TABLE leads ADD COLUMN lead_temperature VARCHAR(20) DEFAULT 'cold'; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='became_hot_at') THEN ALTER TABLE leads ADD COLUMN became_hot_at TIMESTAMP; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='last_engagement_at') THEN ALTER TABLE leads ADD COLUMN last_engagement_at TIMESTAMP; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='engagement_score') THEN ALTER TABLE leads ADD COLUMN engagement_score INTEGER DEFAULT 0; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='engagement_history') THEN ALTER TABLE leads ADD COLUMN engagement_history JSONB DEFAULT '[]'::jsonb; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='leads' AND column_name='follow_up_count') THEN ALTER TABLE leads ADD COLUMN follow_up_count INTEGER DEFAULT 0; END IF;
+                -- Drop NOT NULL constraints that block inserts
+                BEGIN ALTER TABLE leads ALTER COLUMN first_name DROP NOT NULL; EXCEPTION WHEN OTHERS THEN NULL; END;
+                BEGIN ALTER TABLE leads ALTER COLUMN last_name DROP NOT NULL; EXCEPTION WHEN OTHERS THEN NULL; END;
+            END $$;
         `);
 
+        // email_log — backfill columns
         await client.query(`
-            CREATE TABLE IF NOT EXISTS score_history (
-                id SERIAL PRIMARY KEY,
-                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-                rule_id INTEGER REFERENCES scoring_rules(id),
-                points_added INTEGER,
-                reason TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='email_log' AND column_name='error_message') THEN ALTER TABLE email_log ADD COLUMN error_message TEXT; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='email_log' AND column_name='created_at') THEN ALTER TABLE email_log ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP; UPDATE email_log SET created_at = COALESCE(sent_at, CURRENT_TIMESTAMP) WHERE created_at IS NULL; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='email_log' AND column_name='brevo_message_id') THEN ALTER TABLE email_log ADD COLUMN brevo_message_id TEXT; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='email_log' AND column_name='email_type') THEN ALTER TABLE email_log ADD COLUMN email_type VARCHAR(50) DEFAULT 'follow-up'; END IF;
+            END $$;
         `);
 
+        // employees — backfill columns
         await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_lead_scores_total 
-            ON lead_scores(total_score DESC);
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='employees' AND column_name='start_date') THEN ALTER TABLE employees ADD COLUMN start_date DATE; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='employees' AND column_name='end_date') THEN ALTER TABLE employees ADD COLUMN end_date DATE; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='employees' AND column_name='notes') THEN ALTER TABLE employees ADD COLUMN notes TEXT; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='employees' AND column_name='is_active') THEN ALTER TABLE employees ADD COLUMN is_active BOOLEAN DEFAULT TRUE; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='employees' AND column_name='projects_assigned') THEN ALTER TABLE employees ADD COLUMN projects_assigned INTEGER DEFAULT 0; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='employees' AND column_name='tasks_completed') THEN ALTER TABLE employees ADD COLUMN tasks_completed INTEGER DEFAULT 0; END IF;
+            END $$;
         `);
 
+        // admin_users — backfill columns
         await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_score_history_lead 
-            ON score_history(lead_id, created_at DESC);
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_users' AND column_name='settings') THEN ALTER TABLE admin_users ADD COLUMN settings JSONB DEFAULT '{}'::jsonb; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_users' AND column_name='updated_at') THEN ALTER TABLE admin_users ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP; END IF;
+            END $$;
         `);
 
-        // Insert default scoring rules
+        // admin_sessions — migrate token column to TEXT if needed
+        await client.query(`
+            DO $$ BEGIN
+                IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_sessions' AND column_name='token' AND data_type='character varying') THEN
+                    ALTER TABLE admin_sessions ALTER COLUMN token TYPE TEXT;
+                END IF;
+            END $$;
+        `);
+
+        // ticket_responses — backfill user_name
+        await client.query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='ticket_responses' AND column_name='user_name') THEN
+                    ALTER TABLE ticket_responses ADD COLUMN user_name VARCHAR(255) DEFAULT 'Unknown';
+                    UPDATE ticket_responses SET user_name = CASE WHEN user_type='admin' THEN 'Admin' WHEN user_type='client' THEN 'Client' ELSE 'Unknown' END WHERE user_name IS NULL OR user_name = '';
+                    ALTER TABLE ticket_responses ALTER COLUMN user_name SET NOT NULL;
+                END IF;
+            END $$;
+        `);
+
+        // auto_campaigns — backfill columns (table now created with all columns above, this handles old DBs)
+        await client.query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='auto_campaigns' AND column_name='is_active') THEN ALTER TABLE auto_campaigns ADD COLUMN is_active BOOLEAN DEFAULT TRUE; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='auto_campaigns' AND column_name='updated_at') THEN ALTER TABLE auto_campaigns ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='auto_campaigns' AND column_name='last_sent_at') THEN ALTER TABLE auto_campaigns ADD COLUMN last_sent_at TIMESTAMP; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='auto_campaigns' AND column_name='stopped_at') THEN ALTER TABLE auto_campaigns ADD COLUMN stopped_at TIMESTAMP; END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='auto_campaigns' AND column_name='stop_reason') THEN ALTER TABLE auto_campaigns ADD COLUMN stop_reason TEXT; END IF;
+            END $$;
+        `);
+
+        // SMS settings migration (non-fatal)
+        try {
+            await client.query(`
+                DO $sms$
+                BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='client_email_settings' AND column_name='brevo_sms_sender') THEN
+                        ALTER TABLE client_email_settings ADD COLUMN brevo_sms_sender VARCHAR(20);
+                        ALTER TABLE client_email_settings ADD COLUMN brevo_sms_enabled BOOLEAN DEFAULT FALSE;
+                    END IF;
+                END $sms$;
+            `);
+        } catch(smsErr) { console.warn('[SMS MIGRATION] Non-fatal:', smsErr.message); }
+
+        // ══════════════════════════════════════════════════════
+        // SEED DATA
+        // ══════════════════════════════════════════════════════
+
         await client.query(`
             INSERT INTO scoring_rules (name, description, rule_type, field_name, operator, value, points)
-            VALUES 
+            VALUES
                 ('Email Opened', 'Lead opened an email', 'behavioral', 'email_opened', 'equals', 'true', 5),
                 ('Email Clicked', 'Lead clicked link in email', 'behavioral', 'email_clicked', 'equals', 'true', 10),
                 ('Form Submitted', 'Lead submitted contact form', 'behavioral', 'form_submitted', 'equals', 'true', 15),
@@ -2077,113 +2131,8 @@ console.log(' Follow-up tracking columns initialized');
         `);
 
         await client.query(`
-            CREATE TABLE IF NOT EXISTS documents (
-                id SERIAL PRIMARY KEY,
-                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-                filename VARCHAR(500) NOT NULL,
-                original_filename VARCHAR(500) NOT NULL,
-                file_path TEXT NOT NULL,
-                file_size BIGINT,
-                mime_type VARCHAR(100),
-                document_type VARCHAR(100),
-                description TEXT,
-                uploaded_by INTEGER REFERENCES admin_users(id),
-                is_shared BOOLEAN DEFAULT FALSE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS document_versions (
-                id SERIAL PRIMARY KEY,
-                document_id INTEGER REFERENCES documents(id) ON DELETE CASCADE,
-                version_number INTEGER NOT NULL,
-                filename VARCHAR(500) NOT NULL,
-                file_path TEXT NOT NULL,
-                file_size BIGINT,
-                uploaded_by INTEGER REFERENCES admin_users(id),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS document_shares (
-                id SERIAL PRIMARY KEY,
-                document_id INTEGER REFERENCES documents(id) ON DELETE CASCADE,
-                shared_with_email VARCHAR(255),
-                share_token VARCHAR(255) UNIQUE,
-                expires_at TIMESTAMP,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_documents_lead 
-            ON documents(lead_id, created_at DESC);
-        `);
-
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_document_shares_token 
-            ON document_shares(share_token);
-        `);
-
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS pipeline_stages (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(200) NOT NULL,
-                description TEXT,
-                color VARCHAR(50),
-                position INTEGER NOT NULL,
-                probability INTEGER DEFAULT 50,
-                is_active BOOLEAN DEFAULT TRUE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS pipeline_deals (
-                id SERIAL PRIMARY KEY,
-                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-                stage_id INTEGER REFERENCES pipeline_stages(id),
-                title VARCHAR(500) NOT NULL,
-                value DECIMAL(10, 2),
-                expected_close_date DATE,
-                probability INTEGER DEFAULT 50,
-                position INTEGER DEFAULT 0,
-                notes TEXT,
-                assigned_to INTEGER REFERENCES admin_users(id),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS deal_activities (
-                id SERIAL PRIMARY KEY,
-                deal_id INTEGER REFERENCES pipeline_deals(id) ON DELETE CASCADE,
-                activity_type VARCHAR(100) NOT NULL,
-                description TEXT,
-                metadata JSONB,
-                created_by INTEGER REFERENCES admin_users(id),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_pipeline_deals_stage 
-            ON pipeline_deals(stage_id, position);
-        `);
-
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_deal_activities_deal 
-            ON deal_activities(deal_id, created_at DESC);
-        `);
-
-        // Insert default pipeline stages
-        await client.query(`
             INSERT INTO pipeline_stages (name, description, color, position, probability)
-            VALUES 
+            VALUES
                 ('New Lead', 'Initial contact', '#3b82f6', 1, 10),
                 ('Qualified', 'Lead has been qualified', '#10b981', 2, 25),
                 ('Proposal Sent', 'Proposal has been sent to client', '#f59e0b', 3, 50),
@@ -2193,426 +2142,22 @@ console.log(' Follow-up tracking columns initialized');
             ON CONFLICT DO NOTHING;
         `);
 
-        // Bookings/Appointments Table
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS bookings (
-                id SERIAL PRIMARY KEY,
-                lead_id INTEGER REFERENCES leads(id) ON DELETE SET NULL,
-                contact_name VARCHAR(255) NOT NULL,
-                contact_email VARCHAR(255) NOT NULL,
-                contact_phone VARCHAR(50),
-                booking_date DATE NOT NULL,
-                booking_time TIME NOT NULL,
-                duration_minutes INTEGER DEFAULT 30,
-                service_type VARCHAR(100),
-                notes TEXT,
-                status VARCHAR(50) DEFAULT 'scheduled',
-                booked_from VARCHAR(50) DEFAULT 'email',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_bookings_date_time ON bookings(booking_date, booking_time);
-        `);
-
-await client.query(`CREATE TABLE IF NOT EXISTS client_uploads (
-    id SERIAL PRIMARY KEY,
-    lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-    filename VARCHAR(500) NOT NULL,
-    filepath TEXT NOT NULL,
-    file_size BIGINT,
-    mime_type VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)`);
-
-console.log(' Client portal tables initialized');
-
-await client.query(`CREATE TABLE IF NOT EXISTS auto_campaigns (
-    id SERIAL PRIMARY KEY,
-    lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-    subject VARCHAR(500) NOT NULL,
-    body TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)`);
-
-// Migration: ensure all columns exist on auto_campaigns (safe if table already existed without them)
-await client.query(`
-    DO $$
-    BEGIN
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'auto_campaigns' AND column_name = 'is_active') THEN
-            ALTER TABLE auto_campaigns ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'auto_campaigns' AND column_name = 'updated_at') THEN
-            ALTER TABLE auto_campaigns ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'auto_campaigns' AND column_name = 'last_sent_at') THEN
-            ALTER TABLE auto_campaigns ADD COLUMN last_sent_at TIMESTAMP;
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'auto_campaigns' AND column_name = 'stopped_at') THEN
-            ALTER TABLE auto_campaigns ADD COLUMN stopped_at TIMESTAMP;
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'auto_campaigns' AND column_name = 'stop_reason') THEN
-            ALTER TABLE auto_campaigns ADD COLUMN stop_reason TEXT;
-        END IF;
-    END $$;
-`);
-await client.query(`CREATE INDEX IF NOT EXISTS idx_auto_campaigns_lead ON auto_campaigns(lead_id)`);
-await client.query(`CREATE INDEX IF NOT EXISTS idx_auto_campaigns_active ON auto_campaigns(is_active) WHERE is_active = TRUE`);
-console.log(' Auto-campaigns table initialized');
-
-// ── Recruitment: jobs & applications ──
-await client.query(`CREATE TABLE IF NOT EXISTS jobs (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    department VARCHAR(100) NOT NULL,
-    type VARCHAR(50) NOT NULL DEFAULT 'Full-time',
-    location VARCHAR(100) NOT NULL DEFAULT 'Remote',
-    description TEXT,
-    duties TEXT[] DEFAULT '{}',
-    requirements TEXT[] DEFAULT '{}',
-    published BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)`);
-await client.query(`CREATE INDEX IF NOT EXISTS idx_jobs_published ON jobs(published)`);
-
-await client.query(`CREATE TABLE IF NOT EXISTS applications (
-    id SERIAL PRIMARY KEY,
-    job_id INTEGER REFERENCES jobs(id) ON DELETE SET NULL,
-    first_name VARCHAR(150) NOT NULL,
-    last_name VARCHAR(150) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    phone VARCHAR(50),
-    city VARCHAR(100),
-    state VARCHAR(100),
-    linkedin_url TEXT,
-    portfolio_url TEXT,
-    experience VARCHAR(20),
-    cover_letter TEXT,
-    start_date VARCHAR(50),
-    expected_salary VARCHAR(100),
-    referral_source VARCHAR(100),
-    resume_path TEXT,
-    resume_original_name TEXT,
-    status VARCHAR(50) DEFAULT 'new',
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)`);
-await client.query(`CREATE INDEX IF NOT EXISTS idx_applications_job ON applications(job_id)`);
-await client.query(`CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status)`);
-console.log(' Recruitment tables (jobs, applications) initialized');
-
-        // ========================================
-        // DATABASE MIGRATIONS
-        // ========================================
-        console.log(' Running database migrations...');
-        
-        // Migration 1: Add user_name column to ticket_responses if it doesn't exist
-        await client.query(`
-            DO $$ 
-            BEGIN
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'ticket_responses' 
-                    AND column_name = 'user_name'
-                ) THEN
-                    ALTER TABLE ticket_responses 
-                    ADD COLUMN user_name VARCHAR(255) DEFAULT 'Unknown';
-                    
-                    -- Update existing rows to set a default user_name
-                    UPDATE ticket_responses 
-                    SET user_name = CASE 
-                        WHEN user_type = 'admin' THEN 'Admin'
-                        WHEN user_type = 'client' THEN 'Client'
-                        ELSE 'Unknown'
-                    END
-                    WHERE user_name IS NULL OR user_name = '';
-                    
-                    -- Make the column NOT NULL after setting defaults
-                    ALTER TABLE ticket_responses 
-                    ALTER COLUMN user_name SET NOT NULL;
-                    
-                    RAISE NOTICE 'Added user_name column to ticket_responses';
-                END IF;
-            END $$;
-        `);
-        
-        // Migration 2: Add missing columns to employees table if they don't exist
-        await client.query(`
-            DO $$ 
-            BEGIN
-                -- Add start_date column if it doesn't exist
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'employees' 
-                    AND column_name = 'start_date'
-                ) THEN
-                    ALTER TABLE employees 
-                    ADD COLUMN start_date DATE;
-                    RAISE NOTICE 'Added start_date column to employees';
-                END IF;
-                
-                -- Add end_date column if it doesn't exist
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'employees' 
-                    AND column_name = 'end_date'
-                ) THEN
-                    ALTER TABLE employees 
-                    ADD COLUMN end_date DATE;
-                    RAISE NOTICE 'Added end_date column to employees';
-                END IF;
-                
-                -- Add notes column if it doesn't exist
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'employees' 
-                    AND column_name = 'notes'
-                ) THEN
-                    ALTER TABLE employees 
-                    ADD COLUMN notes TEXT;
-                    RAISE NOTICE 'Added notes column to employees';
-                END IF;
-                
-                -- Add is_active column if it doesn't exist
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'employees' 
-                    AND column_name = 'is_active'
-                ) THEN
-                    ALTER TABLE employees 
-                    ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
-                    RAISE NOTICE 'Added is_active column to employees';
-                END IF;
-                
-                -- Add projects_assigned column if it doesn't exist
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'employees' 
-                    AND column_name = 'projects_assigned'
-                ) THEN
-                    ALTER TABLE employees 
-                    ADD COLUMN projects_assigned INTEGER DEFAULT 0;
-                    RAISE NOTICE 'Added projects_assigned column to employees';
-                END IF;
-                
-                -- Add tasks_completed column if it doesn't exist
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'employees' 
-                    AND column_name = 'tasks_completed'
-                ) THEN
-                    ALTER TABLE employees 
-                    ADD COLUMN tasks_completed INTEGER DEFAULT 0;
-                    RAISE NOTICE 'Added tasks_completed column to employees';
-                END IF;
-            END $$;
-        `);
-        
-        // Migration 3: Create tasks table
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS tasks (
-                id SERIAL PRIMARY KEY,
-                title VARCHAR(500) NOT NULL,
-                description TEXT,
-                due_date DATE,
-                priority VARCHAR(20) DEFAULT 'medium',
-                status VARCHAR(50) DEFAULT 'pending',
-                completed BOOLEAN DEFAULT FALSE,
-                assigned_to INTEGER REFERENCES employees(id),
-                created_by VARCHAR(100),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                completed_at TIMESTAMP
-            )
-        `);
-        
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_tasks_assigned_to ON tasks(assigned_to)
-        `);
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)
-        `);
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks(completed)
-        `);
-        
-        // Migration 4: Add settings column to admin_users
-        await client.query(`
-            DO $$ 
-            BEGIN
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'admin_users' 
-                    AND column_name = 'settings'
-                ) THEN
-                    ALTER TABLE admin_users 
-                    ADD COLUMN settings JSONB DEFAULT '{}'::jsonb;
-                    RAISE NOTICE 'Added settings column to admin_users';
-                END IF;
-                
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'admin_users' 
-                    AND column_name = 'updated_at'
-                ) THEN
-                    ALTER TABLE admin_users 
-                    ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-                    RAISE NOTICE 'Added updated_at column to admin_users';
-                END IF;
-            END $$;
-        `);
-        
-        // Migration 5: Create admin_sessions and activity_log tables (safe — never drops existing data)
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS admin_sessions (
-                id SERIAL PRIMARY KEY,
-                user_email VARCHAR(255),
-                token TEXT UNIQUE NOT NULL,
-                ip_address VARCHAR(50),
-                user_agent TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                expires_at TIMESTAMP,
-                is_active BOOLEAN DEFAULT TRUE,
-                CONSTRAINT admin_sessions_user_email_fkey 
-                    FOREIGN KEY (user_email) 
-                    REFERENCES admin_users(email) 
-                    ON DELETE CASCADE
-            )
-        `);
-        
-        await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_user_email ON admin_sessions(user_email)`);
-        await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_token ON admin_sessions(token)`);
-        await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_active ON admin_sessions(is_active)`);
-
-        // Migrate token column from VARCHAR(500) to TEXT if it was created that way
-        await client.query(`
-            DO $$ BEGIN
-                IF EXISTS (
-                    SELECT 1 FROM information_schema.columns
-                    WHERE table_name = 'admin_sessions'
-                    AND column_name = 'token'
-                    AND data_type = 'character varying'
-                ) THEN
-                    ALTER TABLE admin_sessions ALTER COLUMN token TYPE TEXT;
-                    RAISE NOTICE 'Migrated admin_sessions.token to TEXT';
-                END IF;
-            END $$;
-        `);
-        
-        // Migration 6: Create activity_log table for audit trail
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS activity_log (
-                id SERIAL PRIMARY KEY,
-                user_email VARCHAR(255),
-                action VARCHAR(100) NOT NULL,
-                resource_type VARCHAR(50),
-                resource_id INTEGER,
-                details JSONB,
-                ip_address VARCHAR(50),
-                user_agent TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-        
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_activity_user_email ON activity_log(user_email)
-        `);
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_activity_action ON activity_log(action)
-        `);
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_activity_created_at ON activity_log(created_at)
-        `);
-        
-        console.log(' Database migrations completed');
-
-        // Migration: Create message_log table for SMS + inbound email tracking
-        try {
-            await client.query(`
-                CREATE TABLE IF NOT EXISTS message_log (
-                    id SERIAL PRIMARY KEY,
-                    lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-                    client_portal_id VARCHAR(255),
-                    direction VARCHAR(10) NOT NULL DEFAULT 'outbound',
-                    channel VARCHAR(10) NOT NULL DEFAULT 'email',
-                    content TEXT,
-                    subject VARCHAR(500),
-                    status VARCHAR(50) DEFAULT 'sent',
-                    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    from_number VARCHAR(50),
-                    to_number VARCHAR(50),
-                    from_email VARCHAR(255),
-                    to_email VARCHAR(255),
-                    brevo_message_id VARCHAR(255),
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            `);
-            await client.query(`CREATE INDEX IF NOT EXISTS idx_message_log_lead_id ON message_log(lead_id)`);
-            await client.query(`CREATE INDEX IF NOT EXISTS idx_message_log_portal ON message_log(client_portal_id)`);
-
-            // SMS Chains
-            await client.query(`
-                CREATE TABLE IF NOT EXISTS client_sms_chains (
-                    id SERIAL PRIMARY KEY,
-                    client_portal_id VARCHAR(255),
-                    name VARCHAR(255) NOT NULL,
-                    loop BOOLEAN DEFAULT FALSE,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            `).catch(()=>{});
-            await client.query(`
-                CREATE TABLE IF NOT EXISTS client_sms_chain_steps (
-                    id SERIAL PRIMARY KEY,
-                    chain_id INTEGER REFERENCES client_sms_chains(id) ON DELETE CASCADE,
-                    template_id INTEGER REFERENCES client_sms_templates(id) ON DELETE CASCADE,
-                    step_order INTEGER NOT NULL DEFAULT 0,
-                    delay_days INTEGER NOT NULL DEFAULT 0,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            `).catch(()=>{});
-            await client.query(`
-                CREATE TABLE IF NOT EXISTS client_sms_chain_queue (
-                    id SERIAL PRIMARY KEY,
-                    chain_id INTEGER REFERENCES client_sms_chains(id) ON DELETE CASCADE,
-                    lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-                    client_portal_id VARCHAR(255),
-                    current_step INTEGER DEFAULT 0,
-                    next_send_at TIMESTAMP,
-                    is_active BOOLEAN DEFAULT TRUE,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            `).catch(()=>{});
-            await client.query(`
-                DO $sms$
-                BEGIN
-                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='client_email_settings' AND column_name='brevo_sms_sender') THEN
-                        ALTER TABLE client_email_settings ADD COLUMN brevo_sms_sender VARCHAR(20);
-                        ALTER TABLE client_email_settings ADD COLUMN brevo_sms_enabled BOOLEAN DEFAULT FALSE;
-                    END IF;
-                END $sms$;
-            `);
-        } catch(smsErr) { console.warn('[SMS MIGRATION] Non-fatal:', smsErr.message); }
-
         await client.query('COMMIT');
         console.log(' Database tables initialized');
+        console.log(' Database migrations completed');
+        console.log(' Auto-campaigns table initialized');
+        console.log(' Recruitment tables (jobs, applications) initialized');
+        console.log(' Client portal tables initialized');
 
         // Create default admin user if none exists
         const adminCheck = await pool.query('SELECT * FROM admin_users LIMIT 1');
-        
         if (adminCheck.rows.length === 0) {
             const defaultPassword = 'Tango0401!';
             const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-            
             await pool.query(
                 'INSERT INTO admin_users (username, email, password_hash) VALUES ($1, $2, $3)',
                 ['admin', 'admin@crownceramiccoating.dev', hashedPassword]
             );
-            
             console.log('');
             console.log('========================================');
             console.log(' Default admin user created');
