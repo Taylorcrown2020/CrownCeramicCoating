@@ -1560,6 +1560,97 @@ window.addEventListener('load', function() {
     .back-to-top-btn { left: 16px; bottom: 180px; width: 40px; height: 40px; }
 }
 </style>
+
+    <!-- footer + chatbot brand fix (Crown Ceramic Coating) -->
+    <style id="crown-footer-fix">
+    .footer-cta-section {
+        padding: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%),
+                    url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1920&q=80') center/cover;
+        background-attachment: fixed;
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+    }
+    .footer-cta-section::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+    }
+    .footer-cta-wrapper { position: relative; z-index: 2; }
+    .footer-cta-hero {
+        padding: 120px 60px;
+        max-width: 1400px;
+        display: flex; justify-content: space-between; align-items: center;
+        gap: 60px;
+        background: rgba(60, 60, 60, 0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        margin: 96px 60px;
+    }
+    .footer-cta-text { flex: 1; }
+    .footer-cta-text h2 {
+        font-size: 56px; font-weight: 400; line-height: 1.2;
+        letter-spacing: -1.2px; margin-bottom: 0; color: var(--white);
+    }
+    .footer-cta-actions { display: flex; gap: 20px; align-items: center; flex-shrink: 0; }
+    .footer-cta-btn-primary {
+        background: var(--gold); color: #000; padding: 18px 48px;
+        font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+        border: none; cursor: pointer; transition: all 0.3s; text-decoration: none;
+        display: inline-block; border-radius: 4px;
+    }
+    .footer-cta-btn-primary:hover { background: #e6b86b; transform: translateY(-2px); }
+    .footer-cta-contact {
+        padding: 80px 60px; max-width: 1400px; margin: 0 auto;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-cta-call-info { display: flex; flex-direction: column; gap: 8px; }
+    .footer-cta-call-label {
+        font-size: 13px; color: rgba(255,255,255,0.6); letter-spacing: 0.5px;
+    }
+    .footer-cta-phone {
+        font-size: 28px; font-weight: 500; color: var(--white);
+        text-decoration: none; transition: color 0.3s;
+    }
+    .footer-cta-phone:hover { color: var(--gold); }
+    .footer-cta-btn-outline {
+        background: transparent; color: var(--white); padding: 16px 40px;
+        font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+        border: 2px solid var(--white); cursor: pointer; transition: all 0.3s;
+        text-decoration: none; display: inline-block; border-radius: 4px;
+    }
+    .footer-cta-btn-outline:hover { background: var(--white); color: #000; }
+
+    .footer-bottom-left { display: flex; gap: 32px; align-items: center; }
+    .footer-legal-links { display: flex; gap: 24px; list-style: none; }
+    .footer-legal-links a {
+        font-size: 13px; color: var(--grey-600); text-decoration: none; transition: color 0.2s;
+    }
+    .footer-legal-links a:hover { color: var(--white); }
+    .footer-social { display: flex; gap: 16px; }
+    .footer-social a {
+        width: 40px; height: 40px; border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--grey-600); text-decoration: none; transition: all 0.2s;
+    }
+    .footer-social a:hover { border-color: var(--white); color: var(--white); }
+
+    @media (max-width: 768px) {
+        .footer-cta-hero {
+            flex-direction: column; align-items: flex-start;
+            padding: 60px 28px; margin: 40px 16px; gap: 28px;
+        }
+        .footer-cta-text h2 { font-size: 32px; }
+        .footer-cta-contact { flex-direction: column; gap: 24px; align-items: flex-start; padding: 48px 28px; }
+        .footer-cta-phone { font-size: 24px; }
+        .footer-bottom { flex-direction: column; gap: 24px; align-items: flex-start; }
+        .footer-bottom-left { flex-direction: column; gap: 14px; align-items: flex-start; }
+        .footer-legal-links { gap: 18px; }
+    }
+    </style>
 </head>
 <body>
 
@@ -1634,7 +1725,8 @@ window.addEventListener('load', function() {
 .cc-page { --gold:#f4c87e; --ink:#0a0a0a; --cream:#fafaf8; }
 .cc-hero {
   background: linear-gradient(160deg,#0c0c0c 0%, #161616 60%, #1d1a14 100%);
-  color:#fff; padding:170px 24px 90px; text-align:center; position:relative; overflow:hidden;
+  color:#fff; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:130px 24px 80px; text-align:center; position:relative; overflow:hidden;
 }
 .cc-hero::after{content:'';position:absolute;top:-120px;right:-120px;width:420px;height:420px;
   background:radial-gradient(circle,rgba(244,200,126,0.14) 0%,transparent 70%);pointer-events:none;}
@@ -2052,11 +2144,9 @@ window.addEventListener('load', function() {
     <button class="chatbot-bubble-close" id="chatbotBubbleClose"
             onclick="event.stopPropagation(); dismissBubble()">&#x2715;</button>
     <div class="chatbot-bubble-logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
-            <path d="M12 3L3 7.5V16.5L12 21L21 16.5V7.5L12 3Z"/>
-            <path d="M12 12L3 7.5"/>
-            <path d="M12 12V21"/>
-            <path d="M12 12L21 7.5"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linejoin="round">
+            <path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z"/>
+            <line x1="3" y1="21" x2="21" y2="21"/>
         </svg>
     </div>
     <div>

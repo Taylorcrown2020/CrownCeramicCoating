@@ -3693,12 +3693,12 @@ body.graffiti-mode .sidebar::after {
                 Invoices
                 <span class="nav-badge" id="invoicesBadge">0</span>
             </div>
-            <div class="nav-item" data-section="subscriptions">
+            <div class="nav-item" data-section="serviceRequests">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
                 </svg>
-                Subscriptions
-                <span class="nav-badge" id="subscriptionsBadge" style="display:none;">0</span>
+                Service Requests
+                <span class="nav-badge" id="serviceRequestsBadge" style="display:none;">0</span>
             </div>
             <div class="nav-item" data-section="schedule">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -3709,15 +3709,6 @@ body.graffiti-mode .sidebar::after {
                 </svg>
                 Schedule
                 <span class="nav-badge" id="scheduleBadge">0</span>
-            </div>
-            <div class="nav-item" data-section="setupCalls">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                    <path d="m9 12 2 2 4-4"/>
-                </svg>
-                Setup Calls
-                <span class="nav-badge" id="setupCallsBadge" style="display:none;background:#FF6B35;color:#fff;"></span>
             </div>
             <div class="nav-item" data-section="team">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -4727,8 +4718,8 @@ async function renderSection(section) {
             renderInvoices(content);
             break;
 
-        case 'subscriptions':
-            renderSubscriptions(content);
+        case 'serviceRequests':
+            renderServiceRequests(content);
             break;
             
         case 'employees':
@@ -4794,10 +4785,6 @@ case 'client-portal':
             renderSchedule(content);
             break;
 
-        case 'setupCalls':
-            renderSetupCalls(content);
-            break;
-            
         case 'team':
             renderTeamPerformance(content);
             break;
@@ -7608,6 +7595,64 @@ async function deleteWorkspaceAccount(clientPortalId, adminEmail) {
         renderSubscriptions(document.getElementById('contentArea'));
     } catch(e) {
         showToast('Error deleting workspace: ' + e.message, 'error');
+    }
+}
+
+async function renderServiceRequests(content) {
+    const token = getAuthToken();
+    content.innerHTML = `<div style="padding:24px;color:var(--text-muted);">Loading service requests…</div>`;
+    let requests = [];
+    try {
+        const res = await fetch(`${API_URL}/api/admin/service-requests`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        requests = (data && data.requests) || [];
+    } catch (e) {
+        content.innerHTML = `<div style="padding:24px;color:#e25;">Failed to load service requests.</div>`;
+        return;
+    }
+    const badge = document.getElementById('serviceRequestsBadge');
+    const openCount = requests.filter(r => r.status !== 'completed' && r.status !== 'closed').length;
+    if (badge) { badge.textContent = openCount; badge.style.display = openCount > 0 ? 'inline-block' : 'none'; }
+
+    const statusOptions = ['new', 'scheduled', 'in-progress', 'completed', 'closed'];
+    const rows = requests.map(r => {
+        const created = r.created_at ? new Date(r.created_at).toLocaleDateString() : '';
+        const pref = r.preferred_date ? new Date(r.preferred_date).toLocaleDateString() : '—';
+        const sel = statusOptions.map(s => `<option value="${s}" ${r.status === s ? 'selected' : ''}>${s}</option>`).join('');
+        return `<tr>
+            <td>${created}</td>
+            <td><strong>${(r.customer_name || 'Unknown')}</strong><br><span style="color:var(--text-muted);font-size:12px;">${r.customer_email || ''}${r.customer_phone ? ' · ' + r.customer_phone : ''}</span></td>
+            <td>${r.service_type || '—'}</td>
+            <td>${r.vehicle || '—'}</td>
+            <td>${pref}</td>
+            <td style="max-width:280px;">${(r.details || '').replace(/</g, '&lt;')}</td>
+            <td><select onchange="updateServiceRequestStatus(${r.id}, this.value)" style="padding:6px;border-radius:6px;">${sel}</select></td>
+        </tr>`;
+    }).join('');
+
+    content.innerHTML = `
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">Service Requests (${requests.length})</h2></div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead><tr><th>Received</th><th>Customer</th><th>Service</th><th>Vehicle</th><th>Preferred</th><th>Details</th><th>Status</th></tr></thead>
+                    <tbody>${rows || `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">No service requests yet.</td></tr>`}</tbody>
+                </table>
+            </div>
+        </div>`;
+}
+
+async function updateServiceRequestStatus(id, status) {
+    const token = getAuthToken();
+    try {
+        await fetch(`${API_URL}/api/admin/service-requests/${id}`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        if (typeof showToast === 'function') showToast('Request updated', 'success');
+    } catch (e) {
+        if (typeof showToast === 'function') showToast('Update failed', 'error');
     }
 }
 

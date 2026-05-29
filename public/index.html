@@ -214,7 +214,7 @@ window.addEventListener('load', function() {
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            max-width: 1280px;
+            max-width: 1600px;
             margin: 0 auto;
         }
         
@@ -351,7 +351,7 @@ window.addEventListener('load', function() {
         
 .hero {
     position: relative;
-    min-height: 50vh;
+    min-height: calc(100vh - 113px);
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -414,8 +414,8 @@ window.addEventListener('load', function() {
 
         @media (min-width: 1200px) {
             .hero-content {
-                margin: 0;
-                padding-left: 80px;
+                margin: 0 auto;
+                padding: 80px 60px 40px;
             }
         }
 
@@ -486,7 +486,7 @@ window.addEventListener('load', function() {
         }
         
 .logo-carousel {
-    background: transparent;
+    background: #1a1a1a;
     padding: 24px 60px;
     overflow: hidden;
     position: relative;
@@ -3002,6 +3002,43 @@ window.addEventListener('load', function() {
             color: var(--grey-600);
         }
 
+.back-to-top {
+    position: fixed;
+    bottom: 28px;
+    left: 28px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(244, 200, 126, 0.5);
+    background: #1a1a1a;
+    color: var(--gold, #f4c87e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease, background 0.2s ease;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    z-index: 9998;
+}
+.back-to-top svg { width: 22px; height: 22px; }
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.back-to-top:hover {
+    background: var(--gold, #f4c87e);
+    color: #1a1a1a;
+    border-color: var(--gold, #f4c87e);
+    transform: translateY(-2px);
+}
+@media (max-width: 768px) {
+    .back-to-top { bottom: 20px; left: 20px; width: 44px; height: 44px; }
+}
+
 /* CHATBOT BUBBLE — "Have a question?" popup */
 .chatbot-bubble {
     position: fixed;
@@ -4534,6 +4571,12 @@ nav {
 </style>
 </head>
 <body>
+
+    <button id="backToTop" class="back-to-top" aria-label="Back to top" title="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+</button>
 
     <!-- Announcement Banner -->
     <div class="announcement-banner">
@@ -9103,5 +9146,20 @@ document.addEventListener('keydown', function(e) {
 
     document.querySelectorAll('.sr').forEach(el => observer.observe(el));
 })();
+
+(function () {
+    var btn = document.getElementById('backToTop');
+    if (!btn) return;
+    function toggleBtn() {
+        if (window.pageYOffset > 400) { btn.classList.add('visible'); }
+        else { btn.classList.remove('visible'); }
+    }
+    window.addEventListener('scroll', toggleBtn, { passive: true });
+    btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    toggleBtn();
+})();
 </script>
 </body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal — Crown Ceramic Coating</title>
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+:root{
+  --gold:#f4c87e; --gold-deep:#e6b86b; --bg:#0e0e0e; --panel:#171717; --panel-2:#1f1f1f;
+  --line:rgba(255,255,255,.10); --text:#f4f4f4; --muted:#9a9a9a; --green:#43b97f; --red:#e2685f; --amber:#e3b341;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+a{color:var(--gold);text-decoration:none}
+.hidden{display:none!important}
+.brand{display:flex;align-items:center;gap:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;font-size:15px}
+.brand svg{width:30px;height:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;border-radius:8px;
+  padding:13px 22px;font-size:14px;font-weight:600;letter-spacing:.4px;transition:.2s;font-family:inherit}
+.btn-primary{background:var(--gold);color:#1a1a1a}
+.btn-primary:hover{background:var(--gold-deep);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+input,select,textarea{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+  border-radius:8px;padding:12px 14px;font-size:14px;font-family:inherit;transition:.2s}
+input:focus,select,textarea:focus{outline:none;border-color:var(--gold)}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600;letter-spacing:.4px}
+.field{margin-bottom:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.pill.paid{background:rgba(67,185,127,.15);color:var(--green)}
+.pill.unpaid,.pill.sent,.pill.overdue{background:rgba(226,104,95,.15);color:var(--red)}
+.pill.draft,.pill.new{background:rgba(227,179,65,.15);color:var(--amber)}
+.pill.scheduled,.pill.in-progress{background:rgba(244,200,126,.15);color:var(--gold)}
+
+/* LOGIN */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.9)),url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1600&q=80') center/cover fixed}
+#login .box{width:100%;max-width:420px}
+#login .card{padding:36px}
+.crown-badge{width:54px;height:54px;border-radius:12px;background:rgba(244,200,126,.12);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.login-err{background:rgba(226,104,95,.12);color:var(--red);padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:14px}
+
+/* APP SHELL */
+#app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+.sidebar{background:#111;border-right:1px solid var(--line);padding:26px 18px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.sidebar .brand{margin-bottom:26px;padding-left:8px}
+.nav-link{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:9px;color:var(--muted);cursor:pointer;font-size:14px;font-weight:500;transition:.18s}
+.nav-link:hover{background:var(--panel-2);color:var(--text)}
+.nav-link.active{background:rgba(244,200,126,.12);color:var(--gold)}
+.nav-link svg{width:19px;height:19px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--gold);color:#1a1a1a;font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px}
+.sidebar .spacer{flex:1}
+.main{padding:34px 40px;max-width:1100px}
+.page-title{font-size:26px;font-weight:600;letter-spacing:-.4px;margin-bottom:4px}
+.page-sub{color:var(--muted);font-size:14px;margin-bottom:26px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:30px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+.stat .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.stat .value{font-size:28px;font-weight:700}
+.list-item{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:none}
+.muted{color:var(--muted)}.sm{font-size:13px}.mt{margin-top:18px}
+.timeline{position:relative;padding-left:26px}
+.timeline::before{content:'';position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--line)}
+.tl-item{position:relative;padding-bottom:18px}
+.tl-dot{position:absolute;left:-26px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--panel-2);border:2px solid var(--muted)}
+.tl-dot.done{background:var(--gold);border-color:var(--gold)}
+.progress{height:8px;background:var(--panel-2);border-radius:999px;overflow:hidden;margin-top:10px}
+.progress > span{display:block;height:100%;background:var(--gold)}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:100%;max-width:520px;max-height:92vh;overflow:auto}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--line)}
+.modal-head h3{font-size:18px;font-weight:600}
+.modal-body{padding:24px}
+.x{cursor:pointer;color:var(--muted);font-size:22px;line-height:1;background:none;border:none}
+.steps{display:flex;gap:8px;margin-bottom:22px}
+.step{flex:1;height:4px;border-radius:999px;background:var(--panel-2)}
+.step.active{background:var(--gold)}
+.summary-line{display:flex;justify-content:space-between;padding:9px 0;font-size:14px}
+.summary-line.total{border-top:1px solid var(--line);margin-top:6px;padding-top:14px;font-size:17px;font-weight:700}
+#payment-element{margin-top:6px}
+.pay-msg{font-size:13px;margin-top:12px}
+@media(max-width:820px){
+  #app{grid-template-columns:1fr}
+  .sidebar{position:fixed;z-index:50;transform:translateX(-100%);transition:.25s;width:240px}
+  .sidebar.open{transform:none}
+  .main{padding:80px 18px 40px}
+  .stat-grid,.row{grid-template-columns:1fr}
+  .mobile-bar{display:flex!important}
+}
+.mobile-bar{display:none;position:fixed;top:0;left:0;right:0;height:60px;background:#111;border-bottom:1px solid var(--line);
+  align-items:center;justify-content:space-between;padding:0 16px;z-index:40}
+.hamb{background:none;border:none;color:var(--text);cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="login">
+  <div class="box">
+    <div class="card">
+      <div class="crown-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f4c87e" stroke-width="1.6" stroke-linejoin="round" width="30" height="30">
+          <path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z"/>
+          <line x1="3" y1="21" x2="21" y2="21" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 style="font-size:22px;font-weight:600;margin-bottom:4px;">Client Portal</h2>
+      <p class="muted sm" style="margin-bottom:24px;">Crown Ceramic Coating</p>
+      <div id="loginErr" class="login-err hidden"></div>
+      <div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="email" placeholder="you@email.com"></div>
+      <div class="field"><label>Password</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Sign In</button>
+      <p class="muted sm" style="text-align:center;margin-top:16px;">Need access? <a href="contact.html">Contact us</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app" class="hidden">
+  <div class="mobile-bar">
+    <div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="#f4c87e" stroke-width="1.6" stroke-linejoin="round"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z"/><line x1="3" y1="21" x2="21" y2="21" stroke-linecap="round"/></svg>Crown</div>
+    <button class="hamb" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+  </div>
+  <aside class="sidebar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#f4c87e" stroke-width="1.6" stroke-linejoin="round"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z"/><line x1="3" y1="21" x2="21" y2="21" stroke-linecap="round"/></svg>
+      Crown
+    </div>
+    <div class="nav-link active" data-view="dashboard" onclick="nav('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="nav-link" data-view="invoices" onclick="nav('invoices')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Invoices<span class="nav-badge hidden" id="invBadge">0</span></div>
+    <div class="nav-link" data-view="projects" onclick="nav('projects')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Project Timeline</div>
+    <div class="nav-link" data-view="requests" onclick="nav('requests')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Service Requests</div>
+    <div class="nav-link" data-view="documents" onclick="nav('documents')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>Receipts &amp; Docs</div>
+    <div class="spacer"></div>
+    <div class="nav-link" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</div>
+  </aside>
+
+  <main class="main" id="main"><!-- views injected here --></main>
+</div>
+
+<!-- payment modal mount -->
+<div id="payModalMount"></div>
+
+<script>
+const API = (location.origin && location.origin.startsWith('http')) ? location.origin : '';
+let TOKEN = localStorage.getItem('cc_client_token') || '';
+let CLIENT = JSON.parse(localStorage.getItem('cc_client') || 'null');
+let DASH = null, REQUESTS = [], STRIPE = null, STRIPE_PK = '';
+
+function authHeaders(){ return { 'Authorization':'Bearer '+TOKEN, 'Content-Type':'application/json' }; }
+function money(n){ return '$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtDate(d){ return d ? new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'; }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------------- AUTH ---------------- */
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.classList.add('hidden');
+  if(!email || !password){ errEl.textContent='Enter your email and password.'; errEl.classList.remove('hidden'); return; }
+  try{
+    const r = await fetch(API+'/api/client/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+    const d = await r.json();
+    if(!r.ok || !d.success){ errEl.textContent = d.message || 'Invalid login.'; errEl.classList.remove('hidden'); return; }
+    TOKEN = d.token; CLIENT = d.client;
+    localStorage.setItem('cc_client_token',TOKEN);
+    localStorage.setItem('cc_client',JSON.stringify(CLIENT));
+    startApp();
+  }catch(e){ errEl.textContent='Could not reach the server.'; errEl.classList.remove('hidden'); }
+}
+function logout(){ localStorage.removeItem('cc_client_token'); localStorage.removeItem('cc_client'); location.reload(); }
+
+document.getElementById('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+
+/* ---------------- APP BOOTSTRAP ---------------- */
+async function startApp(){
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  // load stripe publishable key
+  try{ const c = await (await fetch(API+'/api/config/stripe')).json(); STRIPE_PK = c.publishableKey||''; if(STRIPE_PK && window.Stripe) STRIPE = Stripe(STRIPE_PK); }catch(e){}
+  await loadDashboard();
+  await loadRequests();
+  nav('dashboard');
+}
+async function loadDashboard(){
+  try{
+    const r = await fetch(API+'/api/client/dashboard',{headers:authHeaders()});
+    if(r.status===401){ logout(); return; }
+    const d = await r.json();
+    DASH = d.dashboard || {invoices:[],projects:[],tickets:[],activity:[]};
+    const unpaid = (DASH.invoices||[]).filter(i=>i.status!=='paid').length;
+    const b=document.getElementById('invBadge'); if(unpaid>0){b.textContent=unpaid;b.classList.remove('hidden');} else b.classList.add('hidden');
+  }catch(e){ DASH={invoices:[],projects:[],tickets:[],activity:[]}; }
+}
+async function loadRequests(){
+  try{ const d = await (await fetch(API+'/api/client/service-requests',{headers:authHeaders()})).json(); REQUESTS = d.requests||[]; }catch(e){ REQUESTS=[]; }
+}
+
+/* ---------------- NAV / VIEWS ---------------- */
+function nav(view){
+  document.querySelectorAll('.nav-link').forEach(n=>n.classList.toggle('active', n.dataset.view===view));
+  document.querySelector('.sidebar').classList.remove('open');
+  ({dashboard:viewDashboard,invoices:viewInvoices,projects:viewProjects,requests:viewRequests,documents:viewDocuments}[view]||viewDashboard)();
+}
+
+function viewDashboard(){
+  const inv = DASH.invoices||[], proj = DASH.projects||[];
+  const outstanding = inv.filter(i=>i.status!=='paid').reduce((s,i)=>s+Number(i.total_amount||0),0);
+  const activeProjects = proj.filter(p=>p.status!=='completed').length;
+  const openReq = REQUESTS.filter(r=>r.status!=='completed'&&r.status!=='closed').length;
+  const recent = inv.slice(0,4).map(i=>`<div class="list-item"><div><div>${esc(i.invoice_number||('Invoice #'+i.id))}</div><div class="muted sm">${fmtDate(i.issue_date||i.created_at)}</div></div><div style="text-align:right"><div>${money(i.total_amount)}</div><span class="pill ${esc(i.status)}">${esc(i.status)}</span></div></div>`).join('') || '<p class="muted sm">No invoices yet.</p>';
+  document.getElementById('main').innerHTML = `
+    <div class="page-title">Welcome back${CLIENT&&CLIENT.name?', '+esc(CLIENT.name.split(' ')[0]):''}</div>
+    <div class="page-sub">Here's an overview of your account.</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="label">Outstanding Balance</div><div class="value">${money(outstanding)}</div></div>
+      <div class="stat"><div class="label">Active Projects</div><div class="value">${activeProjects}</div></div>
+      <div class="stat"><div class="label">Open Requests</div><div class="value">${openReq}</div></div>
+    </div>
+    <div class="card"><h3 style="margin-bottom:8px;">Recent Invoices</h3>${recent}
+      ${outstanding>0?`<div class="mt"><button class="btn btn-primary" onclick="nav('invoices')">Pay an Invoice</button></div>`:''}
+    </div>`;
+}
+
+function viewInvoices(){
+  const inv = DASH.invoices||[];
+  const rows = inv.map(i=>`
+    <div class="list-item">
+      <div><div>${esc(i.invoice_number||('Invoice #'+i.id))}</div>
+        <div class="muted sm">${esc(i.short_description||'Ceramic coating services')} · Due ${fmtDate(i.due_date)}</div></div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div style="text-align:right"><div>${money(i.total_amount)}</div><span class="pill ${esc(i.status)}">${esc(i.status)}</span></div>
+        ${i.status!=='paid'?`<button class="btn btn-primary" onclick="openPay(${i.id})">Pay Now</button>`:`<button class="btn btn-ghost" onclick="viewReceipt(${i.id})">Receipt</button>`}
+      </div>
+    </div>`).join('') || '<p class="muted sm">You have no invoices.</p>';
+  document.getElementById('main').innerHTML = `<div class="page-title">Invoices</div><div class="page-sub">Review and pay your invoices securely without leaving the portal.</div><div class="card">${rows}</div>`;
+}
+
+function viewProjects(){
+  const proj = DASH.projects||[];
+  if(!proj.length){ document.getElementById('main').innerHTML = `<div class="page-title">Project Timeline</div><div class="page-sub">Track the progress of your vehicle.</div><div class="card"><p class="muted sm">No active projects yet. Once work begins, your timeline appears here.</p></div>`; return; }
+  document.getElementById('main').innerHTML = `<div class="page-title">Project Timeline</div><div class="page-sub">Track the progress of your vehicle.</div>
+    ${proj.map(p=>{
+      const total=Number(p.total_milestones||0), done=Number(p.completed_milestones||0);
+      const pct = total? Math.round(done/total*100):0;
+      return `<div class="card mt"><div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><h3>${esc(p.name||p.project_name||'Project')}</h3><div class="muted sm">${esc(p.status||'in progress')}</div></div>
+        <span class="pill ${esc(p.status==='completed'?'paid':'in-progress')}">${esc(p.status||'active')}</span></div>
+        <div class="progress"><span style="width:${pct}%"></span></div>
+        <div class="muted sm mt">${done} of ${total} milestones complete (${pct}%)</div>
+        <div id="ml-${p.id}" class="mt"></div></div>`;
+    }).join('')}`;
+  proj.forEach(p=>loadMilestones(p.id));
+}
+async function loadMilestones(pid){
+  try{
+    const d = await (await fetch(API+'/api/client/projects/'+pid+'/milestones',{headers:authHeaders()})).json();
+    const ms = d.milestones||d.data||[];
+    const el = document.getElementById('ml-'+pid); if(!el) return;
+    if(!ms.length){ return; }
+    el.innerHTML = `<div class="timeline">${ms.map(m=>`<div class="tl-item"><div class="tl-dot ${m.status==='completed'?'done':''}"></div>
+      <div style="font-size:14px;font-weight:500">${esc(m.title||m.name)}</div>
+      <div class="muted sm">${m.status==='completed'?('Completed '+fmtDate(m.completed_at||m.updated_at)) : (m.due_date?('Due '+fmtDate(m.due_date)) : (m.status||'pending'))}</div></div>`).join('')}</div>`;
+  }catch(e){}
+}
+
+function viewRequests(){
+  const rows = REQUESTS.map(r=>`<div class="list-item"><div><div>${esc(r.service_type)}</div><div class="muted sm">${esc(r.vehicle||'')} ${r.preferred_date?('· prefers '+fmtDate(r.preferred_date)):''}</div></div><span class="pill ${esc(r.status)}">${esc(r.status)}</span></div>`).join('') || '<p class="muted sm">No requests yet.</p>';
+  document.getElementById('main').innerHTML = `<div class="page-title">Service Requests</div><div class="page-sub">Request a new service or follow-up. We'll be in touch to confirm.</div>
+    <div class="card">
+      <div class="row"><div class="field"><label>Service Type</label><select id="srType"><option>Ceramic Coating</option><option>Paint Correction &amp; Polishing</option><option>Interior &amp; Detailing</option><option>Maintenance Plan</option><option>Other</option></select></div>
+      <div class="field"><label>Vehicle</label><input id="srVehicle" placeholder="2023 Tesla Model 3"></div></div>
+      <div class="field"><label>Preferred Date</label><input id="srDate" type="date"></div>
+      <div class="field"><label>Details</label><textarea id="srDetails" rows="3" placeholder="Anything we should know?"></textarea></div>
+      <button class="btn btn-primary" onclick="submitRequest()">Submit Request</button>
+    </div>
+    <div class="card mt"><h3 style="margin-bottom:6px;">Your Requests</h3>${rows}</div>`;
+}
+async function submitRequest(){
+  const body = { service_type:document.getElementById('srType').value, vehicle:document.getElementById('srVehicle').value,
+                 preferred_date:document.getElementById('srDate').value||null, details:document.getElementById('srDetails').value };
+  try{
+    const r = await fetch(API+'/api/client/service-requests',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)});
+    const d = await r.json();
+    if(d.success){ await loadRequests(); nav('requests'); }
+    else alert(d.message||'Could not submit.');
+  }catch(e){ alert('Could not submit request.'); }
+}
+
+function viewDocuments(){
+  const paid = (DASH.invoices||[]).filter(i=>i.status==='paid');
+  const rows = paid.map(i=>`<div class="list-item"><div><div>Receipt — ${esc(i.invoice_number||('#'+i.id))}</div><div class="muted sm">Paid ${fmtDate(i.paid_at)}</div></div><button class="btn btn-ghost" onclick="viewReceipt(${i.id})">View</button></div>`).join('') || '<p class="muted sm">Your receipts and sales documents will appear here after payment.</p>';
+  document.getElementById('main').innerHTML = `<div class="page-title">Receipts &amp; Documents</div><div class="page-sub">Your payment receipts and sales documents.</div><div class="card">${rows}</div>`;
+}
+function viewReceipt(id){
+  const i = (DASH.invoices||[]).find(x=>x.id===id); if(!i) return;
+  const w = window.open('','_blank');
+  w.document.write(`<title>Receipt ${esc(i.invoice_number||id)}</title>
+   <body style="font-family:Arial;max-width:600px;margin:40px auto;color:#222;">
+   <h2 style="border-bottom:2px solid #f4c87e;padding-bottom:10px;">Crown Ceramic Coating</h2>
+   <h3>Payment Receipt</h3>
+   <p><b>Invoice:</b> ${esc(i.invoice_number||('#'+i.id))}<br>
+   <b>Date paid:</b> ${fmtDate(i.paid_at)}<br>
+   <b>Description:</b> ${esc(i.short_description||'Ceramic coating services')}</p>
+   <table style="width:100%;border-collapse:collapse;margin-top:14px;">
+     <tr><td style="padding:8px 0;">Subtotal</td><td style="text-align:right;">${money(i.subtotal)}</td></tr>
+     <tr><td style="padding:8px 0;">Tax</td><td style="text-align:right;">${money(i.tax_amount)}</td></tr>
+     <tr style="border-top:2px solid #222;font-weight:bold;"><td style="padding:10px 0;">Total Paid</td><td style="text-align:right;">${money(i.total_amount)}</td></tr>
+   </table>
+   <p style="color:#888;margin-top:20px;font-size:13px;">Payment method: ${esc(i.payment_method||'Card')} · Ref: ${esc(i.payment_reference||'')}</p>
+   <p style="color:#888;font-size:13px;">Thank you for your business.</p>
+   <script>window.print()<\/script></body>`);
+}
+
+/* ---------------- IN-PORTAL PAYMENT (Stripe Elements) ---------------- */
+let payState = { invoiceId:null, breakdown:null, clientSecret:null, elements:null, step:1 };
+
+async function openPay(invoiceId){
+  payState = { invoiceId, breakdown:null, clientSecret:null, elements:null, step:1 };
+  renderPayModal();
+  try{
+    const r = await fetch(API+`/api/client/invoices/${invoiceId}/checkout`,{headers:authHeaders()});
+    const d = await r.json();
+    if(!d.success){ alert(d.message||'Could not load invoice.'); closePay(); return; }
+    payState.breakdown = d.breakdown; payState.invoice = d.invoice;
+    renderPayModal();
+  }catch(e){ alert('Could not load invoice.'); closePay(); }
+}
+function closePay(){ document.getElementById('payModalMount').innerHTML=''; }
+
+function payStepsBar(){ return `<div class="steps">${[1,2,3].map(s=>`<div class="step ${payState.step>=s?'active':''}"></div>`).join('')}</div>`; }
+
+function renderPayModal(){
+  const mount = document.getElementById('payModalMount');
+  const b = payState.breakdown;
+  let inner = '';
+  if(!b){ inner = `<div class="modal-body">Loading…</div>`; }
+  else if(payState.step===1){
+    inner = `<div class="modal-body">${payStepsBar()}
+      <h4 style="margin-bottom:14px;">Review</h4>
+      <div class="muted sm">${esc(payState.invoice.invoice_number||'')} · ${esc(payState.invoice.short_description||'Ceramic coating services')}</div>
+      <div class="mt">
+        <div class="summary-line"><span>Subtotal</span><span>${money(b.subtotal)}</span></div>
+        <div class="summary-line"><span>Sales tax${b.taxRate?` (${b.taxRate}%)`:''}</span><span>${money(b.tax)}</span></div>
+        ${b.discount?`<div class="summary-line"><span>Discount</span><span>-${money(b.discount)}</span></div>`:''}
+        <div class="summary-line"><span>Card processing fee</span><span>${money(b.processingFee)}</span></div>
+        <div class="summary-line total"><span>Total due</span><span>${money(b.total)}</span></div>
+      </div>
+      <button class="btn btn-primary mt" style="width:100%" onclick="payGoto(2)">Continue to Billing</button></div>`;
+  } else if(payState.step===2){
+    const c = CLIENT||{};
+    inner = `<div class="modal-body">${payStepsBar()}
+      <h4 style="margin-bottom:14px;">Billing Details</h4>
+      <div class="row"><div class="field"><label>Full name</label><input id="bName" value="${esc(c.name||'')}"></div>
+      <div class="field"><label>Email</label><input id="bEmail" value="${esc(c.email||'')}"></div></div>
+      <div class="field"><label>Phone</label><input id="bPhone" value="${esc(c.phone||'')}"></div>
+      <div class="field"><label>Billing address</label><input id="bAddr" placeholder="Street address"></div>
+      <div class="row"><div class="field"><label>City</label><input id="bCity"></div>
+      <div class="field"><label>ZIP</label><input id="bZip"></div></div>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button class="btn btn-ghost" onclick="payGoto(1)">Back</button>
+        <button class="btn btn-primary" style="flex:1" onclick="payGoto(3)">Continue to Payment</button></div></div>`;
+  } else if(payState.step===3){
+    inner = `<div class="modal-body">${payStepsBar()}
+      <h4 style="margin-bottom:6px;">Payment</h4>
+      <div class="summary-line total" style="border:none;margin:0;padding:6px 0 14px;"><span>Total</span><span>${money(b.total)}</span></div>
+      <div id="payment-element"></div>
+      <div id="payMsg" class="pay-msg"></div>
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button class="btn btn-ghost" id="payBack" onclick="payGoto(2)">Back</button>
+        <button class="btn btn-primary" style="flex:1" id="payBtn" onclick="confirmPay()">Pay ${money(b.total)}</button></div>
+      ${!STRIPE_PK?`<p class="pay-msg" style="color:var(--amber)">Payments are not configured yet (missing Stripe key).</p>`:''}</div>`;
+  } else if(payState.step==='done'){
+    inner = `<div class="modal-body" style="text-align:center;padding:40px 24px;">
+      <div style="width:60px;height:60px;border-radius:50%;background:rgba(67,185,127,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#43b97f" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <h3>Payment Successful</h3>
+      <p class="muted mt">Thank you! Your payment of ${money(b.total)} has been received.</p>
+      <button class="btn btn-primary mt" onclick="afterPaid()">Done</button></div>`;
+  }
+  mount.innerHTML = `<div class="overlay" onclick="if(event.target===this)closePay()"><div class="modal">
+    <div class="modal-head"><h3>Pay Invoice</h3><button class="x" onclick="closePay()">&times;</button></div>${inner}</div></div>`;
+
+  if(payState.step===3 && STRIPE && !payState.mounted){ mountStripe(); }
+}
+
+async function payGoto(step){
+  if(step===3){
+    // create / fetch payment intent before showing card form
+    try{
+      const r = await fetch(API+`/api/client/invoices/${payState.invoiceId}/payment-intent`,{method:'POST',headers:authHeaders(),body:'{}'});
+      const d = await r.json();
+      if(!d.success){ alert(d.message||'Could not start payment.'); return; }
+      payState.clientSecret = d.clientSecret; payState.breakdown = d.breakdown||payState.breakdown; payState.mounted=false;
+    }catch(e){ alert('Could not start payment.'); return; }
+  }
+  payState.step = step; renderPayModal();
+}
+function mountStripe(){
+  if(!STRIPE || !payState.clientSecret) return;
+  payState.elements = STRIPE.elements({ clientSecret: payState.clientSecret, appearance:{ theme:'night', variables:{ colorPrimary:'#f4c87e' } } });
+  const pe = payState.elements.create('payment'); pe.mount('#payment-element'); payState.mounted = true;
+}
+async function confirmPay(){
+  const msg = document.getElementById('payMsg'); const btn = document.getElementById('payBtn');
+  if(!STRIPE || !payState.elements){ msg.textContent='Payments are not available right now.'; return; }
+  btn.disabled=true; btn.textContent='Processing…'; msg.textContent='';
+  const { error, paymentIntent } = await STRIPE.confirmPayment({ elements: payState.elements, redirect:'if_required' });
+  if(error){ msg.style.color='var(--red)'; msg.textContent = error.message || 'Payment failed.'; btn.disabled=false; btn.textContent='Pay '+money(payState.breakdown.total); return; }
+  if(paymentIntent && (paymentIntent.status==='succeeded' || paymentIntent.status==='processing')){
+    payState.step='done'; renderPayModal();
+  } else { msg.textContent='Payment could not be completed.'; btn.disabled=false; btn.textContent='Pay '+money(payState.breakdown.total); }
+}
+async function afterPaid(){ closePay(); await loadDashboard(); nav('invoices'); }
+
+/* ---------------- INIT ---------------- */
+if(TOKEN && CLIENT){ startApp(); }
+</script>
+</body>
+</html>
