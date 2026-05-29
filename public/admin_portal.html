@@ -3724,12 +3724,13 @@ body.graffiti-mode .sidebar::after {
         <!-- ── Projects & Work ── -->
         <div class="nav-section">
             <div class="nav-section-title">Projects &amp; Work</div>
-            <div class="nav-item" data-section="projects">
+            <div class="nav-item" data-section="salesAgreements">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
                 </svg>
-                Project Timelines
+                Sales Agreements
             </div>
             <div class="nav-item" data-section="tasks">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -3756,12 +3757,6 @@ body.graffiti-mode .sidebar::after {
                     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
                 </svg>
                 Team
-            </div>
-            <div class="nav-item" data-section="support">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                Support Tickets
             </div>
             <div class="nav-item" data-section="recruitment">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -4577,10 +4572,10 @@ async function renderSection(section) {
         employees: 'Team Management',
         invoices: 'Invoices',
         tasks: 'Tasks',
-        projects: 'Project Timelines',
+        salesAgreements: 'Sales Agreements',
         settings: 'Settings',
         followups: 'Follow-Up Queue',
-        tickets: 'Support Tickets',
+        serviceRequests: 'Service Requests',
         documents: 'Document Management',
         pipeline: 'Sales Pipeline',
         'lead-scoring': 'Lead Scoring',
@@ -4652,14 +4647,14 @@ async function renderSection(section) {
                     Add Task
                 </button>
             `;
-        } else if (section === 'projects') {
+        } else if (section === 'salesAgreements') {
             actionButtons += `
-                <button class="btn btn-primary" onclick="openProjectTimelineModal()">
+                <button class="btn btn-primary" onclick="openSalesAgreementModal()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
-                    Create Project Timeline
+                    New Sales Agreement
                 </button>
             `;
         } else if (section === 'recruitment') {
@@ -4738,15 +4733,9 @@ async function renderSection(section) {
             renderSettings(content);
             break;
             
-        case 'projects':
-            console.log(' Rendering projects section');
-            renderProjects(content);
+        case 'salesAgreements':
+            renderSalesAgreements(content);
             break;
-            
-case 'support':
-case 'tickets':
-    renderTickets();
-    break;
             
         case 'documents':
             renderDocuments(content);
@@ -6505,7 +6494,7 @@ window.showEmailModal = function(leadId, leadName, leadEmail) {
                             </optgroup>
                             <optgroup label="── Outreach ──">
                                 <option value="initial">Initial Outreach</option>
-                                <option value="zerotransactionfees">Zero Transaction Fees</option>
+                                <option value="zerotransactionfees">Protect Your Paint</option>
                                 <option value="proposal">Send Proposal</option>
                             </optgroup>
                             <optgroup label="── Promos ──">
@@ -6633,20 +6622,20 @@ window.loadEmailTemplate = function(leadId, leadName, leadEmail) {
             preview: `[HTML EMAIL] Valentine's 14% original promo template. Subject is editable.`
         },
         zerotransactionfees: {
-            subject: `Zero Transaction Fees | Crown Ceramic Coating`,
-            preview: `[HTML EMAIL] Zero Transaction Fees — comparison tables, savings breakdown ($75K/$200K/$500K), "What sets us apart" section, CTA. Subject is editable.`
+            subject: `Protect Your Paint | Crown Ceramic Coating`,
+            preview: `[HTML EMAIL] Ceramic value pitch — why paint needs protection, what a coating delivers (gloss, easy-clean, UV defense), "Get Your Free Quote" CTA. Subject is editable.`
         },
         initial: {
-            subject: `Your Vision, Our Code — Crown Ceramic Coating`,
-            preview: `[HTML EMAIL] Initial outreach — curved header, About Us, service cards (Web Dev, CRM, SEO), Get Started CTA. Subject is editable.`
+            subject: `Showroom Shine, Lasting Protection — Crown Ceramic Coating`,
+            preview: `[HTML EMAIL] Initial outreach — curved header, About Us, service cards (Ceramic Coating, Interior Detailing, Polishing), Get a Quote CTA. Subject is editable.`
         },
         followup1: {
             subject: `Quick follow-up — ${leadName}`,
             preview: `[HTML EMAIL] Initial Follow-Up — warm personal check-in, references your previous message, light CTA to schedule a call.`
         },
         followup2: {
-            subject: `Still thinking it over? — ${leadName}`,
-            preview: `[HTML EMAIL] Second Follow-Up — acknowledges they may be busy, highlights a key differentiator (ownership, zero fees), softer close.`
+            subject: `Still thinking about protecting your paint? — ${leadName}`,
+            preview: `[HTML EMAIL] Second Follow-Up — acknowledges they may be busy, highlights a key benefit (a coating that pays for itself), softer close.`
         },
         followup3: {
             subject: `One last thing, ${leadName}`,
@@ -6657,7 +6646,7 @@ window.loadEmailTemplate = function(leadId, leadName, leadEmail) {
             preview: `[HTML EMAIL] Indefinite Follow-Up — short re-engagement nudge, no pressure. Used for long-term nurturing cadence.`
         },
         proposal: {
-            subject: `Your Custom Proposal — Crown Ceramic Coating`,
+            subject: `Your Detailing Quote — Crown Ceramic Coating`,
             preview: `[HTML EMAIL] Proposal — professional proposal framing with services overview and next-step CTA.`
         },
         thankyou: {
@@ -15279,292 +15268,7 @@ function saveProjectTimeline() {
     renderSection('projects');
 }
 
-// ==================== CLIENT SUPPORT TICKET ENDPOINTS ====================
-
-// Get all tickets for authenticated client
-app.get('/api/client/tickets', authenticateClient, async (req, res) => {
-    try {
-        const clientId = req.user.id;
-        
-        const result = await pool.query(`
-            SELECT st.*,
-                   COUNT(tr.id) as response_count,
-                   MAX(tr.created_at) as last_response_at
-            FROM support_tickets st
-            LEFT JOIN ticket_responses tr ON st.id = tr.ticket_id
-            WHERE st.lead_id = $1
-            GROUP BY st.id
-            ORDER BY st.created_at DESC
-        `, [clientId]);
-        
-        res.json({
-            success: true,
-            tickets: result.rows
-        });
-    } catch (error) {
-        console.error('Get client tickets error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to load tickets' 
-        });
-    }
-});
-
-// Create new ticket (client)
-app.post('/api/client/tickets', authenticateClient, async (req, res) => {
-    try {
-        const clientId = req.user.id;
-        const { subject, message, priority } = req.body;
-        
-        const result = await pool.query(`
-            INSERT INTO support_tickets (lead_id, subject, message, priority, status)
-            VALUES ($1, $2, $3, $4, 'open')
-            RETURNING *
-        `, [clientId, subject, message, priority || 'normal']);
-        
-        res.json({
-            success: true,
-            ticket: result.rows[0]
-        });
-    } catch (error) {
-        console.error('Create ticket error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to create ticket' 
-        });
-    }
-});
-
-// Get responses for a ticket (client)
-app.get('/api/client/tickets/:ticketId/responses', authenticateClient, async (req, res) => {
-    try {
-        const clientId = req.user.id;
-        const ticketId = req.params.ticketId;
-        
-        // Verify ticket belongs to client
-        const ticketCheck = await pool.query(
-            'SELECT id FROM support_tickets WHERE id = $1 AND lead_id = $2',
-            [ticketId, clientId]
-        );
-        
-        if (ticketCheck.rows.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Ticket not found' 
-            });
-        }
-        
-        const result = await pool.query(`
-            SELECT tr.*,
-                   CASE 
-                       WHEN tr.user_type = 'client' THEN l.name
-                       WHEN tr.user_type = 'admin' THEN u.username
-                   END as user_name
-            FROM ticket_responses tr
-            LEFT JOIN leads l ON tr.user_type = 'client' AND tr.user_id = l.id
-            LEFT JOIN users u ON tr.user_type = 'admin' AND tr.user_id = u.id
-            WHERE tr.ticket_id = $1
-            ORDER BY tr.created_at ASC
-        `, [ticketId]);
-        
-        res.json({
-            success: true,
-            responses: result.rows
-        });
-    } catch (error) {
-        console.error('Get ticket responses error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to load responses' 
-        });
-    }
-});
-
-// Add response to ticket (client)
-app.post('/api/client/tickets/:ticketId/responses', authenticateClient, async (req, res) => {
-    try {
-        const clientId = req.user.id;
-        const ticketId = req.params.ticketId;
-        const { message } = req.body;
-        
-        // Verify ticket belongs to client
-        const ticketCheck = await pool.query(
-            'SELECT id FROM support_tickets WHERE id = $1 AND lead_id = $2',
-            [ticketId, clientId]
-        );
-        
-        if (ticketCheck.rows.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Ticket not found' 
-            });
-        }
-        
-        const result = await pool.query(`
-            INSERT INTO ticket_responses (ticket_id, user_type, user_id, message)
-            VALUES ($1, 'client', $2, $3)
-            RETURNING *
-        `, [ticketId, clientId, message]);
-        
-        // Update ticket status to 'in-progress' if it was 'open'
-        await pool.query(`
-            UPDATE support_tickets 
-            SET status = CASE WHEN status = 'open' THEN 'in-progress' ELSE status END,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = $1
-        `, [ticketId]);
-        
-        res.json({
-            success: true,
-            response: result.rows[0]
-        });
-    } catch (error) {
-        console.error('Add ticket response error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to add response' 
-        });
-    }
-});
-
-// ==================== ADMIN SUPPORT TICKET ENDPOINTS ====================
-
-// Get all tickets (admin)
-app.get('/api/tickets', authenticateToken, async (req, res) => {
-    try {
-        const result = await pool.query(`
-            SELECT st.*, l.name as client_name, l.email as client_email,
-                   COUNT(tr.id) as response_count,
-                   MAX(tr.created_at) as last_response_at
-            FROM support_tickets st
-            LEFT JOIN leads l ON st.lead_id = l.id
-            LEFT JOIN ticket_responses tr ON st.id = tr.ticket_id
-            GROUP BY st.id, l.name, l.email
-            ORDER BY 
-                CASE st.status 
-                    WHEN 'open' THEN 1
-                    WHEN 'in-progress' THEN 2
-                    WHEN 'resolved' THEN 3
-                    WHEN 'closed' THEN 4
-                END,
-                st.created_at DESC
-        `);
-        
-        res.json({
-            success: true,
-            tickets: result.rows
-        });
-    } catch (error) {
-        console.error('Get tickets error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to load tickets' 
-        });
-    }
-});
-
-// Get responses for a ticket (admin)
-app.get('/api/tickets/:ticketId/responses', authenticateToken, async (req, res) => {
-    try {
-        const ticketId = req.params.ticketId;
-        
-        const result = await pool.query(`
-            SELECT tr.*,
-                   CASE 
-                       WHEN tr.user_type = 'client' THEN l.name
-                       WHEN tr.user_type = 'admin' THEN u.username
-                   END as user_name
-            FROM ticket_responses tr
-            LEFT JOIN leads l ON tr.user_type = 'client' AND tr.user_id = l.id
-            LEFT JOIN users u ON tr.user_type = 'admin' AND tr.user_id = u.id
-            WHERE tr.ticket_id = $1
-            ORDER BY tr.created_at ASC
-        `, [ticketId]);
-        
-        res.json({
-            success: true,
-            responses: result.rows
-        });
-    } catch (error) {
-        console.error('Get ticket responses error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to load responses' 
-        });
-    }
-});
-
-// Add response to ticket (admin)
-app.post('/api/tickets/:ticketId/responses', authenticateToken, async (req, res) => {
-    try {
-        const ticketId = req.params.ticketId;
-        const adminId = req.user.id;
-        const { message } = req.body;
-        
-        const result = await pool.query(`
-            INSERT INTO ticket_responses (ticket_id, user_type, user_id, message)
-            VALUES ($1, 'admin', $2, $3)
-            RETURNING *
-        `, [ticketId, adminId, message]);
-        
-        // Update ticket timestamp
-        await pool.query(`
-            UPDATE support_tickets 
-            SET updated_at = CURRENT_TIMESTAMP
-            WHERE id = $1
-        `, [ticketId]);
-        
-        res.json({
-            success: true,
-            response: result.rows[0]
-        });
-    } catch (error) {
-        console.error('Add ticket response error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to add response' 
-        });
-    }
-});
-
-// Update ticket status (admin)
-app.put('/api/tickets/:ticketId/status', authenticateToken, async (req, res) => {
-    try {
-        const ticketId = req.params.ticketId;
-        const { status } = req.body;
-        
-        const resolvedAt = status === 'resolved' || status === 'closed' 
-            ? 'CURRENT_TIMESTAMP' 
-            : 'NULL';
-        
-        const result = await pool.query(`
-            UPDATE support_tickets 
-            SET status = $1, 
-                updated_at = CURRENT_TIMESTAMP,
-                resolved_at = ${resolvedAt}
-            WHERE id = $2
-            RETURNING *
-        `, [status, ticketId]);
-        
-        if (result.rows.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Ticket not found' 
-            });
-        }
-        
-        res.json({
-            success: true,
-            ticket: result.rows[0]
-        });
-    } catch (error) {
-        console.error('Update ticket status error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to update ticket status' 
-        });
-    }
-});
+// (Support-ticket backend routes removed — they belong in server.js, not the browser.)
 
 // Open Timeline Preview Modal
 // Open Timeline Preview Modal
@@ -21545,6 +21249,247 @@ async function sendMarketingBlast() {
         if (btn) { btn.disabled = false; btn.textContent = 'Send Marketing Blast'; }
     }
 }
+
+
+// ============================================================
+// SALES AGREEMENTS (Crown Ceramic Coating)
+// Replaces the old website "Project Timelines" system.
+// ============================================================
+const SA_SERVICES = {
+    ceramic_coating: {
+        label: 'Ceramic Coating',
+        packages: [
+            'Entry Ceramic — 1 Year Protection',
+            'Premium Ceramic — 3 Year Protection',
+            'Elite Ceramic — 5 Year Protection',
+            'Signature Ceramic — 7+ Year / Multi-Layer'
+        ]
+    },
+    interior_detailing: {
+        label: 'Interior Detailing',
+        packages: [
+            'Standard Interior Detail',
+            'Deep Interior Detail & Sanitize',
+            'Full Interior Restoration',
+            'Leather Clean & Condition Add-On'
+        ]
+    },
+    polishing: {
+        label: 'Polishing / Paint Correction',
+        packages: [
+            'Single-Stage Polish (Gloss Enhancement)',
+            'Two-Stage Paint Correction',
+            'Multi-Stage Show-Car Correction',
+            'Wheel & Trim Polish Add-On'
+        ]
+    }
+};
+const SA_STATUSES = ['draft', 'sent', 'signed', 'scheduled', 'completed', 'cancelled'];
+let SA_CACHE = [];
+
+function saServiceLabel(type) { return (SA_SERVICES[type] && SA_SERVICES[type].label) || type || '—'; }
+function saMoney(n) { const v = Number(n || 0); return '$' + v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function saEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+async function renderSalesAgreements(content) {
+    const token = getAuthToken();
+    content.innerHTML = `<div style="padding:24px;color:var(--text-muted);">Loading sales agreements…</div>`;
+    try {
+        const res = await fetch(`${API_URL}/api/sales-agreements`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        SA_CACHE = (data && data.agreements) || [];
+    } catch (e) {
+        content.innerHTML = `<div style="padding:24px;color:#e25;">Failed to load sales agreements.</div>`;
+        return;
+    }
+    const rows = SA_CACHE.map(a => {
+        const created = a.created_at ? new Date(a.created_at).toLocaleDateString() : '';
+        const start = a.start_date ? new Date(a.start_date).toLocaleDateString() : '—';
+        const who = a.customer_name || a.lead_name || 'Unassigned';
+        const email = a.customer_email || a.lead_email || '';
+        const sel = SA_STATUSES.map(s => `<option value="${s}" ${a.status === s ? 'selected' : ''}>${s}</option>`).join('');
+        return `<tr>
+            <td><strong>${saEsc(a.agreement_number || ('#' + a.id))}</strong><br><span style="color:var(--text-muted);font-size:12px;">${created}</span></td>
+            <td><strong>${saEsc(who)}</strong><br><span style="color:var(--text-muted);font-size:12px;">${saEsc(email)}</span></td>
+            <td>${saEsc(saServiceLabel(a.service_type))}<br><span style="color:var(--text-muted);font-size:12px;">${saEsc(a.package_name || '')}</span></td>
+            <td>${saEsc(a.vehicle || '—')}</td>
+            <td>${saMoney(a.price)}</td>
+            <td>${start}</td>
+            <td><select onchange="updateSalesAgreementStatus(${a.id}, this.value)" style="padding:6px;border-radius:6px;">${sel}</select></td>
+            <td style="white-space:nowrap;">
+                <button class="btn btn-secondary" style="padding:6px 10px;" onclick="openSalesAgreementModal(${a.id})">Edit</button>
+                <button class="btn btn-secondary" style="padding:6px 10px;color:#e25;" onclick="deleteSalesAgreement(${a.id})">Delete</button>
+            </td>
+        </tr>`;
+    }).join('');
+    content.innerHTML = `
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">Sales Agreements (${SA_CACHE.length})</h2>
+                <button class="btn btn-primary" onclick="openSalesAgreementModal()">New Sales Agreement</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead><tr><th>Agreement</th><th>Client / Lead</th><th>Service</th><th>Vehicle</th><th>Price</th><th>Start</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>${rows || `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);">No sales agreements yet. Click “New Sales Agreement” to create one.</td></tr>`}</tbody>
+                </table>
+            </div>
+        </div>`;
+}
+
+function saPackageOptions(serviceType, selected) {
+    const list = (SA_SERVICES[serviceType] && SA_SERVICES[serviceType].packages) || [];
+    return ['<option value="">Select a package…</option>'].concat(
+        list.map(p => `<option value="${saEsc(p)}" ${p === selected ? 'selected' : ''}>${saEsc(p)}</option>`)
+    ).join('');
+}
+function saOnServiceChange() {
+    const st = document.getElementById('saServiceType').value;
+    document.getElementById('saPackage').innerHTML = saPackageOptions(st, '');
+}
+
+async function openSalesAgreementModal(id) {
+    const token = getAuthToken();
+    const editing = SA_CACHE.find(a => a.id === id) || null;
+
+    // Load clients for the assign dropdown.
+    let clients = [];
+    try {
+        const r = await fetch(`${API_URL}/api/sales-agreement-clients`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const d = await r.json();
+        clients = (d && d.clients) || [];
+    } catch (e) { /* dropdown will still allow saving without assignment */ }
+
+    const clientOpts = ['<option value="">— Unassigned —</option>'].concat(
+        clients.map(c => `<option value="${c.id}" ${editing && editing.lead_id === c.id ? 'selected' : ''}>${saEsc(c.name || ('Lead #' + c.id))}${c.is_customer ? ' (customer)' : ''}${c.email ? ' · ' + saEsc(c.email) : ''}</option>`)
+    ).join('');
+
+    const serviceOpts = ['<option value="">Select a service…</option>'].concat(
+        Object.keys(SA_SERVICES).map(k => `<option value="${k}" ${editing && editing.service_type === k ? 'selected' : ''}>${SA_SERVICES[k].label}</option>`)
+    ).join('');
+    const statusOpts = SA_STATUSES.map(s => `<option value="${s}" ${editing && editing.status === s ? 'selected' : ''}>${s}</option>`).join('');
+
+    const e = editing || {};
+    const overlay = document.createElement('div');
+    overlay.id = 'saModalOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.onclick = (ev) => { if (ev.target === overlay) closeSalesAgreementModal(); };
+    overlay.innerHTML = `
+        <div style="background:var(--bg-secondary,#1c1c1c);color:var(--text-primary,#fff);max-width:640px;width:100%;max-height:90vh;overflow-y:auto;border-radius:14px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+                <h2 style="margin:0;font-size:20px;">${editing ? 'Edit' : 'New'} Sales Agreement</h2>
+                <button onclick="closeSalesAgreementModal()" style="background:none;border:none;color:var(--text-muted,#999);font-size:26px;cursor:pointer;line-height:1;">&times;</button>
+            </div>
+            <input type="hidden" id="saId" value="${editing ? editing.id : ''}">
+            <div style="display:grid;gap:14px;">
+                <div>
+                    <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Assign to client or lead</label>
+                    <select id="saLeadId" style="width:100%;padding:10px;border-radius:8px;">${clientOpts}</select>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div>
+                        <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Service type *</label>
+                        <select id="saServiceType" onchange="saOnServiceChange()" style="width:100%;padding:10px;border-radius:8px;">${serviceOpts}</select>
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Package</label>
+                        <select id="saPackage" style="width:100%;padding:10px;border-radius:8px;">${saPackageOptions(e.service_type, e.package_name)}</select>
+                    </div>
+                </div>
+                <div>
+                    <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Vehicle (year / make / model)</label>
+                    <input id="saVehicle" value="${saEsc(e.vehicle || '')}" placeholder="e.g. 2022 Tesla Model 3" style="width:100%;padding:10px;border-radius:8px;">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+                    <div>
+                        <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Price ($)</label>
+                        <input id="saPrice" type="number" step="0.01" value="${e.price != null ? e.price : ''}" style="width:100%;padding:10px;border-radius:8px;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Deposit ($)</label>
+                        <input id="saDeposit" type="number" step="0.01" value="${e.deposit != null ? e.deposit : ''}" style="width:100%;padding:10px;border-radius:8px;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Start date</label>
+                        <input id="saStart" type="date" value="${e.start_date ? String(e.start_date).split('T')[0] : ''}" style="width:100%;padding:10px;border-radius:8px;">
+                    </div>
+                </div>
+                <div>
+                    <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Status</label>
+                    <select id="saStatus" style="width:100%;padding:10px;border-radius:8px;">${statusOpts}</select>
+                </div>
+                <div>
+                    <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Scope / terms</label>
+                    <textarea id="saTerms" rows="3" placeholder="What's included, prep required, cure time, warranty terms…" style="width:100%;padding:10px;border-radius:8px;">${saEsc(e.terms || '')}</textarea>
+                </div>
+                <div>
+                    <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Internal notes</label>
+                    <textarea id="saNotes" rows="2" style="width:100%;padding:10px;border-radius:8px;">${saEsc(e.notes || '')}</textarea>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:22px;">
+                <button class="btn btn-secondary" onclick="closeSalesAgreementModal()">Cancel</button>
+                <button class="btn btn-primary" id="saSaveBtn" onclick="saveSalesAgreement()">${editing ? 'Save Changes' : 'Create Agreement'}</button>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+}
+function closeSalesAgreementModal() {
+    const o = document.getElementById('saModalOverlay');
+    if (o) o.remove();
+}
+
+async function saveSalesAgreement() {
+    const token = getAuthToken();
+    const id = document.getElementById('saId').value;
+    const body = {
+        lead_id: document.getElementById('saLeadId').value || null,
+        service_type: document.getElementById('saServiceType').value,
+        package_name: document.getElementById('saPackage').value,
+        vehicle: document.getElementById('saVehicle').value.trim(),
+        price: parseFloat(document.getElementById('saPrice').value) || 0,
+        deposit: parseFloat(document.getElementById('saDeposit').value) || 0,
+        start_date: document.getElementById('saStart').value || null,
+        status: document.getElementById('saStatus').value,
+        terms: document.getElementById('saTerms').value.trim(),
+        notes: document.getElementById('saNotes').value.trim()
+    };
+    if (!body.service_type) { showToast('Please choose a service type.', 'error'); return; }
+    const btn = document.getElementById('saSaveBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    try {
+        const url = id ? `${API_URL}/api/sales-agreements/${id}` : `${API_URL}/api/sales-agreements`;
+        const method = id ? 'PATCH' : 'POST';
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!data.success) { showToast(data.message || 'Could not save agreement.', 'error'); if (btn) { btn.disabled = false; btn.textContent = id ? 'Save Changes' : 'Create Agreement'; } return; }
+        showToast(id ? 'Sales agreement updated.' : 'Sales agreement created.', 'success');
+        closeSalesAgreementModal();
+        renderSection('salesAgreements');
+    } catch (e) {
+        showToast('Error saving agreement: ' + e.message, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = id ? 'Save Changes' : 'Create Agreement'; }
+    }
+}
+
+async function updateSalesAgreementStatus(id, status) {
+    const token = getAuthToken();
+    try {
+        await fetch(`${API_URL}/api/sales-agreements/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ status }) });
+        const a = SA_CACHE.find(x => x.id === id); if (a) a.status = status;
+        showToast('Status updated.', 'success');
+    } catch (e) { showToast('Could not update status.', 'error'); }
+}
+
+async function deleteSalesAgreement(id) {
+    if (!confirm('Delete this sales agreement? This cannot be undone.')) return;
+    const token = getAuthToken();
+    try {
+        await fetch(`${API_URL}/api/sales-agreements/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        showToast('Sales agreement deleted.', 'success');
+        renderSection('salesAgreements');
+    } catch (e) { showToast('Could not delete agreement.', 'error'); }
+}
+
 
 </script>
 

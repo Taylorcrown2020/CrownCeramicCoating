@@ -198,7 +198,7 @@ window.addEventListener('load', function() {
         /* Hero */
         .contact-hero {
             position: relative;
-            min-height: 50vh;
+            min-height: calc(100vh - 113px);
             display: flex;
             align-items: center;
             overflow: visible;
@@ -2224,7 +2224,7 @@ window.addEventListener('load', function() {
             </div>
             <div class="form-group"><label>Tell Us About Your Vehicle *</label><textarea id="details" placeholder="Share the condition of your paint and what you're hoping to achieve — gloss, protection, swirl removal, etc." required></textarea></div>
             <div class="form-row" style="align-items:end;">
-                <div class="form-group"><label>Schedule a Consultation (optional)</label><input type="date" id="consultDate"></div>
+                <div class="form-group"><label>Schedule a Consultation (optional)</label><input type="date" id="consultDate"><small id="consultHint" style="display:block;margin-top:6px;color:rgba(255,255,255,0.5);font-size:12px;"></small></div>
                 <div class="form-group"><label>Preferred Time</label>
                     <select id="consultTime">
                         <option value="">Select a time...</option>
@@ -3317,6 +3317,47 @@ function dismissBubble() {
             try { sessionStorage.setItem(OPEN_KEY, (t && t.classList.contains('active')) ? '1' : '0'); } catch (e) {}
         };
     }
+
+    // ----- Live consultation availability: grey out already-booked slots -----
+    (function initConsultAvailability() {
+        const dateEl = document.getElementById('consultDate');
+        const timeEl = document.getElementById('consultTime');
+        const hintEl = document.getElementById('consultHint');
+        if (!dateEl || !timeEl) return;
+        // 24h value -> display label, e.g. "13:00" -> "1:00 PM"
+        function toLabel(v) {
+            const [h, m] = v.split(':').map(Number);
+            const period = h >= 12 ? 'PM' : 'AM';
+            const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+            return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+        }
+        // Don't allow booking in the past.
+        const today = new Date().toISOString().split('T')[0];
+        dateEl.min = today;
+        async function refresh() {
+            const date = (dateEl.value || '').trim();
+            // reset
+            Array.from(timeEl.options).forEach(o => { o.disabled = false; if (o.value) o.textContent = toLabel(o.value); });
+            if (!date) { if (hintEl) hintEl.textContent = ''; return; }
+            if (hintEl) hintEl.textContent = 'Checking availability…';
+            try {
+                const r = await fetch(`${window.location.origin}/api/public/booked-times?date=${encodeURIComponent(date)}`);
+                const d = await r.json();
+                const booked = new Set((d.booked || []).map(s => s.replace('\u202f', ' ')));
+                let openCount = 0;
+                Array.from(timeEl.options).forEach(o => {
+                    if (!o.value) return;
+                    const label = toLabel(o.value);
+                    if (booked.has(label)) { o.disabled = true; o.textContent = label + ' — booked'; if (timeEl.value === o.value) timeEl.value = ''; }
+                    else openCount++;
+                });
+                if (hintEl) hintEl.textContent = openCount ? `${openCount} time${openCount === 1 ? '' : 's'} available on this date.` : 'No times left on this date — please pick another day.';
+            } catch (e) {
+                if (hintEl) hintEl.textContent = '';
+            }
+        }
+        dateEl.addEventListener('change', refresh);
+    })();
 
     document.addEventListener('DOMContentLoaded', function () {
         loadMsgs();

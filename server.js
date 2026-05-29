@@ -16970,42 +16970,42 @@ No longer want to receive these emails? <a href="https://crownceramiccoating.com
             const followupContent = {
                 followup1: {
                     eyebrow: 'Just a quick note',
-                    headline: 'Still thinking it over?',
+                    headline: 'Still thinking about protecting your paint?',
                     subhead: `Hi ${lead.name || 'there'} — I wanted to check in on my previous message.`,
-                    body: `We help businesses like yours build custom websites and CRM platforms — owned by you, no subscriptions, no transaction fees. If you haven't had a chance to look us over, I'd love just five minutes of your time.`,
-                    ctaLabel: 'Schedule a Quick Call',
+                    body: `At Crown Ceramic Coating we protect daily drivers, luxury cars, and exotics with professional-grade ceramic coatings, paint correction, and detailing. If you haven't had a chance to grab a quote yet, I'd love just five minutes to talk about your vehicle.`,
+                    ctaLabel: 'Get Your Free Quote',
                     ctaUrl: SCHEDULING_URL,
-                    accentColor: '#FF6B35',
-                    tagline: 'YOUR VISION. OUR CODE.',
+                    accentColor: '#f4c87e',
+                    tagline: 'SHOWROOM SHINE. LASTING PROTECTION.',
                 },
                 followup2: {
                     eyebrow: 'Following up again',
-                    headline: 'You keep 100% of your revenue.',
+                    headline: 'A coating that pays for itself.',
                     subhead: `Hi ${lead.name || 'there'} — just circling back one more time.`,
-                    body: `Platforms like Shopify and Squarespace quietly take 2–5% of every sale you make. With a custom Crown Ceramic Coating site, that money stays in your pocket — forever. For a business doing $200K/year, that's up to $10,000 back in your pocket annually.`,
-                    ctaLabel: 'Schedule a Consultation',
+                    body: `A quality ceramic coating shields your paint from UV fade, road grime, bird droppings, and light swirls for years — so you wash less, wax never, and keep that deep gloss far longer. It also protects your resale value. We'd love to show you what it can do for your vehicle.`,
+                    ctaLabel: 'Book a Consultation',
                     ctaUrl: SCHEDULING_URL,
-                    accentColor: '#1A7A3A',
-                    tagline: 'ZERO TRANSACTION FEES.',
+                    accentColor: '#f4c87e',
+                    tagline: 'PROTECTION YOU CAN SEE.',
                 },
                 followup3: {
                     eyebrow: 'One last thing',
                     headline: 'No pressure — just wanted you to have this.',
                     subhead: `Hi ${lead.name || 'there'},`,
-                    body: `I won't keep filling your inbox. But before I go, I'd love for you to know that our clients get custom-built websites they fully own, CRM systems tailored to how they work, and real human support. No templates. No platform lock-in. If the timing ever makes sense, we'll be here.`,
-                    ctaLabel: 'Book a Call When Ready',
+                    body: `I won't keep filling your inbox. But before I go, I'd love for you to know that our clients get meticulous paint correction, long-lasting ceramic protection, and interior detailing done by a hands-on local team that treats every vehicle like our own. Whenever the timing is right, we'll be here.`,
+                    ctaLabel: 'Book When You\'re Ready',
                     ctaUrl: SCHEDULING_URL,
                     accentColor: '#2D3142',
-                    tagline: 'BUILT FOR YOUR BUSINESS.',
+                    tagline: 'BUILT ON INTEGRITY. OBSESSED WITH RESULTS.',
                 },
                 followupindefinite: {
                     eyebrow: 'Checking in',
                     headline: 'We\'re still here when you\'re ready.',
-                    subhead: `Hi ${lead.name || 'there'} — hope things are going well.`,
-                    body: `We know timing isn't always right. When it is, we'd love to talk about how a custom website or CRM can take work off your plate and keep more revenue in your business. No obligation — just a conversation.`,
+                    subhead: `Hi ${lead.name || 'there'} — hope you and your vehicle are doing well.`,
+                    body: `We know timing isn't always right. When it is, we'd love to talk about protecting your paint with a ceramic coating, bringing it back to life with paint correction, or freshening up the interior. No obligation — just a conversation.`,
                     ctaLabel: 'Schedule a Call',
                     ctaUrl: SCHEDULING_URL,
-                    accentColor: '#FF6B35',
+                    accentColor: '#f4c87e',
                     tagline: 'CROWN CERAMIC COATING.',
                 },
             };
@@ -17832,31 +17832,31 @@ app.post('/api/auto-campaigns/run-due', authenticateToken, async (req, res) => {
                         followup2: {
                             subject: 'Following up again',
                             eyebrow: 'Following up again',
-                            headline: 'You keep 100% of your revenue.',
+                            headline: 'A coating that pays for itself.',
                             subhead: `Hi ${c.lead_name || 'there'} — just circling back one more time.`,
-                            body: `Platforms like Shopify and Squarespace quietly take 2–5% of every sale you make. With a custom Crown Ceramic Coating site, that money stays in your pocket — forever. For a business doing $200K/year, that's up to $10,000 back in your pocket annually.`,
-                            ctaLabel: 'Schedule a Consultation',
+                            body: `A quality ceramic coating shields your paint from UV fade, road grime, bird droppings, and light swirls for years — so you wash less, wax never, and keep that deep gloss far longer. It also protects your resale value. We'd love to show you what it can do for your vehicle.`,
+                            ctaLabel: 'Book a Consultation',
                             ctaUrl: SCHEDULING_URL,
-                            accentColor: '#1A7A3A',
-                            tagline: 'ZERO TRANSACTION FEES.',
+                            accentColor: '#f4c87e',
+                            tagline: 'PROTECTION YOU CAN SEE.',
                         },
                         followup3: {
                             subject: 'One last thing',
                             eyebrow: 'One last thing',
                             headline: 'No pressure — just wanted you to have this.',
                             subhead: `Hi ${c.lead_name || 'there'},`,
-                            body: `I won't keep filling your inbox. But before I go, I'd love for you to know that our clients get custom-built websites they fully own, CRM systems tailored to how they work, and real human support. No templates. No platform lock-in. If the timing ever makes sense, we'll be here.`,
+                            body: `I won't keep filling your inbox. But before I go, I'd love for you to know that our clients get meticulous paint correction, long-lasting ceramic protection, and interior detailing done by a hands-on local team that treats every vehicle like our own. Whenever the timing is right, we'll be here.`,
                             ctaLabel: 'Book a Call When Ready',
                             ctaUrl: SCHEDULING_URL,
                             accentColor: '#2D3142',
-                            tagline: 'BUILT FOR YOUR BUSINESS.',
+                            tagline: 'BUILT ON INTEGRITY. OBSESSED WITH RESULTS.',
                         },
                         followupindefinite: {
                             subject: 'Checking in',
                             eyebrow: 'Checking in',
                             headline: 'We\'re still here when you\'re ready.',
                             subhead: `Hi ${c.lead_name || 'there'} — hope things are going well.`,
-                            body: `We know timing isn't always right. When it is, we'd love to talk about how a custom website or CRM can take work off your plate and keep more revenue in your business. No obligation — just a conversation.`,
+                            body: `We know timing isn't always right. When it is, we'd love to talk about protecting your paint with a ceramic coating, bringing it back to life with paint correction, or freshening up the interior. No obligation — just a conversation.`,
                             ctaLabel: 'Schedule a Call',
                             ctaUrl: SCHEDULING_URL,
                             accentColor: '#FF6B35',
@@ -24248,44 +24248,6 @@ app.post('/api/client/email-chains/:id/toggle', authenticateClient, async (req, 
         res.json({ success: true, active });
     } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
-// ========================================
-// 404 HANDLER
-// ========================================
-app.use((req, res) => {
-    // If it's an API route, return JSON
-    if (req.path.startsWith('/api/')) {
-        res.status(404).json({ 
-            success: false, 
-            message: 'API endpoint not found' 
-        });
-    } else {
-        // Serve the custom 404 page; fall back to inline HTML if the file doesn't exist.
-        const notFoundFile = path.join(__dirname, 'public', '404.html');
-        res.status(404).sendFile(notFoundFile, (err) => {
-            if (err) {
-                res.status(404).send(
-                    '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
-                    '<title>404 — Not Found</title>' +
-                    '<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#0e0e0e;color:#f4f4f4;}' +
-                    'h1{font-size:2rem;margin-bottom:.5rem}p{color:#9a9a9a}</style></head>' +
-                    '<body><div><h1>404</h1><p>Page not found.</p></div></body></html>'
-                );
-            }
-        });
-    }
-});
-
-// ========================================
-// ERROR HANDLER
-// ========================================
-app.use((err, req, res, next) => {
-    console.error('Server error:', err.stack);
-    res.status(500).json({ 
-        success: false, 
-        message: 'Internal server error' 
-    });
-});
-
 async function startServer() {
     try {
         await initializeDatabase(pool);
@@ -24684,6 +24646,25 @@ async function ensurePortalSchema() {
             notes TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS sales_agreements (
+            id SERIAL PRIMARY KEY,
+            agreement_number VARCHAR(40) UNIQUE,
+            lead_id INTEGER REFERENCES leads(id) ON DELETE SET NULL,
+            customer_name VARCHAR(255),
+            customer_email VARCHAR(255),
+            service_type VARCHAR(60),
+            package_name VARCHAR(160),
+            vehicle VARCHAR(200),
+            price NUMERIC(10,2) DEFAULT 0,
+            deposit NUMERIC(10,2) DEFAULT 0,
+            start_date DATE,
+            status VARCHAR(40) DEFAULT 'draft',
+            terms TEXT,
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
     await pool.query(`DO $$ BEGIN
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='invoices' AND column_name='stripe_payment_intent_id')
         THEN ALTER TABLE invoices ADD COLUMN stripe_payment_intent_id VARCHAR(255); END IF;
@@ -24865,6 +24846,164 @@ app.post('/api/public/consultations', async (req, res) => {
 });
 
 
+        // ========================================
+        // SALES AGREEMENTS (Crown Ceramic Coating)
+        // ========================================
+
+        // Lightweight client list for the "assign to" dropdown (leads + customers).
+        app.get('/api/sales-agreement-clients', authenticateToken, async (req, res) => {
+            try {
+                const r = await pool.query(
+                    `SELECT id, name, email, COALESCE(is_customer, FALSE) AS is_customer
+                       FROM leads ORDER BY is_customer DESC, name ASC LIMIT 1000`);
+                res.json({ success: true, clients: r.rows });
+            } catch (e) {
+                res.status(500).json({ success: false, message: 'Could not load clients.' });
+            }
+        });
+
+        // List all sales agreements.
+        app.get('/api/sales-agreements', authenticateToken, async (req, res) => {
+            try {
+                await ensurePortalSchema();
+                const r = await pool.query(`
+                    SELECT sa.*, l.name AS lead_name, l.email AS lead_email, l.phone AS lead_phone,
+                           COALESCE(l.is_customer, FALSE) AS lead_is_customer
+                      FROM sales_agreements sa
+                      LEFT JOIN leads l ON sa.lead_id = l.id
+                     ORDER BY sa.created_at DESC`);
+                res.json({ success: true, agreements: r.rows });
+            } catch (e) {
+                console.error('[SALES-AGREEMENT] list error:', e.message);
+                res.status(500).json({ success: false, message: 'Could not load sales agreements.' });
+            }
+        });
+
+        // Get one.
+        app.get('/api/sales-agreements/:id', authenticateToken, async (req, res) => {
+            try {
+                const r = await pool.query(`
+                    SELECT sa.*, l.name AS lead_name, l.email AS lead_email, l.phone AS lead_phone
+                      FROM sales_agreements sa LEFT JOIN leads l ON sa.lead_id = l.id
+                     WHERE sa.id = $1`, [req.params.id]);
+                if (r.rows.length === 0) return res.status(404).json({ success: false, message: 'Agreement not found.' });
+                res.json({ success: true, agreement: r.rows[0] });
+            } catch (e) {
+                res.status(500).json({ success: false, message: 'Could not load agreement.' });
+            }
+        });
+
+        // Create a sales agreement and assign it to a lead/customer.
+        app.post('/api/sales-agreements', authenticateToken, async (req, res) => {
+            try {
+                await ensurePortalSchema();
+                const { lead_id, service_type, package_name, vehicle, price, deposit,
+                        start_date, status, terms, notes } = req.body || {};
+                if (!service_type) return res.status(400).json({ success: false, message: 'A service type is required.' });
+
+                // Resolve the assigned customer's name/email snapshot.
+                let customer_name = null, customer_email = null;
+                if (lead_id) {
+                    const lr = await pool.query('SELECT name, email FROM leads WHERE id = $1', [lead_id]);
+                    if (lr.rows[0]) { customer_name = lr.rows[0].name; customer_email = lr.rows[0].email; }
+                }
+                const agreement_number = 'SA-' + Date.now().toString(36).toUpperCase();
+                const r = await pool.query(`
+                    INSERT INTO sales_agreements
+                        (agreement_number, lead_id, customer_name, customer_email, service_type,
+                         package_name, vehicle, price, deposit, start_date, status, terms, notes)
+                    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
+                    [agreement_number, lead_id || null, customer_name, customer_email, service_type,
+                     package_name || null, vehicle || null, price || 0, deposit || 0,
+                     start_date || null, status || 'draft', terms || null, notes || null]);
+                res.json({ success: true, agreement: r.rows[0] });
+            } catch (e) {
+                console.error('[SALES-AGREEMENT] create error:', e.message);
+                res.status(500).json({ success: false, message: 'Could not create agreement.' });
+            }
+        });
+
+        // Update fields / status.
+        app.patch('/api/sales-agreements/:id', authenticateToken, async (req, res) => {
+            try {
+                const allowed = ['lead_id','service_type','package_name','vehicle','price','deposit','start_date','status','terms','notes'];
+                const sets = [], vals = [];
+                let i = 1;
+                for (const k of allowed) {
+                    if (req.body && Object.prototype.hasOwnProperty.call(req.body, k)) {
+                        sets.push(`${k} = $${i++}`); vals.push(req.body[k]);
+                    }
+                }
+                // If lead_id changes, refresh the name/email snapshot.
+                if (req.body && Object.prototype.hasOwnProperty.call(req.body, 'lead_id') && req.body.lead_id) {
+                    const lr = await pool.query('SELECT name, email FROM leads WHERE id = $1', [req.body.lead_id]);
+                    if (lr.rows[0]) {
+                        sets.push(`customer_name = $${i++}`); vals.push(lr.rows[0].name);
+                        sets.push(`customer_email = $${i++}`); vals.push(lr.rows[0].email);
+                    }
+                }
+                if (sets.length === 0) return res.status(400).json({ success: false, message: 'Nothing to update.' });
+                sets.push(`updated_at = CURRENT_TIMESTAMP`);
+                vals.push(req.params.id);
+                const r = await pool.query(
+                    `UPDATE sales_agreements SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`, vals);
+                if (r.rows.length === 0) return res.status(404).json({ success: false, message: 'Agreement not found.' });
+                res.json({ success: true, agreement: r.rows[0] });
+            } catch (e) {
+                console.error('[SALES-AGREEMENT] update error:', e.message);
+                res.status(500).json({ success: false, message: 'Could not update agreement.' });
+            }
+        });
+
+        // Delete.
+        app.delete('/api/sales-agreements/:id', authenticateToken, async (req, res) => {
+            try {
+                await pool.query('DELETE FROM sales_agreements WHERE id = $1', [req.params.id]);
+                res.json({ success: true });
+            } catch (e) {
+                res.status(500).json({ success: false, message: 'Could not delete agreement.' });
+            }
+        });
+
+        // ----- 404 + ERROR HANDLERS (registered LAST, after all routes) -----
+// ========================================
+// 404 HANDLER
+// ========================================
+app.use((req, res) => {
+    // If it's an API route, return JSON
+    if (req.path.startsWith('/api/')) {
+        res.status(404).json({ 
+            success: false, 
+            message: 'API endpoint not found' 
+        });
+    } else {
+        // Serve the custom 404 page; fall back to inline HTML if the file doesn't exist.
+        const notFoundFile = path.join(__dirname, 'public', '404.html');
+        res.status(404).sendFile(notFoundFile, (err) => {
+            if (err) {
+                res.status(404).send(
+                    '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+                    '<title>404 — Not Found</title>' +
+                    '<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#0e0e0e;color:#f4f4f4;}' +
+                    'h1{font-size:2rem;margin-bottom:.5rem}p{color:#9a9a9a}</style></head>' +
+                    '<body><div><h1>404</h1><p>Page not found.</p></div></body></html>'
+                );
+            }
+        });
+    }
+});
+
+// ========================================
+// ERROR HANDLER
+// ========================================
+app.use((err, req, res, next) => {
+    console.error('Server error:', err.stack);
+    res.status(500).json({ 
+        success: false, 
+        message: 'Internal server error' 
+    });
+});
+
         app.listen(PORT, () => {
             console.log('');
             console.log('========================================');
@@ -24901,19 +25040,19 @@ async function buildMarketingTemplateHTML(template, name, subject, bodyText, uns
     const accentColor = '#FF6B35';
 
     if (template === 'zerotransactionfees') {
-        // Return a concise but branded version referencing the zero-fee pitch
+        // Branded ceramic-coating value pitch.
         return buildEmailHTML(`
             <p>Hi ${name},</p>
-            <h2 style="font-size:24px;color:#2D3142;letter-spacing:-0.5px;">Every sale you make, they take a cut.</h2>
-            <p>Shopify, Squarespace, and Wix charge 2–5% on every transaction. On $200K in annual sales, that's up to <strong>$10,000 quietly disappearing</strong> every year.</p>
-            <p>At Crown Ceramic Coating, we charge <strong>zero transaction fees</strong> — ever. You get a fully custom website you own outright, with no platform dependencies and no revenue leaks.</p>
-            <div style="background:#FFF8F0;border-left:3px solid #FF6B35;padding:18px 20px;border-radius:4px;margin:20px 0;">
-                <strong>What $200K/yr looks like:</strong><br>
-                Other platforms: <span style="color:#CC2222;font-weight:700;">−$6,000/yr</span> in fees &nbsp;|&nbsp; Crown Ceramic Coating: <span style="color:#1A7A3A;font-weight:700;">$0</span>
+            <h2 style="font-size:24px;color:#2D3142;letter-spacing:-0.5px;">Your paint is taking a beating every single day.</h2>
+            <p>UV rays, road grime, bird droppings, hard-water spots, and everyday washing slowly dull your finish and leave swirls behind. Wax washes away in weeks.</p>
+            <p>A professional ceramic coating from Crown Ceramic Coating bonds to your paint and protects it for <strong>years</strong> — deep gloss, easier washing, and real defense against the elements. It even helps protect your resale value.</p>
+            <div style="background:#FFF8F0;border-left:3px solid #b07d2b;padding:18px 20px;border-radius:4px;margin:20px 0;">
+                <strong>What you get:</strong><br>
+                Long-lasting gloss &nbsp;|&nbsp; Hydrophobic, easy-clean surface &nbsp;|&nbsp; UV &amp; contaminant protection &nbsp;|&nbsp; Done by a hands-on local team
             </div>
-            <p>Ready to stop losing revenue to your own platform?</p>
+            <p>Ready to lock in that showroom shine?</p>
             <div style="margin:28px 0;">
-                <a href="${SCHEDULING_URL}" style="background:#FF6B35;color:#fff;padding:14px 32px;border-radius:3px;font-weight:700;text-decoration:none;font-size:15px;">Schedule a Free Consultation</a>
+                <a href="${SCHEDULING_URL}" style="background:#b07d2b;color:#fff;padding:14px 32px;border-radius:3px;font-weight:700;text-decoration:none;font-size:15px;">Get Your Free Quote</a>
             </div>
             <div class="sign-off"><p>Warm regards,</p><p class="team-name">The Crown Ceramic Coating Team</p></div>
         `, { unsubscribeUrl: unsubUrl });
@@ -24921,14 +25060,14 @@ async function buildMarketingTemplateHTML(template, name, subject, bodyText, uns
 
     // For promo and other HTML templates: personalized intro + promo body
     const promoDetails = {
-        initial: { headline: 'Your Vision. Our Code.', body: `We build custom websites and CRM systems for businesses like yours — no templates, no transaction fees, full ownership.` },
-        valentinessale: { headline: "Valentine's Day: 25% OFF Everything", body: `This Valentine's Day, treat your business to a custom website or CRM at 25% off. Offer ends soon.` },
-        springsale: { headline: 'Spring Sale: 25% OFF All Services', body: `Spring is here — and so is our biggest sale of the season. 25% off custom web development and CRM solutions.` },
-        blackfriday: { headline: 'BLACK FRIDAY: 25% OFF Everything', body: `Our biggest deal of the year. 25% off all custom development packages — today only.` },
-        initialsale: { headline: 'Spring Event: 25% OFF — Limited Time', body: `Kick off spring with a custom website or CRM at 25% off. Spots are filling fast.` },
-        valentines14: { headline: "Valentine's Special: 14% Off", body: `Show your business some love this Valentine's season with 14% off our custom web solutions.` },
-        checkin: { headline: `Checking In, ${name}`, body: `We wanted to take a moment to check in. How is everything going? If there's anything we can help with — updates, new features, SEO — just say the word.` },
-        referralrequest: { headline: 'Know Someone Who Could Use Us?', body: `If you know a business owner looking for a custom website or CRM, we'd love an introduction. We take care of your referrals like they're our own.` },
+        initial: { headline: 'Showroom Shine. Lasting Protection.', body: `Crown Ceramic Coating protects daily drivers, luxury cars, and exotics with professional ceramic coatings, paint correction, and detailing across Dallas–Fort Worth.` },
+        valentinessale: { headline: "Valentine's Day: 25% OFF Detailing", body: `Treat your car (or someone you love) this Valentine's Day — 25% off ceramic coating and detailing packages. Offer ends soon.` },
+        springsale: { headline: 'Spring Sale: 25% OFF All Services', body: `Wash off the winter grime — 25% off ceramic coatings, paint correction, and interior detailing this spring.` },
+        blackfriday: { headline: 'BLACK FRIDAY: 25% OFF Everything', body: `Our biggest deal of the year. 25% off every ceramic coating and detailing package — today only.` },
+        initialsale: { headline: 'Spring Event: 25% OFF — Limited Time', body: `Kick off the season with a ceramic coating or full detail at 25% off. Spots are filling fast.` },
+        valentines14: { headline: "Valentine's Special: 14% Off", body: `Show your ride some love this Valentine's season with 14% off ceramic coating and detailing.` },
+        checkin: { headline: `Checking In, ${name}`, body: `We wanted to check in on how your vehicle is holding up. If it's time for a maintenance wash, a top-up, or a fresh detail, just say the word.` },
+        referralrequest: { headline: 'Know Someone Who Loves Their Car?', body: `If you know someone who'd want their paint protected and detailed right, we'd love an introduction. We take care of your referrals like they're our own.` },
     };
 
     const pd = promoDetails[template] || { headline: 'Crown Ceramic Coating', body: bodyText || '' };

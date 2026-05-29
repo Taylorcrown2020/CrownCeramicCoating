@@ -198,7 +198,7 @@ window.addEventListener('load', function() {
         /* Hero */
         .about-hero {
             position: relative;
-            min-height: 50vh;
+            min-height: calc(100vh - 113px);
             display: flex;
             align-items: center;
             overflow: visible;
@@ -1817,11 +1817,21 @@ window.addEventListener('load', function() {
 </style>
 
 <div class="cc-page">
-<section class="cc-hero">
-  <div class="eyebrow">Our Process</div>
-  <h1>From inspection to a flawless, protected finish</h1>
-  <p>Great results come from disciplined prep, not shortcuts. Here's exactly how we treat every vehicle that comes through our doors.</p>
-  <a href="contact.html#contact" class="cc-btn">Book Your Consultation</a>
+<section class="about-hero">
+    <div class="hero-background">
+        <video id="heroVideo" class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
+            <source src="4779866-hd_1920_1080_30fps.mp4" type="video/mp4">
+        </video>
+        <img src="pexels-gdtography-277628-911738.jpg" alt="Crown Ceramic Coating process" class="hero-mobile-image" loading="eager">
+    </div>
+    <div class="hero-content">
+        <div class="hero-text">
+            <div class="hero-label">OUR PROCESS</div>
+            <h1 class="hero-title">From Inspection to a Flawless, Protected Finish</h1>
+            <p class="hero-subtitle">Great results come from disciplined prep, not shortcuts. Here's exactly how we treat every vehicle that comes through our doors.</p>
+            <a href="contact.html#contact" class="hero-cta">Book Your Consultation</a>
+        </div>
+    </div>
 </section>
 
 <section class="cc-section">

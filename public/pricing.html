@@ -198,7 +198,7 @@ window.addEventListener('load', function() {
         /* Hero */
         .about-hero {
             position: relative;
-            min-height: 50vh;
+            min-height: calc(100vh - 113px);
             display: flex;
             align-items: center;
             overflow: visible;
@@ -1818,11 +1818,21 @@ window.addEventListener('load', function() {
 
 <div class="cc-page">
 <!-- HERO -->
-<section class="cc-hero">
-  <div class="eyebrow">Honest, Upfront Pricing</div>
-  <h1>Ceramic Coating, Paint Correction &amp; Detailing Pricing</h1>
-  <p>Every vehicle is different, so every quote is tailored. Below are our core packages and starting points — your final price depends on size, paint condition, and the level of correction your vehicle needs.</p>
-  <a href="contact.html#contact" class="cc-btn">Get Your Free Quote</a>
+<section class="about-hero">
+    <div class="hero-background">
+        <video id="heroVideo" class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
+            <source src="4779866-hd_1920_1080_30fps.mp4" type="video/mp4">
+        </video>
+        <img src="pexels-gdtography-277628-911738.jpg" alt="Crown Ceramic Coating pricing" class="hero-mobile-image" loading="eager">
+    </div>
+    <div class="hero-content">
+        <div class="hero-text">
+            <div class="hero-label">HONEST, UPFRONT PRICING</div>
+            <h1 class="hero-title">Ceramic Coating, Paint Correction &amp; Detailing Pricing</h1>
+            <p class="hero-subtitle">Every vehicle is different, so every quote is tailored. Below are our core packages and starting points — your final price depends on size, paint condition, and the level of correction your vehicle needs.</p>
+            <a href="contact.html#contact" class="hero-cta">Get Your Free Quote</a>
+        </div>
+    </div>
 </section>
 
 <!-- CERAMIC COATING -->
