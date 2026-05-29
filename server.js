@@ -13793,43 +13793,6 @@ app.post('/api/client/login', async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid email or password.' });
         }
 
-        // Resolve clientPortalId and admin status
-        // Always check client_companies so admins whose lead row has stale/missing flags
-        // still get isCompanyAdmin=true and the correct clientPortalId
-        let clientPortalId = lead.client_portal_id || null;
-        let isCompanyAdmin = lead.is_company_admin || false;
-
-        const ccLookup = await pool.query(
-            'SELECT client_portal_id FROM client_companies WHERE LOWER(admin_email) = LOWER($1) LIMIT 1',
-            [lead.email]
-        );
-        if (ccLookup.rows[0]?.client_portal_id) {
-            clientPortalId = ccLookup.rows[0].client_portal_id;
-            isCompanyAdmin = true;
-            // Stamp back so future requests are instant
-            await pool.query(
-                'UPDATE leads SET client_portal_id = $1, is_company_admin = TRUE WHERE id = $2',
-                [clientPortalId, lead.id]
-            ).catch(() => {});
-        } else if (!clientPortalId) {
-            // Not a company admin — try to find portal via company_users (workspace member)
-            const cu = await pool.query(
-                `SELECT client_portal_id FROM company_users WHERE LOWER(user_email)=LOWER($1) AND status='active' LIMIT 1`,
-                [lead.email]
-            );
-            if (cu.rows[0]?.client_portal_id) {
-                clientPortalId = cu.rows[0].client_portal_id;
-                await pool.query(
-                    'UPDATE leads SET client_portal_id=$1 WHERE id=$2',
-                    [clientPortalId, lead.id]
-                ).catch(() => {});
-            } else {
-                // Pure individual subscription — no company, no team.
-                // They are the sole owner of their account so they get full admin rights.
-                isCompanyAdmin = true;
-            }
-        }
-
         // Update last login timestamp
         await pool.query(
             'UPDATE leads SET client_last_login = CURRENT_TIMESTAMP WHERE id = $1',
@@ -13843,9 +13806,6 @@ app.post('/api/client/login', async (req, res) => {
             { expiresIn: '7d' }
         );
 
-        // Resolve plan limits so the frontend can enforce UI restrictions immediately
-        const planData = await getClientPlanLimits(lead.id);
-
         res.json({
             success: true,
             token,
@@ -13854,11 +13814,7 @@ app.post('/api/client/login', async (req, res) => {
                 name: lead.name,
                 email: lead.email,
                 company: lead.company,
-                isCompanyAdmin,
-                isCoAdmin: lead.is_co_admin || false,
-                clientPortalId,
-                planKey:    planData.planKey,
-                planLimits: planData,
+                phone: lead.phone || null
             }
         });
 
