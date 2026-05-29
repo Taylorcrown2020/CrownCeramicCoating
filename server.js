@@ -1956,29 +1956,35 @@ async function initializeDatabase(){
         `);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_project_milestones_project ON project_milestones(project_id, order_index)`);
 
-        // SMS chain tables (.catch so they never kill startup)
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS client_sms_chains (
-                id SERIAL PRIMARY KEY,
-                client_portal_id VARCHAR(255),
-                name VARCHAR(255) NOT NULL,
-                loop BOOLEAN DEFAULT FALSE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `).catch(()=>{});
-
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS client_sms_chain_queue (
-                id SERIAL PRIMARY KEY,
-                chain_id INTEGER REFERENCES client_sms_chains(id) ON DELETE CASCADE,
-                lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
-                client_portal_id VARCHAR(255),
-                current_step INTEGER DEFAULT 0,
-                next_send_at TIMESTAMP,
-                is_active BOOLEAN DEFAULT TRUE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `).catch(()=>{});
+        // SMS chain tables — use savepoints so failures don't abort the transaction
+        await client.query('SAVEPOINT sms_chains');
+        try {
+            await client.query(`
+                CREATE TABLE IF NOT EXISTS client_sms_chains (
+                    id SERIAL PRIMARY KEY,
+                    client_portal_id VARCHAR(255),
+                    name VARCHAR(255) NOT NULL,
+                    loop BOOLEAN DEFAULT FALSE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            `);
+            await client.query(`
+                CREATE TABLE IF NOT EXISTS client_sms_chain_queue (
+                    id SERIAL PRIMARY KEY,
+                    chain_id INTEGER REFERENCES client_sms_chains(id) ON DELETE CASCADE,
+                    lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+                    client_portal_id VARCHAR(255),
+                    current_step INTEGER DEFAULT 0,
+                    next_send_at TIMESTAMP,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            `);
+            await client.query('RELEASE SAVEPOINT sms_chains');
+        } catch(e) {
+            await client.query('ROLLBACK TO SAVEPOINT sms_chains');
+            console.warn('[SMS CHAINS] Non-fatal:', e.message);
+        }
 
         // ══════════════════════════════════════════════════════
         // COLUMN MIGRATIONS — run after all tables exist
@@ -2099,7 +2105,8 @@ async function initializeDatabase(){
             END $$;
         `);
 
-        // SMS settings migration (non-fatal)
+        // SMS settings migration — use savepoint so failure doesn't abort the whole transaction
+        await client.query('SAVEPOINT sms_migration');
         try {
             await client.query(`
                 DO $sms$
@@ -2110,7 +2117,11 @@ async function initializeDatabase(){
                     END IF;
                 END $sms$;
             `);
-        } catch(smsErr) { console.warn('[SMS MIGRATION] Non-fatal:', smsErr.message); }
+            await client.query('RELEASE SAVEPOINT sms_migration');
+        } catch(smsErr) {
+            await client.query('ROLLBACK TO SAVEPOINT sms_migration');
+            console.warn('[SMS MIGRATION] Non-fatal:', smsErr.message);
+        }
 
         // ══════════════════════════════════════════════════════
         // SEED DATA
