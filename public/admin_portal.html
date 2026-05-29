@@ -3700,6 +3700,13 @@ body.graffiti-mode .sidebar::after {
                 Service Requests
                 <span class="nav-badge" id="serviceRequestsBadge" style="display:none;">0</span>
             </div>
+            <div class="nav-item" data-section="surveys">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4"/>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                Surveys
+            </div>
             <div class="nav-item" data-section="schedule">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -4044,7 +4051,19 @@ const state = {
 // ========================================
 document.addEventListener('DOMContentLoaded', async function() {
     state.authToken = authToken;
-    
+
+    // ── One-time cleanup: remove old Diamondback "Project Timelines" ──
+    // These were stored in the browser (localStorage), not the database.
+    // Crown's service agreements now live in the DB-backed "Sales Agreements" tab.
+    try {
+        if (!localStorage.getItem('crownPurgedLegacyTimelines')) {
+            localStorage.removeItem('projectTimelines');
+            localStorage.removeItem('projectTimelineDrafts');
+            localStorage.setItem('crownPurgedLegacyTimelines', '1');
+            console.log('[CROWN] Removed legacy Diamondback project timelines from local storage.');
+        }
+    } catch (e) { /* ignore storage errors */ }
+
     if (!authToken) {
         window.location.href = '/admin';
         return;
@@ -4576,6 +4595,7 @@ async function renderSection(section) {
         settings: 'Settings',
         followups: 'Follow-Up Queue',
         serviceRequests: 'Service Requests',
+        surveys: 'Surveys',
         documents: 'Document Management',
         pipeline: 'Sales Pipeline',
         'lead-scoring': 'Lead Scoring',
@@ -4715,6 +4735,9 @@ async function renderSection(section) {
 
         case 'serviceRequests':
             renderServiceRequests(content);
+            break;
+        case 'surveys':
+            renderSurveys(content);
             break;
             
         case 'employees':
@@ -7608,14 +7631,18 @@ async function renderServiceRequests(content) {
         const created = r.created_at ? new Date(r.created_at).toLocaleDateString() : '';
         const pref = r.preferred_date ? new Date(r.preferred_date).toLocaleDateString() : '—';
         const sel = statusOptions.map(s => `<option value="${s}" ${r.status === s ? 'selected' : ''}>${s}</option>`).join('');
+        const responded = r.admin_response
+            ? `<div style="margin-top:6px;font-size:12px;color:#7fc99b;border-left:2px solid #3fae6b;padding-left:8px;">Replied: ${(r.admin_response).replace(/</g,'&lt;').slice(0,120)}${r.admin_response.length>120?'…':''}</div>`
+            : '';
         return `<tr>
             <td>${created}</td>
             <td><strong>${(r.customer_name || 'Unknown')}</strong><br><span style="color:var(--text-muted);font-size:12px;">${r.customer_email || ''}${r.customer_phone ? ' · ' + r.customer_phone : ''}</span></td>
             <td>${r.service_type || '—'}</td>
             <td>${r.vehicle || '—'}</td>
             <td>${pref}</td>
-            <td style="max-width:280px;">${(r.details || '').replace(/</g, '&lt;')}</td>
+            <td style="max-width:280px;">${(r.details || '').replace(/</g, '&lt;')}${responded}</td>
             <td><select onchange="updateServiceRequestStatus(${r.id}, this.value)" style="padding:6px;border-radius:6px;">${sel}</select></td>
+            <td><button class="btn btn-primary" style="padding:6px 12px;white-space:nowrap;" onclick='openServiceReply(${r.id}, ${JSON.stringify((r.customer_name||"")).replace(/'/g,"&#39;")})'>${r.admin_response ? 'Reply again' : 'Reply'}</button></td>
         </tr>`;
     }).join('');
 
@@ -7624,11 +7651,58 @@ async function renderServiceRequests(content) {
             <div class="card-header"><h2 class="card-title">Service Requests (${requests.length})</h2></div>
             <div class="table-container">
                 <table class="data-table">
-                    <thead><tr><th>Received</th><th>Customer</th><th>Service</th><th>Vehicle</th><th>Preferred</th><th>Details</th><th>Status</th></tr></thead>
-                    <tbody>${rows || `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">No service requests yet.</td></tr>`}</tbody>
+                    <thead><tr><th>Received</th><th>Customer</th><th>Service</th><th>Vehicle</th><th>Preferred</th><th>Details</th><th>Status</th><th>Reply</th></tr></thead>
+                    <tbody>${rows || `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);">No service requests yet.</td></tr>`}</tbody>
                 </table>
             </div>
         </div>`;
+}
+
+// Reply to a service request — emails the client + stores the response (#7)
+function openServiceReply(id, name) {
+    let ov = document.getElementById('srReplyOverlay');
+    if (ov) ov.remove();
+    ov = document.createElement('div');
+    ov.id = 'srReplyOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    ov.innerHTML = `
+        <div style="background:var(--bg-card,#1a1a1a);border:1px solid var(--border,#333);border-radius:14px;max-width:520px;width:100%;padding:26px;">
+            <h3 style="margin:0 0 6px;font-size:18px;">Reply to ${name || 'customer'}</h3>
+            <p style="color:var(--text-muted,#999);font-size:13px;margin:0 0 16px;">Your message is emailed to the customer and shown in their client portal.</p>
+            <textarea id="srReplyText" style="width:100%;min-height:130px;background:#141414;border:1px solid #2e2c29;border-radius:9px;padding:12px;color:#f4f1ea;font-family:inherit;font-size:14px;" placeholder="Type your response…"></textarea>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+                <button class="btn btn-secondary" onclick="document.getElementById('srReplyOverlay').remove()">Cancel</button>
+                <button class="btn btn-primary" id="srReplySend" onclick="sendServiceReply(${id})">Send Reply</button>
+            </div>
+        </div>`;
+    ov.onclick = e => { if (e.target === ov) ov.remove(); };
+    document.body.appendChild(ov);
+    document.getElementById('srReplyText').focus();
+}
+
+async function sendServiceReply(id) {
+    const text = (document.getElementById('srReplyText').value || '').trim();
+    if (!text) { if (typeof showToast === 'function') showToast('Please type a response', 'error'); return; }
+    const btn = document.getElementById('srReplySend'); btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+        const res = await fetch(`${API_URL}/api/admin/service-requests/${id}/respond`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ response: text })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            document.getElementById('srReplyOverlay').remove();
+            if (typeof showToast === 'function') showToast('Reply sent & emailed', 'success');
+            renderServiceRequests(document.getElementById('contentArea'));
+        } else {
+            if (typeof showToast === 'function') showToast(data.message || 'Failed to send', 'error');
+            btn.disabled = false; btn.textContent = 'Send Reply';
+        }
+    } catch (e) {
+        if (typeof showToast === 'function') showToast('Network error', 'error');
+        btn.disabled = false; btn.textContent = 'Send Reply';
+    }
 }
 
 async function updateServiceRequestStatus(id, status) {
@@ -7643,6 +7717,56 @@ async function updateServiceRequestStatus(id, status) {
     } catch (e) {
         if (typeof showToast === 'function') showToast('Update failed', 'error');
     }
+}
+
+async function renderSurveys(content) {
+    const token = getAuthToken();
+    content.innerHTML = `<div style="padding:24px;color:var(--text-muted);">Loading surveys…</div>`;
+    let surveys = [];
+    try {
+        const res = await fetch(`${API_URL}/api/admin/surveys`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        surveys = (data && data.surveys) || [];
+    } catch (e) {
+        content.innerHTML = `<div style="padding:24px;color:#e25;">Failed to load surveys.</div>`;
+        return;
+    }
+    const stars = n => '★★★★★☆☆☆☆☆'.slice(5 - (n || 0), 10 - (n || 0));
+    const completed = surveys.filter(s => s.completed_at);
+    const avg = completed.length ? (completed.reduce((a, s) => a + (s.rating || 0), 0) / completed.length).toFixed(1) : '—';
+    const esc = t => (t == null ? '' : String(t)).replace(/</g, '&lt;');
+
+    const rows = surveys.map(s => {
+        const who = s.customer_name || s.lead_name || 'Unknown';
+        const email = s.customer_email || s.lead_email || '';
+        const done = s.completed_at ? new Date(s.completed_at).toLocaleDateString() : null;
+        const resp = s.responses && typeof s.responses === 'object'
+            ? Object.entries(s.responses).map(([k, v]) => `<span style="display:inline-block;background:#222;border-radius:5px;padding:2px 8px;margin:2px;font-size:11px;color:#bbb;">${esc(k)}: ${esc(v)}</span>`).join('')
+            : '';
+        return `<tr>
+            <td><strong>${esc(who)}</strong><br><span style="color:var(--text-muted);font-size:12px;">${esc(email)}</span></td>
+            <td>${esc(s.service_type) || '—'}</td>
+            <td>${done ? `<span style="color:#e6c879;font-size:16px;">${stars(s.rating)}</span> <span style="color:var(--text-muted);font-size:12px;">(${s.rating || 0}/5)</span>` : '<span style="color:var(--text-muted);">Awaiting response</span>'}</td>
+            <td style="max-width:340px;">${esc(s.comments) || '<span style="color:var(--text-muted);">—</span>'}${resp ? '<div style="margin-top:5px;">' + resp + '</div>' : ''}</td>
+            <td>${done || `<span style="color:var(--text-muted);font-size:12px;">sent ${s.sent_at ? new Date(s.sent_at).toLocaleDateString() : ''}</span>`}</td>
+        </tr>`;
+    }).join('');
+
+    content.innerHTML = `
+        <div style="display:flex;gap:16px;margin-bottom:18px;flex-wrap:wrap;">
+            <div class="card" style="flex:1;min-width:160px;padding:18px 22px;"><div style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Avg. rating</div><div style="font-size:30px;font-weight:700;color:#e6c879;">${avg} <span style="font-size:15px;">/ 5</span></div></div>
+            <div class="card" style="flex:1;min-width:160px;padding:18px 22px;"><div style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Completed</div><div style="font-size:30px;font-weight:700;">${completed.length}</div></div>
+            <div class="card" style="flex:1;min-width:160px;padding:18px 22px;"><div style="color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Sent</div><div style="font-size:30px;font-weight:700;">${surveys.length}</div></div>
+        </div>
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">Customer Surveys</h2></div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead><tr><th>Customer</th><th>Service</th><th>Rating</th><th>Feedback</th><th>Completed</th></tr></thead>
+                    <tbody>${rows || `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No surveys yet. They're sent automatically when a service is marked completed.</td></tr>`}</tbody>
+                </table>
+            </div>
+        </div>`;
 }
 
 async function renderSubscriptions(content) {

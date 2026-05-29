@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Feedback | Crown Ceramic Coating</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--black:#0a0a0a;--dark:#1a1a1a;--gold:#c9a14a;--gold2:#e6c879;--text:#f4f1ea;--muted:#9b958c;--line:rgba(201,161,74,.22);--ok:#3fae6b;--err:#e2574c;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',-apple-system,sans-serif;background:var(--black);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .topbar{padding:20px 6vw;border-bottom:1px solid var(--line);}
+  .brand{font-family:'Playfair Display',serif;letter-spacing:5px;color:var(--gold);text-transform:uppercase;font-size:15px;}
+  .brand small{display:block;font-family:'Inter',sans-serif;letter-spacing:3px;font-size:10px;color:var(--muted);margin-top:3px;}
+  .wrap{max-width:620px;margin:0 auto;padding:50px 22px 90px;}
+  .kicker{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;text-align:center;}
+  h1{font-family:'Playfair Display',serif;font-size:clamp(28px,6vw,40px);font-weight:700;text-align:center;line-height:1.15;}
+  .sub{text-align:center;color:var(--muted);margin:14px 0 34px;}
+  .card{background:var(--dark);border:1px solid var(--line);border-radius:16px;padding:32px clamp(20px,4vw,40px);box-shadow:0 20px 60px rgba(0,0,0,.4);}
+  label{display:block;font-size:13px;letter-spacing:1px;color:var(--text);margin:24px 0 10px;font-weight:600;}
+  .stars{display:flex;gap:8px;justify-content:center;font-size:42px;}
+  .star{cursor:pointer;color:#3a3733;transition:color .15s,transform .1s;}
+  .star:hover,.star.lit{color:var(--gold2);}
+  .star:active{transform:scale(.9);}
+  .qrow{display:flex;gap:10px;flex-wrap:wrap;}
+  .opt{flex:1;min-width:90px;background:#141414;border:1px solid #2e2c29;border-radius:9px;padding:11px;text-align:center;cursor:pointer;font-size:14px;transition:all .15s;}
+  .opt.active{background:var(--gold);color:#16130c;border-color:var(--gold);font-weight:700;}
+  textarea{width:100%;background:#141414;border:1px solid #2e2c29;border-radius:9px;padding:14px 16px;color:var(--text);font-family:inherit;font-size:15px;min-height:96px;resize:vertical;}
+  textarea:focus{outline:none;border-color:var(--gold);}
+  .submit{width:100%;margin-top:28px;background:var(--gold);color:#16130c;border:none;border-radius:10px;padding:16px;font-size:15px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:inherit;}
+  .submit:disabled{opacity:.55;cursor:not-allowed;}
+  .state{text-align:center;padding:34px 10px;display:none;}
+  .state.show{display:block;}
+  .state .check{width:64px;height:64px;border-radius:50%;background:rgba(63,174,107,.15);border:2px solid var(--ok);color:var(--ok);font-size:32px;line-height:60px;margin:0 auto 18px;}
+  .state h2{font-family:'Playfair Display',serif;font-size:26px;margin-bottom:10px;}
+  .state p{color:var(--muted);}
+  .err-text{color:#f3b4ae;text-align:center;margin-top:14px;display:none;}
+</style>
+</head>
+<body>
+  <div class="topbar"><div class="brand">&#9819; Crown<small>Ceramic Coating</small></div></div>
+  <div class="wrap">
+    <div id="formView">
+      <div class="kicker">Your feedback</div>
+      <h1 id="heading">How did we do?</h1>
+      <p class="sub" id="sub">Your feedback takes about a minute and helps us keep raising the bar.</p>
+      <div class="card">
+        <label style="text-align:center;">Overall, how would you rate your experience?</label>
+        <div class="stars" id="stars">
+          <span class="star" data-v="1">&#9733;</span><span class="star" data-v="2">&#9733;</span>
+          <span class="star" data-v="3">&#9733;</span><span class="star" data-v="4">&#9733;</span>
+          <span class="star" data-v="5">&#9733;</span>
+        </div>
+
+        <label>How was the quality of the finish?</label>
+        <div class="qrow" data-q="quality">
+          <div class="opt">Exceeded expectations</div><div class="opt">Great</div><div class="opt">Okay</div><div class="opt">Below expectations</div>
+        </div>
+
+        <label>How was our communication & professionalism?</label>
+        <div class="qrow" data-q="communication">
+          <div class="opt">Excellent</div><div class="opt">Good</div><div class="opt">Fair</div><div class="opt">Poor</div>
+        </div>
+
+        <label>Would you recommend Crown to a friend?</label>
+        <div class="qrow" data-q="recommend">
+          <div class="opt">Definitely</div><div class="opt">Probably</div><div class="opt">Maybe</div><div class="opt">No</div>
+        </div>
+
+        <label for="comments">Anything else you'd like us to know?</label>
+        <textarea id="comments" placeholder="Tell us what stood out — or what we could do better."></textarea>
+
+        <button class="submit" id="submitBtn">Submit Feedback</button>
+        <div class="err-text" id="errText">Something went wrong. Please try again.</div>
+      </div>
+    </div>
+
+    <div class="state" id="thanks">
+      <div class="check">&#10003;</div>
+      <h2>Thank you!</h2>
+      <p>We truly appreciate your feedback — it means the world to a local shop like ours.</p>
+    </div>
+    <div class="state" id="done">
+      <div class="check">&#10003;</div>
+      <h2>Already submitted</h2>
+      <p>Thanks — we've already received your feedback for this service.</p>
+    </div>
+    <div class="state" id="notfound">
+      <div class="check" style="background:rgba(226,87,76,.12);border-color:var(--err);color:var(--err);">!</div>
+      <h2>Survey not found</h2>
+      <p>This link may have expired. Questions? Call us at (940) 217-8680.</p>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const ORIGIN = window.location.origin;
+  const token = new URLSearchParams(location.search).get('token');
+  let rating = 0;
+  const answers = {};
+
+  function show(id){ document.getElementById('formView').style.display='none'; document.getElementById(id).classList.add('show'); }
+
+  if(!token){ show('notfound'); return; }
+
+  // Load context
+  fetch(ORIGIN + '/api/public/survey/' + encodeURIComponent(token))
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(data => {
+      if(!data || !data.success){ show('notfound'); return; }
+      if(data.already){ show('done'); return; }
+      const s = data.survey || {};
+      if(s.name) document.getElementById('sub').textContent =
+        'Thanks ' + s.name + ' for trusting Crown with your ' + (s.service_type || 'vehicle') + '. Your feedback takes about a minute.';
+    })
+    .catch(()=> show('notfound'));
+
+  // Stars
+  const stars = [...document.querySelectorAll('.star')];
+  stars.forEach(st=>{
+    st.addEventListener('click', ()=>{ rating = +st.dataset.v; paint(); });
+    st.addEventListener('mouseenter', ()=> paint(+st.dataset.v));
+  });
+  document.getElementById('stars').addEventListener('mouseleave', ()=> paint());
+  function paint(hover){ const n = hover || rating; stars.forEach(s=> s.classList.toggle('lit', +s.dataset.v <= n)); }
+
+  // Multiple-choice
+  document.querySelectorAll('.qrow').forEach(row=>{
+    row.addEventListener('click', e=>{
+      const o = e.target.closest('.opt'); if(!o) return;
+      [...row.children].forEach(c=>c.classList.toggle('active', c===o));
+      answers[row.dataset.q] = o.textContent.trim();
+    });
+  });
+
+  document.getElementById('submitBtn').addEventListener('click', async ()=>{
+    if(!rating){ const e=document.getElementById('errText'); e.textContent='Please pick a star rating first.'; e.style.display='block'; return; }
+    const btn = document.getElementById('submitBtn'); btn.disabled = true; btn.textContent = 'Submitting…';
+    try{
+      const r = await fetch(ORIGIN + '/api/public/survey/' + encodeURIComponent(token), {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ rating, responses: answers, comments: document.getElementById('comments').value.trim() })
+      });
+      const data = await r.json();
+      if(r.ok && data.success){ show(data.already ? 'done' : 'thanks'); }
+      else { const e=document.getElementById('errText'); e.textContent = data.message||'Something went wrong.'; e.style.display='block'; btn.disabled=false; btn.textContent='Submit Feedback'; }
+    }catch(err){ const e=document.getElementById('errText'); e.style.display='block'; btn.disabled=false; btn.textContent='Submit Feedback'; }
+  });
+})();
+</script>
+</body>
+</html>

@@ -824,7 +824,7 @@ function buildEmailHTML(bodyHTML, opts = {}) {
     const eyebrow = opts.eyebrow || '';
     const headline = opts.headline || '';
     const accentColor = opts.accentColor || '#FF6B35';
-    const tagline = opts.tagline || 'YOUR VISION. OUR CODE.';
+    const tagline = opts.tagline || 'SHOWROOM SHINE. LASTING PROTECTION.';
     const ctaLabel = opts.ctaLabel || '';
     const ctaUrl = opts.ctaUrl || '';
     const unsubscribeUrl = opts.unsubscribeUrl || '';
@@ -2441,7 +2441,7 @@ app.post('/api/scheduling/webhook', async (req, res) => {
             ctaLabel: 'Reschedule Appointment',
             ctaUrl: SCHEDULING_URL,
             accentColor: '#FF6B35',
-            tagline: 'YOUR VISION. OUR CODE.'
+            tagline: 'SHOWROOM SHINE. LASTING PROTECTION.'
         });
         
         try {
@@ -2698,7 +2698,7 @@ app.post('/api/appointments/admin-create', authenticateToken, async (req, res) =
                     ctaLabel:    'Reschedule',
                     ctaUrl:      process.env.SCHEDULING_URL || 'https://crownceramiccoating.com/schedule.html',
                     accentColor: '#FF6B35',
-                    tagline:     'YOUR VISION. OUR CODE.'
+                    tagline:     'SHOWROOM SHINE. LASTING PROTECTION.'
                 });
 
                 await sendTrackedEmail({
@@ -3490,6 +3490,40 @@ app.delete('/api/leads/:id', authenticateToken, async (req, res) => {
                 AND client_password IS NOT NULL
             )
         `).catch(() => {});
+
+        // ══════════════════════════════════════════════════════════════
+        // 9b. DYNAMIC FK SWEEP — auto-clean ANY table that references leads(id)
+        //     This future-proofs deletion: new Crown features (consultations,
+        //     service_requests, sales_agreements, surveys, etc.) that add a
+        //     foreign key to leads are cleaned automatically, so the final
+        //     DELETE never fails with a foreign_key_violation (23503).
+        // ══════════════════════════════════════════════════════════════
+        try {
+            const deps = await pool.query(`
+                SELECT tc.table_name, kcu.column_name
+                FROM information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                  ON tc.constraint_name = kcu.constraint_name
+                 AND tc.table_schema = kcu.table_schema
+                JOIN information_schema.constraint_column_usage ccu
+                  ON ccu.constraint_name = tc.constraint_name
+                 AND ccu.table_schema = tc.table_schema
+                WHERE tc.constraint_type = 'FOREIGN KEY'
+                  AND ccu.table_name = 'leads'
+                  AND ccu.column_name = 'id'
+            `);
+            for (const dep of deps.rows) {
+                // table_name / column_name come from system catalogs (not user input) — safe to interpolate
+                try {
+                    await pool.query(`DELETE FROM "${dep.table_name}" WHERE "${dep.column_name}" = $1`, [leadId]);
+                } catch (depErr) {
+                    console.warn(`[DELETE] FK sweep skip ${dep.table_name}.${dep.column_name}:`, depErr.message);
+                }
+            }
+        } catch (sweepErr) {
+            console.warn('[DELETE] FK dependency sweep failed (continuing):', sweepErr.message);
+        }
+
         await pool.query(`DELETE FROM leads WHERE id = $1`, [leadId]);
         
         console.log(`✅ [DELETE COMPLETE] ${leadEmail} completely wiped from system`);
@@ -6078,7 +6112,7 @@ app.post('/api/email/send-timeline', authenticateToken, async (req, res) => {
         doc.fillColor('#FFC15E') // Gold color
            .fontSize(10)
            .font('Helvetica-Bold')
-           .text('YOUR VISION. OUR CODE. ENDLESS POSSIBILITIES.', 50, 25);
+           .text('SHOWROOM SHINE. LASTING PROTECTION. ZERO COMPROMISE.', 50, 25);
         doc.fontSize(11).text('Premium Web Development & CRM Solutions', 50, 42);
         doc.fillColor('#ffffff')
            .fontSize(28)
@@ -6391,7 +6425,7 @@ app.post('/api/email/send-timeline', authenticateToken, async (req, res) => {
             tagline = 'WEBSITE + CRM POWER.';
         } else if (categories.web) {
             headline = 'Your Custom Website Project';
-            tagline = 'YOUR VISION. OUR CODE.';
+            tagline = 'SHOWROOM SHINE. LASTING PROTECTION.';
             accentColor = '#FF6B35'; // Orange
         } else if (categories.crm) {
             headline = 'Your Custom CRM Solution';
@@ -15022,7 +15056,7 @@ app.post('/api/follow-ups/:leadId/send-email', authenticateToken, async (req, re
 
 <!-- Curved Header Section -->
 <tr><td style="background-color:#2C3E50;padding:60px 40px 70px 40px;text-align:center">
-<span style="color:#F59E0B;font-size:11px;font-weight:600;letter-spacing:2px;font-family:Arial,sans-serif;text-transform:uppercase;display:block;margin-bottom:12px">YOUR VISION. OUR CODE. ENDLESS POSSIBILITIES.</span>
+<span style="color:#F59E0B;font-size:11px;font-weight:600;letter-spacing:2px;font-family:Arial,sans-serif;text-transform:uppercase;display:block;margin-bottom:12px">SHOWROOM SHINE. LASTING PROTECTION. ZERO COMPROMISE.</span>
 <span style="color:#F59E0B;font-size:12px;font-weight:600;letter-spacing:2.5px;font-family:Arial,sans-serif;text-transform:uppercase;display:block;margin-bottom:20px">Premium Web Development & CRM Solutions</span>
 <span style="color:#ffffff;font-size:36px;font-weight:300;letter-spacing:3px;font-family:Georgia,serif;font-style:italic;display:block">Crown Ceramic Coating®</span>
 </td></tr>
@@ -24617,6 +24651,12 @@ async function markInvoicePaidById(invoiceId, reference) {
         await pool.query(
             `UPDATE leads SET lifetime_value = $1, last_payment_date = CURRENT_TIMESTAMP WHERE id = $2`,
             [ltv.rows[0].total, inv.lead_id]).catch(() => {});
+        // Payment receipt email (defensive)
+        try {
+            const who = (await pool.query('SELECT name, email FROM leads WHERE id=$1', [inv.lead_id])).rows[0];
+            const amt = inv.total_amount != null ? ('$' + Number(inv.total_amount).toFixed(2)) : null;
+            if (who && who.email && global.__crownMail) global.__crownMail.paymentReceipt(who.name, who.email, amt, inv.invoice_number);
+        } catch (_) {}
     }
     return inv;
 }
@@ -24753,6 +24793,11 @@ app.post('/api/client/service-requests', authenticateClient, async (req, res) =>
             `INSERT INTO service_requests (lead_id, service_type, vehicle, preferred_date, details, status)
              VALUES ($1, $2, $3, $4, $5, 'new') RETURNING *`,
             [clientId, service_type, vehicle || null, preferred_date || null, details || null]);
+        // Auto-confirmation email (defensive: never blocks the request)
+        try {
+            const who = (await pool.query('SELECT name, email FROM leads WHERE id=$1', [clientId])).rows[0];
+            if (who && global.__crownMail) global.__crownMail.serviceRequestReceived(who.name, who.email, service_type);
+        } catch (_) {}
         res.json({ success: true, request: r.rows[0] });
     } catch (e) {
         console.error('[CLIENT] service-request create error:', e.message);
@@ -24875,7 +24920,8 @@ app.post('/api/public/consultations', async (req, res) => {
                 res.json({ success: true, agreements: r.rows });
             } catch (e) {
                 console.error('[SALES-AGREEMENT] list error:', e.message);
-                res.status(500).json({ success: false, message: 'Could not load sales agreements.' });
+                // Never hard-fail the tab — return an empty list so the UI renders cleanly.
+                res.json({ success: true, agreements: [], warning: 'Could not load agreements: ' + e.message });
             }
         });
 
@@ -24916,6 +24962,12 @@ app.post('/api/public/consultations', async (req, res) => {
                     [agreement_number, lead_id || null, customer_name, customer_email, service_type,
                      package_name || null, vehicle || null, price || 0, deposit || 0,
                      start_date || null, status || 'draft', terms || null, notes || null]);
+                // Auto-email the agreement PDF to the customer (defensive)
+                try {
+                    if ((customer_email || lead_id) && typeof global.__crownEmailAgreement === 'function') {
+                        global.__crownEmailAgreement(r.rows[0].id);
+                    }
+                } catch (_) {}
                 res.json({ success: true, agreement: r.rows[0] });
             } catch (e) {
                 console.error('[SALES-AGREEMENT] create error:', e.message);
@@ -24964,6 +25016,15 @@ app.post('/api/public/consultations', async (req, res) => {
                 res.status(500).json({ success: false, message: 'Could not delete agreement.' });
             }
         });
+
+        // ===== CROWN AUTOMATION (scheduling, surveys, lifecycle emails) =====
+        // Registered HERE (before the 404 handler) so its routes are reachable.
+        try {
+            global.__authenticateToken = authenticateToken;
+            require('./crown-automation.js')({ app, pool, transporter, stripe });
+        } catch (e) {
+            console.error('[CROWN] Failed to initialize automation module:', e.message);
+        }
 
         // ----- 404 + ERROR HANDLERS (registered LAST, after all routes) -----
 // ========================================
