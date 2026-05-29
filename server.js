@@ -3120,7 +3120,7 @@ app.get('/api/leads/followup-all', authenticateToken, async (req, res) => {
                 l.*,
                 e.name as employee_name,
                 e.email as employee_email,
-                COALESCE(EXTRACT(DAY FROM CURRENT_DATE - l.last_contact_date)::INTEGER, 999) as days_since_contact,
+                COALESCE((CURRENT_DATE - l.last_contact_date::date)::INTEGER, 999) as days_since_contact,
                 CASE 
                     WHEN l.last_contact_date IS NULL THEN true
                     WHEN (l.lead_temperature = 'hot' AND (
@@ -11481,7 +11481,7 @@ app.get('/api/follow-ups/dead-leads', authenticateToken, async (req, res) => {
         const result = await pool.query(`
             SELECT 
                 l.*,
-                COALESCE(EXTRACT(DAY FROM CURRENT_DATE - l.last_contact_date)::INTEGER, 999) as days_since_contact
+                COALESCE((CURRENT_DATE - l.last_contact_date::date)::INTEGER, 999) as days_since_contact
             FROM leads l
             WHERE l.unsubscribed = TRUE
             AND l.is_customer = FALSE
@@ -11710,8 +11710,10 @@ app.get('/api/follow-ups/by-temperature', authenticateToken, async (req, res) =>
         const result = await pool.query(`
             SELECT 
                 l.*,
-                COALESCE(EXTRACT(DAY FROM CURRENT_DATE - l.last_contact_date)::INTEGER, 999) as days_since_contact,
-                COALESCE(EXTRACT(DAY FROM CURRENT_DATE - l.last_engagement_at)::INTEGER, 999) as days_since_engagement,
+                -- DATE - DATE = INTEGER in Postgres; use direct cast, not EXTRACT (which needs an INTERVAL).
+                -- TIMESTAMP subtraction returns INTERVAL, so EXTRACT(DAY FROM ...) is fine there.
+                COALESCE((CURRENT_DATE - l.last_contact_date::date)::INTEGER, 999) as days_since_contact,
+                COALESCE(EXTRACT(DAY FROM (NOW() - l.last_engagement_at::timestamptz))::INTEGER, 999) as days_since_engagement,
                 COALESCE(l.follow_up_count, 0) as follow_up_count
             FROM leads l
             WHERE l.status IN ('new', 'contacted', 'qualified', 'pending')
@@ -11795,13 +11797,13 @@ app.get('/api/follow-ups/categorized', authenticateToken, async (req, res) => {
                     l.*,
                     CASE 
                         WHEN l.last_contact_date IS NULL THEN 'never_contacted'
-                        WHEN EXTRACT(DAY FROM CURRENT_DATE - l.last_contact_date) >= 14 THEN '14_day'
-                        WHEN EXTRACT(DAY FROM CURRENT_DATE - l.last_contact_date) >= 7 THEN '7_day'
-                        WHEN EXTRACT(DAY FROM CURRENT_DATE - l.last_contact_date) >= 3 THEN '3_day'
-                        WHEN EXTRACT(DAY FROM CURRENT_DATE - l.last_contact_date) >= 1 THEN '1_day'
+                        WHEN (CURRENT_DATE - l.last_contact_date::date) >= 14 THEN '14_day'
+                        WHEN (CURRENT_DATE - l.last_contact_date::date) >= 7 THEN '7_day'
+                        WHEN (CURRENT_DATE - l.last_contact_date::date) >= 3 THEN '3_day'
+                        WHEN (CURRENT_DATE - l.last_contact_date::date) >= 1 THEN '1_day'
                         ELSE NULL
                     END as follow_up_category,
-                    COALESCE(EXTRACT(DAY FROM CURRENT_DATE - l.last_contact_date)::INTEGER, 999) as days_since_contact
+                    COALESCE((CURRENT_DATE - l.last_contact_date::date)::INTEGER, 999) as days_since_contact
                 FROM leads l
                 WHERE l.status IN ('new', 'contacted', 'qualified', 'pending')
                 AND l.is_customer = FALSE
@@ -22777,7 +22779,6 @@ console.log(`[ROUTES] Total routes registered: ${routeCount}\n`);
 const clientRoutes = [
     '/api/client/login',
     '/api/client/dashboard',
-    '/api/public/subscriptions/checkout',
     '/api/client/projects',
     '/api/client/invoices'
 ];
@@ -24258,8 +24259,19 @@ app.use((req, res) => {
             message: 'API endpoint not found' 
         });
     } else {
-        // Serve the custom 404 page
-        res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+        // Serve the custom 404 page; fall back to inline HTML if the file doesn't exist.
+        const notFoundFile = path.join(__dirname, 'public', '404.html');
+        res.status(404).sendFile(notFoundFile, (err) => {
+            if (err) {
+                res.status(404).send(
+                    '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+                    '<title>404 — Not Found</title>' +
+                    '<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#0e0e0e;color:#f4f4f4;}' +
+                    'h1{font-size:2rem;margin-bottom:.5rem}p{color:#9a9a9a}</style></head>' +
+                    '<body><div><h1>404</h1><p>Page not found.</p></div></body></html>'
+                );
+            }
+        });
     }
 });
 
@@ -24973,18 +24985,25 @@ async function buildMarketingTemplateHTML(template, name, subject, bodyText, uns
             );
 
             -- Migrate existing individual template support (safe if already done)
+            -- Guard: only ALTER if the table already exists (avoids crash on a fresh database
+            -- where the CREATE TABLE below hasn't run yet).
             DO $migtempl$ BEGIN
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns
-                    WHERE table_name='client_email_templates' AND column_name='individual_owner_id'
+                IF EXISTS (
+                    SELECT 1 FROM information_schema.tables
+                    WHERE table_name = 'client_email_templates'
                 ) THEN
-                    ALTER TABLE client_email_templates ADD COLUMN individual_owner_id INTEGER REFERENCES leads(id) ON DELETE CASCADE;
+                    IF NOT EXISTS (
+                        SELECT 1 FROM information_schema.columns
+                        WHERE table_name='client_email_templates' AND column_name='individual_owner_id'
+                    ) THEN
+                        ALTER TABLE client_email_templates ADD COLUMN individual_owner_id INTEGER REFERENCES leads(id) ON DELETE CASCADE;
+                    END IF;
+                    -- Make client_portal_id nullable for individual users
+                    BEGIN
+                        ALTER TABLE client_email_templates ALTER COLUMN client_portal_id DROP NOT NULL;
+                    EXCEPTION WHEN others THEN NULL;
+                    END;
                 END IF;
-                -- Make client_portal_id nullable for individual users
-                BEGIN
-                    ALTER TABLE client_email_templates ALTER COLUMN client_portal_id DROP NOT NULL;
-                EXCEPTION WHEN others THEN NULL;
-                END;
             END $migtempl$;
 
             CREATE TABLE IF NOT EXISTS client_email_templates (
