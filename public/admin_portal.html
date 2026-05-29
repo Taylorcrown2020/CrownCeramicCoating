@@ -11369,7 +11369,7 @@ async function openDetailModal(type, id) {
                                 <span class="note-author">${note.created_by ? `Admin User #${note.created_by}` : 'System'}</span>
                                 <span class="note-date">${formatDate(note.created_at)}</span>
                             </div>
-                            <div class="note-text">${note.note_text}</div>
+                            <div class="note-text">${note.note}</div>
                         </div>
                     `).join('') : '<div class="note-empty">No notes yet</div>'}
                 </div>

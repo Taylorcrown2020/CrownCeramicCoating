@@ -3651,7 +3651,7 @@ app.post('/api/leads/:id/notes', authenticateToken, async (req, res) => {
         const userId = req.user.id;
 
         const result = await pool.query(
-            `INSERT INTO lead_notes (lead_id, note_text, created_by)
+            `INSERT INTO lead_notes (lead_id, note, created_by)
              VALUES ($1, $2, $3)
              RETURNING *`,
             [leadId, noteText, userId]
@@ -4744,7 +4744,7 @@ app.post('/api/leads', async (req, res) => {
             // Create an activity/note to track this re-engagement
             try {
                 await pool.query(
-                    `INSERT INTO lead_notes (lead_id, note_text, created_at)
+                    `INSERT INTO lead_notes (lead_id, note, created_at)
                      VALUES ($1, $2, CURRENT_TIMESTAMP)`,
                     [existing.id, `Lead re-engaged via contact form. New message: ${message || details || 'No message provided'}`]
                 );
@@ -25027,43 +25027,43 @@ app.post('/api/public/consultations', async (req, res) => {
         }
 
         // ----- 404 + ERROR HANDLERS (registered LAST, after all routes) -----
-// ========================================
-// 404 HANDLER
-// ========================================
-app.use((req, res) => {
-    // If it's an API route, return JSON
-    if (req.path.startsWith('/api/')) {
-        res.status(404).json({ 
-            success: false, 
-            message: 'API endpoint not found' 
-        });
-    } else {
-        // Serve the custom 404 page; fall back to inline HTML if the file doesn't exist.
-        const notFoundFile = path.join(__dirname, 'public', '404.html');
-        res.status(404).sendFile(notFoundFile, (err) => {
-            if (err) {
-                res.status(404).send(
-                    '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
-                    '<title>404 — Not Found</title>' +
-                    '<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#0e0e0e;color:#f4f4f4;}' +
-                    'h1{font-size:2rem;margin-bottom:.5rem}p{color:#9a9a9a}</style></head>' +
-                    '<body><div><h1>404</h1><p>Page not found.</p></div></body></html>'
-                );
+        // ========================================
+        // 404 HANDLER
+        // ========================================
+        app.use((req, res) => {
+            // If it's an API route, return JSON
+            if (req.path.startsWith('/api/')) {
+                res.status(404).json({ 
+                    success: false, 
+                    message: 'API endpoint not found' 
+                });
+            } else {
+                // Serve the custom 404 page; fall back to inline HTML if the file doesn't exist.
+                const notFoundFile = path.join(__dirname, 'public', '404.html');
+                res.status(404).sendFile(notFoundFile, (err) => {
+                    if (err) {
+                        res.status(404).send(
+                            '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+                            '<title>404 — Not Found</title>' +
+                            '<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#0e0e0e;color:#f4f4f4;}' +
+                            'h1{font-size:2rem;margin-bottom:.5rem}p{color:#9a9a9a}</style></head>' +
+                            '<body><div><h1>404</h1><p>Page not found.</p></div></body></html>'
+                        );
+                    }
+                });
             }
         });
-    }
-});
 
-// ========================================
-// ERROR HANDLER
-// ========================================
-app.use((err, req, res, next) => {
-    console.error('Server error:', err.stack);
-    res.status(500).json({ 
-        success: false, 
-        message: 'Internal server error' 
-    });
-});
+        // ========================================
+        // ERROR HANDLER
+        // ========================================
+        app.use((err, req, res, next) => {
+            console.error('Server error:', err.stack);
+            res.status(500).json({ 
+                success: false, 
+                message: 'Internal server error' 
+            });
+        });
 
         app.listen(PORT, () => {
             console.log('');
