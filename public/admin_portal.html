@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crown Care Maintenance Plan | Admin Portal</title>
-    <meta name="description" content="Professional CRM & Project Management Dashboard">
+<!-- CROWN-SEO:START -->
+    <title>Admin Portal | Crown Ceramic Coating</title>
+    <meta name="description" content="Crown Ceramic Coating admin portal.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://crownceramiccoating.com/admin_portal.html">
+    <!-- CROWN-SEO:END -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.js"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -5028,6 +5033,23 @@ function renderLeadsTable(content, type) {
 }
 
 // Helper: Render table HTML
+// Task 10 — payment status pill for leads & customers (green = clear, red = owes/overdue).
+function paymentBadge(lead) {
+    const bal = parseFloat(lead && lead.outstanding_balance) || 0;
+    const overdue = parseInt(lead && lead.overdue_count) || 0;
+    const pill = (bg, brd, col, dot, label, title) =>
+        `<span title="${title}" style="display:inline-flex;align-items:center;gap:6px;background:${bg};color:${col};border:1px solid ${brd};padding:3px 10px;border-radius:30px;font-size:11px;font-weight:700;white-space:nowrap;">
+            <span style="width:8px;height:8px;border-radius:50%;background:${dot};flex:none;"></span>${label}</span>`;
+    if (bal <= 0) {
+        return pill('rgba(16,185,129,0.14)', 'rgba(16,185,129,0.45)', '#10b981', '#10b981', 'Paid', 'No balance due');
+    }
+    const money = '$' + bal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (overdue > 0) {
+        return pill('rgba(239,68,68,0.18)', 'rgba(239,68,68,0.55)', '#f87171', '#ef4444', 'Overdue ' + money, 'Overdue balance — payment past due');
+    }
+    return pill('rgba(239,68,68,0.12)', 'rgba(239,68,68,0.4)', '#f87171', '#ef4444', 'Due ' + money, 'Outstanding balance — payment needed');
+}
+
 function renderLeadsTableHTML(data) {
     if (!data || data.length === 0) {
         return `
@@ -5045,6 +5067,7 @@ function renderLeadsTableHTML(data) {
                     <th>Email</th>
                     <th>Company</th>
                     <th>Status</th>
+                    <th>Payment</th>
                     <th>Created</th>
                     <th>Actions</th>
                 </tr>
@@ -5060,6 +5083,7 @@ function renderLeadsTableHTML(data) {
                                 ${(lead.status || 'new').charAt(0).toUpperCase() + (lead.status || 'new').slice(1)}
                             </span>
                         </td>
+                        <td>${paymentBadge(lead)}</td>
                         <td>${formatDate(lead.created_at)}</td>
                         <td>
 <button class="btn-icon" onclick="event.stopPropagation(); openDetailModal('lead', ${lead.id})" title="View Lead">
@@ -5459,7 +5483,7 @@ try {
         try {
             await fetch(`${API_URL}/api/admin/company/${encodeURIComponent(clientPortalId)}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${authToken}` }
+                headers: { 'Authorization': `Bearer ${getAuthToken()}` }
             });
         } catch(companyErr) {
             console.warn('[DELETE] Company cleanup error (non-fatal):', companyErr.message);
@@ -5468,7 +5492,7 @@ try {
 
     const r = await fetch(`${API_URL}/api/leads/${leadId}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${authToken}` }
+        headers: { 'Authorization': `Bearer ${getAuthToken()}` }
     });
     
     if (!r.ok) {
@@ -9247,8 +9271,31 @@ function renderSchedule(content) {
                         const isToday = dayCount === now.getDate() && currentMonth === now.getMonth() && currentYear === now.getFullYear();
                         const isSelected = selectedDate && selectedDate.getDate() === dayCount && selectedDate.getMonth() === currentMonth && selectedDate.getFullYear() === currentYear;
                         const dayApts = appointmentsByDate[dayCount] || [];
-                        
-                        calendarHTML += `
+                        const isClosed = (day === 0); // Sunday — closed
+
+                        const aptsHTML = dayApts.slice(0, 3).map(apt => {
+                            const aptTime = new Date(apt.scheduled_time);
+                            const timeStr = aptTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                            const statusColor = apt.status === 'scheduled' ? '#10b981' : apt.status === 'cancelled' ? '#ef4444' : '#f59e0b';
+                            return `
+                                        <div style="background:${statusColor};color:#fff;padding:4px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${apt.lead_name} - ${apt.event_type || 'Consultation'}">
+                                            ${timeStr.replace(' ', '')} ${apt.lead_name}
+                                        </div>`;
+                        }).join('')
+                        + (dayApts.length > 3 ? `<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px;">+${dayApts.length - 3} more</div>` : '');
+
+                        if (isClosed) {
+                            // Closed (Sunday): blocked off, not bookable.
+                            calendarHTML += `
+                            <div class="calendar-day calendar-closed" data-day="${dayCount}" title="Closed on Sundays"
+                                 style="background:repeating-linear-gradient(45deg,var(--bg-secondary),var(--bg-secondary) 9px,rgba(127,127,127,0.07) 9px,rgba(127,127,127,0.07) 18px);
+                                        border-radius:8px;padding:12px;min-height:120px;border:1px solid var(--border-subtle);opacity:0.65;cursor:not-allowed;">
+                                <div style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--text-muted);">${dayCount}</div>
+                                <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Closed</div>
+                                ${aptsHTML}
+                            </div>`;
+                        } else {
+                            calendarHTML += `
                             <div class="calendar-day" data-day="${dayCount}" 
                                  onclick="selectScheduleDate(${currentYear}, ${currentMonth}, ${dayCount})" 
                                  style="background:var(--bg-secondary);border-radius:8px;padding:12px;min-height:120px;
@@ -9257,19 +9304,9 @@ function renderSchedule(content) {
                                  onmouseover="this.style.borderColor='var(--brand-gold)'" 
                                  onmouseout="this.style.borderColor='${isSelected ? 'var(--brand-gold)' : isToday ? 'var(--brand-gold)' : 'var(--border-subtle)'}'">
                                 <div style="font-weight:700;font-size:16px;margin-bottom:8px;${isToday ? 'color:var(--brand-gold);' : ''}">${dayCount}</div>
-                                ${dayApts.slice(0, 3).map(apt => {
-                                    const aptTime = new Date(apt.scheduled_time);
-                                    const timeStr = aptTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-                                    const statusColor = apt.status === 'scheduled' ? '#10b981' : apt.status === 'cancelled' ? '#ef4444' : '#f59e0b';
-                                    return `
-                                        <div style="background:${statusColor};color:#fff;padding:4px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${apt.lead_name} - ${apt.event_type || 'Consultation'}">
-                                            ${timeStr.replace(' ', '')} ${apt.lead_name}
-                                        </div>
-                                    `;
-                                }).join('')}
-                                ${dayApts.length > 3 ? `<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px;">+${dayApts.length - 3} more</div>` : ''}
-                            </div>
-                        `;
+                                ${aptsHTML}
+                            </div>`;
+                        }
                         dayCount++;
                     }
                 }
@@ -11120,6 +11157,10 @@ async function openDetailModal(type, id) {
         titleEl.textContent = `${lead.is_customer ? 'Customer' : 'Lead'} Details`;
         
         bodyEl.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+                <span style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Payment status</span>
+                ${paymentBadge(lead)}
+            </div>
             <div class="detail-section">
                 <div class="section-header">
                     <h3 class="section-title">Contact Information</h3>

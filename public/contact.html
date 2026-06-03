@@ -3,10 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- CROWN-SEO:START -->
+    <title>Contact &amp; Free Quote | Ceramic Coating Rockwall–Dallas TX</title>
+    <meta name="description" content="Request a free ceramic coating or detailing quote from Crown Ceramic Coating in Rockwall &amp; Dallas, TX. Call (940) 217-8680 or book a consultation online. Serving all of DFW.">
+    <meta name="keywords" content="ceramic coating Rockwall TX, ceramic coating Dallas TX, paint correction Dallas, auto detailing Rockwall, paint protection film Dallas, car detailing Rowlett, ceramic coating near me, mobile detailing Garland Mesquite Forney, PPF Plano Frisco McKinney">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://crownceramiccoating.com/contact.html">
+    <meta name="geo.region" content="US-TX">
+    <meta name="geo.placename" content="Rockwall, Dallas, Texas">
+    <meta name="geo.position" content="32.9312;-96.4597">
+    <meta name="ICBM" content="32.9312, -96.4597">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Crown Ceramic Coating">
+    <meta property="og:title" content="Contact &amp; Free Quote | Ceramic Coating Rockwall–Dallas TX">
+    <meta property="og:description" content="Request a free ceramic coating or detailing quote from Crown Ceramic Coating in Rockwall &amp; Dallas, TX. Call (940) 217-8680 or book a consultation online. Serving all of DFW.">
+    <meta property="og:url" content="https://crownceramiccoating.com/contact.html">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://crownceramiccoating.com/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contact &amp; Free Quote | Ceramic Coating Rockwall–Dallas TX">
+    <meta name="twitter:description" content="Request a free ceramic coating or detailing quote from Crown Ceramic Coating in Rockwall &amp; Dallas, TX. Call (940) 217-8680 or book a consultation online. Serving all of DFW.">
+    <meta name="twitter:image" content="https://crownceramiccoating.com/og-image.jpg">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": ["AutoDetailing","LocalBusiness"],
+      "name": "Crown Ceramic Coating",
+      "image": "https://crownceramiccoating.com/og-image.jpg",
+      "url": "https://crownceramiccoating.com/",
+      "telephone": "+19402178680",
+      "priceRange": "$$",
+      "description": "Request a free ceramic coating or detailing quote from Crown Ceramic Coating in Rockwall &amp; Dallas, TX. Call (940) 217-8680 or book a consultation online. Serving all of DFW.",
+      "address": {"@type":"PostalAddress","addressLocality":"Rockwall","addressRegion":"TX","addressCountry":"US"},
+      "geo": {"@type":"GeoCoordinates","latitude":32.9312,"longitude":-96.4597},
+      "areaServed": [{"@type":"City","name":"Rockwall"}, {"@type":"City","name":"Dallas"}, {"@type":"City","name":"Rowlett"}, {"@type":"City","name":"Garland"}, {"@type":"City","name":"Mesquite"}, {"@type":"City","name":"Forney"}, {"@type":"City","name":"Sunnyvale"}, {"@type":"City","name":"Heath"}, {"@type":"City","name":"Royse City"}, {"@type":"City","name":"Fate"}, {"@type":"City","name":"Wylie"}, {"@type":"City","name":"Sachse"}, {"@type":"City","name":"Plano"}, {"@type":"City","name":"Richardson"}, {"@type":"City","name":"McKinney"}, {"@type":"City","name":"Frisco"}, {"@type":"City","name":"Allen"}, {"@type":"City","name":"Terrell"}],
+      "openingHoursSpecification": [{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"06:00","closes":"19:00"}],
+      "sameAs": []
+    }
+    </script>
+    <!-- CROWN-SEO:END -->
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
-    <title>Contact Us | Get In Touch | Crown Ceramic Coating</title>
-    <meta name="description" content="Get in touch with Crown Ceramic Coating. Contact us for ceramic coating, paint correction & polishing, and interior detailing. We're here to help bring your project to life.">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -2747,62 +2784,86 @@ window.addEventListener('load', function() {
     
 async function handleSubmit(event) {
     event.preventDefault();
-    const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn.textContent;
-    const fullName = document.getElementById('fullName').value.trim();
-    const nameParts = fullName.split(' ');
-    const vehicle = (document.getElementById('vehicle')?.value || '').trim();
-    const vehicleType = (document.getElementById('vehicleType')?.value || '').trim();
-    let details = document.getElementById('details').value.trim();
-    // Fold vehicle info into the message so it reaches the CRM lead record
+    const form = event.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.textContent : 'Submit';
+    // Null-safe field reader — a missing element can NEVER throw before we submit.
+    const val = (id) => { const el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
+
+    const fullName    = val('fullName');
+    const email       = val('email');
+    const phone       = val('phone');
+    const service     = val('service');
+    const vehicle     = val('vehicle');
+    const vehicleType = val('vehicleType');
+    let   details     = val('details');
+
+    if (!fullName || !email) {
+        alert('Please enter your name and email so we can get back to you.');
+        return;
+    }
+
+    // Fold vehicle info into the message so it reaches the CRM lead record.
     const vehicleLines = [];
     if (vehicle) vehicleLines.push('Vehicle: ' + vehicle);
     if (vehicleType) vehicleLines.push('Vehicle Type: ' + vehicleType);
-    if (vehicleLines.length) details = vehicleLines.join('\n') + '\n\n' + details;
+    if (vehicleLines.length) details = vehicleLines.join('\n') + (details ? '\n\n' + details : '');
+
+    const nameParts = fullName.split(' ');
     const formData = {
+        name: fullName,
         firstName: nameParts[0] || 'Unknown',
         lastName: nameParts.slice(1).join(' ') || '',
-        email: document.getElementById('email').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        service: document.getElementById('service').value,
-        project_type: document.getElementById('service').value,
+        email: email,
+        phone: phone,
+        service: service,
+        project_type: service,
         details: details,
         message: details,
         source: 'Contact Page'
     };
-    submitBtn.disabled = true;
-    submitBtn.textContent = '⏳ Sending...';
+
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Sending...'; }
     try {
+        // 1) Create/update the lead first — this is what reaches the admin portal.
         const response = await fetch(`${window.location.origin}/api/leads`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(formData)
         });
-        const data = await response.json();
-        if (data.success) {
-            const cDate = (document.getElementById('consultDate')?.value || '').trim();
-            const cTime = (document.getElementById('consultTime')?.value || '').trim();
-            if (cDate) {
-                try {
-                    const scheduledTime = new Date(cDate + 'T' + (cTime || '09:00')).toISOString();
-                    await fetch(`${window.location.origin}/api/public/consultations`, {
-                        method: 'POST', headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ name: fullName, email: formData.email, phone: formData.phone, scheduledTime, service: formData.service, message: details })
-                    });
-                } catch (consultErr) { console.warn('Consultation booking skipped:', consultErr); }
-            }
-            document.getElementById('contactForm').reset();
-            document.getElementById('successModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        } else {
-            alert('Error: ' + (data.message || 'Something went wrong. Please try again.'));
+        let data = {};
+        try { data = await response.json(); } catch (_) { data = {}; }
+
+        if (!response.ok || !data.success) {
+            alert('Sorry — we couldn\u2019t submit your request' +
+                  (data && data.message ? ': ' + data.message : '.') +
+                  ' Please try again or call us at (940) 217-8680.');
+            return;
         }
+
+        // 2) If a consultation date was chosen, book it — best-effort, never blocks the lead.
+        const cDate = val('consultDate');
+        const cTime = val('consultTime');
+        if (cDate) {
+            try {
+                const scheduledTime = new Date(cDate + 'T' + (cTime || '09:00')).toISOString();
+                await fetch(`${window.location.origin}/api/public/consultations`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ name: fullName, email: email, phone: phone, scheduledTime, service: service, message: details })
+                });
+            } catch (consultErr) { console.warn('Consultation booking skipped:', consultErr); }
+        }
+
+        // 3) Success UI (null-guarded so a missing modal can't break the flow).
+        try { form.reset(); } catch (_) {}
+        const modal = document.getElementById('successModal');
+        if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        else { alert('Thank you! Your request has been received. We\u2019ll be in touch within 24 hours.'); }
     } catch (error) {
         console.error('Form submission error:', error);
-        alert('Network error. Please check your connection and try again.');
+        alert('Network error. Please check your connection and try again, or call us at (940) 217-8680.');
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalBtnText;
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalBtnText; }
     }
 }
 
@@ -3332,13 +3393,27 @@ function dismissBubble() {
             return `${h12}:${String(m).padStart(2, '0')} ${period}`;
         }
         // Don't allow booking in the past.
-        const today = new Date().toISOString().split('T')[0];
-        dateEl.min = today;
+        // No same-day booking — earliest selectable date is tomorrow.
+        const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+        dateEl.min = tomorrow;
         async function refresh() {
             const date = (dateEl.value || '').trim();
             // reset
             Array.from(timeEl.options).forEach(o => { o.disabled = false; if (o.value) o.textContent = toLabel(o.value); });
             if (!date) { if (hintEl) hintEl.textContent = ''; return; }
+            // Closed Sundays — clear the pick and tell the visitor.
+            const picked = new Date(date + 'T12:00:00');
+            if (picked.getDay() === 0) {
+                if (hintEl) hintEl.textContent = 'We\u2019re closed on Sundays — please choose another day.';
+                dateEl.value = '';
+                return;
+            }
+            // No same-day.
+            if (date <= new Date().toISOString().split('T')[0]) {
+                if (hintEl) hintEl.textContent = 'Same-day booking isn\u2019t available — please choose a future date.';
+                dateEl.value = '';
+                return;
+            }
             if (hintEl) hintEl.textContent = 'Checking availability…';
             try {
                 const r = await fetch(`${window.location.origin}/api/public/booked-times?date=${encodeURIComponent(date)}`);

@@ -3063,7 +3063,18 @@ app.get('/api/leads', authenticateToken, async (req, res) => {
         const result = await pool.query(`
             SELECT l.*, 
                    e.name as employee_name,
-                   e.email as employee_email
+                   e.email as employee_email,
+                   COALESCE((
+                       SELECT SUM(i.total_amount) FROM invoices i
+                        WHERE i.lead_id = l.id
+                          AND LOWER(COALESCE(i.status,'')) NOT IN ('paid','draft','cancelled','void')
+                   ), 0) AS outstanding_balance,
+                   COALESCE((
+                       SELECT COUNT(*) FROM invoices i
+                        WHERE i.lead_id = l.id
+                          AND LOWER(COALESCE(i.status,'')) NOT IN ('paid','draft','cancelled','void')
+                          AND ((i.due_date IS NOT NULL AND i.due_date < CURRENT_DATE) OR LOWER(COALESCE(i.status,'')) = 'overdue')
+                   ), 0) AS overdue_count
             FROM leads l
             LEFT JOIN employees e ON l.assigned_to = e.id
             WHERE l.source IS NULL
@@ -3342,10 +3353,19 @@ app.delete('/api/leads/:id', authenticateToken, async (req, res) => {
         // ══════════════════════════════════════════════════════════════
         // 2. DELETE COMPANY DATA
         // ══════════════════════════════════════════════════════════════
-        const adminCompanies = await pool.query(
-            `SELECT client_portal_id FROM client_companies WHERE LOWER(admin_email) = LOWER($1)`,
-            [leadEmail]
-        );
+        // Guarded: client_companies may not exist in this deployment. A missing
+        // table here previously threw and aborted EVERY deletion.
+        let adminCompanies = { rows: [] };
+        try {
+            adminCompanies = await pool.query(
+                `SELECT client_portal_id FROM client_companies WHERE LOWER(admin_email) = LOWER($1)`,
+                [leadEmail]
+            );
+        } catch (e) {
+            if (e.code !== '42P01' && e.code !== '42703') {
+                console.warn('[DELETE] client_companies lookup skipped:', e.message);
+            }
+        }
         const portalIdsToDelete = new Set(
             adminCompanies.rows.map(r => r.client_portal_id).filter(Boolean)
         );
@@ -3365,9 +3385,9 @@ app.delete('/api/leads/:id', authenticateToken, async (req, res) => {
                     }
                 }
             }
-            await pool.query(`DELETE FROM crm_subscriptions WHERE client_portal_id = $1`, [pid]);
+            await pool.query(`DELETE FROM crm_subscriptions WHERE client_portal_id = $1`, [pid]).catch(() => {});
             await pool.query(`DELETE FROM subscription_events WHERE client_portal_id = $1`, [pid]).catch(() => {});
-            await pool.query(`DELETE FROM company_users WHERE client_portal_id = $1`, [pid]);
+            await pool.query(`DELETE FROM company_users WHERE client_portal_id = $1`, [pid]).catch(() => {});
             await pool.query(`DELETE FROM client_email_log WHERE client_portal_id = $1`, [pid]).catch(() => {});
             await pool.query(`DELETE FROM client_email_chain_steps WHERE chain_id IN (SELECT id FROM client_email_chains WHERE client_portal_id = $1)`, [pid]).catch(() => {});
             await pool.query(`DELETE FROM client_chain_queue WHERE client_portal_id = $1`, [pid]).catch(() => {});
@@ -3378,22 +3398,31 @@ app.delete('/api/leads/:id', authenticateToken, async (req, res) => {
             await pool.query(`DELETE FROM client_unsubscribes WHERE client_portal_id = $1`, [pid]).catch(() => {});
             // Delete all seat user lead records that belong to this company portal (source='company-user')
             // This removes them from the Client Portal tab entirely instead of leaving orphaned accounts
-            await pool.query(`DELETE FROM leads WHERE client_portal_id = $1 AND id != $2`, [pid, leadId]);
-            await pool.query(`DELETE FROM client_companies WHERE client_portal_id = $1`, [pid]);
+            await pool.query(`DELETE FROM leads WHERE client_portal_id = $1 AND id != $2`, [pid, leadId]).catch(() => {});
+            await pool.query(`DELETE FROM client_companies WHERE client_portal_id = $1`, [pid]).catch(() => {});
             console.log(`[DELETE] Wiped company: ${pid}`);
         }
 
-        // Remove from any other company user list
-        const memberSubs = await pool.query(
-            `SELECT stripe_subscription_id FROM company_users WHERE LOWER(user_email) = LOWER($1)`,
-            [leadEmail]
-        );
-        for (const row of memberSubs.rows) {
-            if (row.stripe_subscription_id) {
-                try { await stripe.subscriptions.cancel(row.stripe_subscription_id); } catch (_) {}
+        // Remove from any other company user list.
+        // Guarded: this table may not exist in every deployment — a missing table
+        // (42P01) or column (42703) must NOT abort the whole deletion (that was the
+        // bug that prevented leads/customers from being deleted at all).
+        try {
+            const memberSubs = await pool.query(
+                `SELECT stripe_subscription_id FROM company_users WHERE LOWER(user_email) = LOWER($1)`,
+                [leadEmail]
+            );
+            for (const row of memberSubs.rows) {
+                if (row.stripe_subscription_id) {
+                    try { await stripe.subscriptions.cancel(row.stripe_subscription_id); } catch (_) {}
+                }
+            }
+            await pool.query(`DELETE FROM company_users WHERE LOWER(user_email) = LOWER($1)`, [leadEmail]);
+        } catch (e) {
+            if (e.code !== '42P01' && e.code !== '42703') {
+                console.warn('[DELETE] company_users cleanup skipped:', e.message);
             }
         }
-        await pool.query(`DELETE FROM company_users WHERE LOWER(user_email) = LOWER($1)`, [leadEmail]);
         
         // ══════════════════════════════════════════════════════════════
         // 3. DELETE ALL CRM DATA
@@ -3405,13 +3434,13 @@ app.delete('/api/leads/:id', authenticateToken, async (req, res) => {
         await _safeDelete('client_notes', 'client_id', leadId);
         
         // ══════════════════════════════════════════════════════════════
-        // 4. DELETE ALL SUBSCRIPTION RECORDS
+        // 4. DELETE ALL SUBSCRIPTION RECORDS  (guarded — tables may not exist)
         // ══════════════════════════════════════════════════════════════
-        await pool.query(`DELETE FROM crm_subscriptions WHERE lead_id = $1`, [leadId]);
-        await pool.query(`DELETE FROM crm_subscriptions WHERE LOWER(lead_email) = LOWER($1)`, [leadEmail]);
-        await pool.query(`DELETE FROM subscription_events WHERE LOWER(lead_email) = LOWER($1)`, [leadEmail]);
+        await pool.query(`DELETE FROM crm_subscriptions WHERE lead_id = $1`, [leadId]).catch(() => {});
+        await pool.query(`DELETE FROM crm_subscriptions WHERE LOWER(lead_email) = LOWER($1)`, [leadEmail]).catch(() => {});
+        await pool.query(`DELETE FROM subscription_events WHERE LOWER(lead_email) = LOWER($1)`, [leadEmail]).catch(() => {});
         for (const pid of portalIdsToDelete) {
-            await pool.query(`DELETE FROM crm_subscriptions WHERE client_portal_id = $1`, [pid]);
+            await pool.query(`DELETE FROM crm_subscriptions WHERE client_portal_id = $1`, [pid]).catch(() => {});
         }
         
         // ══════════════════════════════════════════════════════════════
@@ -24675,6 +24704,13 @@ async function ensurePortalSchema() {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`);
+    // Reply support for service requests (admin -> customer). Safe/idempotent.
+    await pool.query(`DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='service_requests' AND column_name='admin_response')
+        THEN ALTER TABLE service_requests ADD COLUMN admin_response TEXT; END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='service_requests' AND column_name='responded_at')
+        THEN ALTER TABLE service_requests ADD COLUMN responded_at TIMESTAMP; END IF;
+    END $$;`).catch(() => {});
     await pool.query(`
         CREATE TABLE IF NOT EXISTS appointments (
             id SERIAL PRIMARY KEY,
@@ -24842,6 +24878,63 @@ app.patch('/api/admin/service-requests/:id', authenticateToken, async (req, res)
     }
 });
 
+// Admin: reply to a service request — stores the response, emails the customer,
+// and surfaces it in the client portal. (Fixes "can't reply to a service request".)
+app.post('/api/admin/service-requests/:id/respond', authenticateToken, async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        const { response } = req.body || {};
+        if (!response || !response.trim()) {
+            return res.status(400).json({ success: false, message: 'A response message is required.' });
+        }
+
+        // Load the request + the customer it belongs to.
+        const reqRow = (await pool.query(`
+            SELECT sr.*, l.name AS customer_name, l.email AS customer_email
+              FROM service_requests sr
+              LEFT JOIN leads l ON sr.lead_id = l.id
+             WHERE sr.id = $1`, [req.params.id])).rows[0];
+        if (!reqRow) {
+            return res.status(404).json({ success: false, message: 'Service request not found.' });
+        }
+
+        // Store the response and move the request to "in-progress" if it was still new.
+        const updated = (await pool.query(`
+            UPDATE service_requests
+               SET admin_response = $1,
+                   responded_at = CURRENT_TIMESTAMP,
+                   status = CASE WHEN status = 'new' THEN 'in-progress' ELSE status END,
+                   updated_at = CURRENT_TIMESTAMP
+             WHERE id = $2
+             RETURNING *`, [response.trim(), req.params.id])).rows[0];
+
+        // Best-effort customer email (never fails the request if email isn't configured).
+        if (reqRow.customer_email) {
+            try {
+                if (typeof transporter !== 'undefined' && transporter) {
+                    const safe = String(response).replace(/</g, '&lt;').replace(/\n/g, '<br>');
+                    await transporter.sendMail({
+                        to: reqRow.customer_email,
+                        subject: `Re: your ${reqRow.service_type || 'service'} request — Crown Ceramic Coating`,
+                        html: `<p>Hi ${reqRow.customer_name || 'there'},</p>
+                               <p>Thanks for your ${reqRow.service_type || 'service'} request. Here's our reply:</p>
+                               <blockquote style="border-left:3px solid #c9a14a;padding:6px 14px;color:#333;background:#faf7f0;">${safe}</blockquote>
+                               <p>You can also view this in your client portal. Reply to this email or call (940) 217-8680 with any questions.</p>
+                               <p>— Crown Ceramic Coating</p>`
+                    });
+                }
+            } catch (mailErr) {
+                console.warn('[SERVICE-REQUEST] reply email skipped:', mailErr.message);
+            }
+        }
+
+        res.json({ success: true, request: updated });
+    } catch (e) {
+        console.error('[SERVICE-REQUEST] respond error:', e.message);
+        res.status(500).json({ success: false, message: 'Could not send reply: ' + e.message });
+    }
+});
+
 // Public: book a consultation from the website contact form.
 // Creates/links a lead and an appointment so it appears on the admin Schedule tab.
 app.post('/api/public/consultations', async (req, res) => {
@@ -24851,6 +24944,8 @@ app.post('/api/public/consultations', async (req, res) => {
         if (!name || !email || !scheduledTime) {
             return res.status(400).json({ success: false, message: 'Name, email and a preferred time are required.' });
         }
+        const dateErr = crownBookingDateError(scheduledTime);
+        if (dateErr) return res.status(400).json({ success: false, message: dateErr });
         // Find or create the lead.
         let leadRow = (await pool.query('SELECT id FROM leads WHERE LOWER(email) = LOWER($1) LIMIT 1', [email])).rows[0];
         const noteText = `Consultation requested via website${service ? ' for ' + service : ''}${message ? ' — ' + message : ''}`;
@@ -24887,6 +24982,107 @@ app.post('/api/public/consultations', async (req, res) => {
     } catch (e) {
         console.error('[CONSULT] error:', e.message);
         res.status(500).json({ success: false, message: 'Could not book consultation.' });
+    }
+});
+
+// ── Crown public-booking business rules (America/Chicago) ────────────────
+//   Open Mon–Sat 6:00 AM–7:00 PM CST. Closed Sundays. No same-day booking.
+//   Returns an error string if the requested date is invalid, else null.
+function crownBookingDateError(whenISO) {
+    const d = new Date(whenISO);
+    if (isNaN(d.getTime())) return 'Please choose a valid date.';
+    const ymd = (dt) => new Intl.DateTimeFormat('en-CA',
+        { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' }).format(dt);
+    const todayCT = ymd(new Date());
+    const pickCT = ymd(d);
+    if (pickCT <= todayCT) return 'We can\u2019t book the same day — please choose a future date.';
+    const weekday = new Intl.DateTimeFormat('en-US',
+        { timeZone: 'America/Chicago', weekday: 'short' }).format(d);
+    if (weekday === 'Sun') return 'We\u2019re closed on Sundays — please choose another day.';
+    return null;
+}
+
+// Public: list bookable DATES for the website scheduler (schedule.html).
+// Skips Sundays (closed) and today (no same-day). Returns open days only.
+app.get('/api/public/availability', async (req, res) => {
+    try {
+        const days = Math.min(Math.max(parseInt(req.query.days || '60', 10) || 60, 1), 120);
+        const todayCT = new Intl.DateTimeFormat('en-CA',
+            { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+        const start = new Date(todayCT + 'T12:00:00Z'); // noon UTC keeps the calendar date stable
+        const available = [];
+        for (let i = 1; i <= days; i++) { // start at 1 → never offer same-day
+            const d = new Date(start);
+            d.setUTCDate(d.getUTCDate() + i);
+            if (d.getUTCDay() === 0) continue; // Sunday → closed
+            available.push({ date: d.toISOString().slice(0, 10) });
+        }
+        res.json({
+            success: true,
+            hours: 'Mon\u2013Sat 6:00 AM\u20137:00 PM CST \u00b7 Closed Sunday',
+            available
+        });
+    } catch (e) {
+        console.error('[AVAILABILITY] error:', e.message);
+        res.status(500).json({ success: false, message: 'Could not load availability.' });
+    }
+});
+
+// Public: create a booking from the website scheduler (schedule.html).
+// Writes to the SAME appointments table the admin Schedule tab reads, so it
+// syncs straight into the admin calendar. Enforces no-Sunday / no-same-day.
+app.post('/api/public/schedule', async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        const { name, email, phone, date, eventType, service, vehicle, message } = req.body || {};
+        if (!name || !email || !date) {
+            return res.status(400).json({ success: false, message: 'Name, email and a date are required.' });
+        }
+        // Default the time to 9:00 AM CST on the chosen date.
+        const scheduledTime = new Date(date + 'T09:00:00-06:00').toISOString();
+        const dateErr = crownBookingDateError(scheduledTime);
+        if (dateErr) return res.status(400).json({ success: false, message: dateErr });
+
+        const note = `Website booking: ${eventType === 'service' ? 'Service appointment' : 'Free consultation'}`
+            + `${service ? ' — ' + service : ''}${vehicle ? ' (' + vehicle + ')' : ''}${message ? ' — ' + message : ''}`;
+
+        let leadRow = (await pool.query('SELECT id FROM leads WHERE LOWER(email) = LOWER($1) LIMIT 1', [email])).rows[0];
+        if (!leadRow) {
+            leadRow = (await pool.query(
+                `INSERT INTO leads (name, email, phone, status, lead_temperature, source, notes, created_at, updated_at)
+                 VALUES ($1, $2, $3, 'new', 'warm', 'website-schedule', $4, NOW(), NOW()) RETURNING id`,
+                [name, email, phone || null, note])).rows[0];
+        } else {
+            await pool.query(
+                `UPDATE leads SET lead_temperature = 'warm', updated_at = NOW(),
+                        notes = COALESCE(notes || E'\\n\\n', '') || $2 WHERE id = $1`,
+                [leadRow.id, note]).catch(() => {});
+        }
+
+        const apt = (await pool.query(
+            `INSERT INTO appointments (lead_email, lead_name, scheduled_time, event_type, status, notes, created_at)
+             VALUES ($1, $2, $3, $4, 'scheduled', $5, NOW()) RETURNING *`,
+            [email, name, scheduledTime, eventType === 'service' ? 'service' : 'consultation', note])).rows[0];
+
+        const when = new Date(scheduledTime).toLocaleDateString('en-US',
+            { timeZone: 'America/Chicago', weekday: 'long', month: 'long', day: 'numeric' });
+
+        try {
+            if (typeof transporter !== 'undefined' && transporter) {
+                await transporter.sendMail({
+                    to: email,
+                    subject: 'Your Crown Ceramic Coating appointment request',
+                    html: `<p>Hi ${name},</p><p>Thanks for booking with Crown Ceramic Coating. We have your `
+                        + `${eventType === 'service' ? 'service appointment' : 'consultation'} request for <strong>${when}</strong> `
+                        + `and will confirm shortly.</p><p>— Crown Ceramic Coating</p>`
+                });
+            }
+        } catch (mailErr) { console.warn('[SCHEDULE] confirmation email skipped:', mailErr.message); }
+
+        res.json({ success: true, when, appointment: apt });
+    } catch (e) {
+        console.error('[SCHEDULE] error:', e.message);
+        res.status(500).json({ success: false, message: 'Could not book your appointment.' });
     }
 });
 
