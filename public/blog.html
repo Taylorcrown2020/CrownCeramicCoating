@@ -2528,7 +2528,7 @@ window.addEventListener('load', function() {
             
             if (result.success) {
                 console.log('✅ NEWSLETTER SUCCESS');
-                alert('✅ Success! You\'ve been subscribed to our newsletter.');
+                showNewsletterPopup('success', email);
                 event.target.reset();
             } else {
                 throw new Error(result.message || 'Subscription failed');
@@ -2536,7 +2536,7 @@ window.addEventListener('load', function() {
             
         } catch (error) {
             console.error('❌ NEWSLETTER SUBMISSION ERROR:', error);
-            alert('⚠️ There was an error processing your subscription. Please try again or call us at (512) 980-0393.');
+            showNewsletterPopup('error');
         } finally {
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
@@ -2776,6 +2776,61 @@ function dismissBubble() {
         setTimeout(patchToggle, 50);   // wait for page scripts to define toggleChatbot
     });
 })();
+</script>
+
+<!-- Newsletter confirmation popup (replaces native alert) -->
+<div class="nl-popup-overlay" id="nlPopup" role="dialog" aria-modal="true" aria-labelledby="nlPopupTitle">
+  <div class="nl-popup-card">
+    <button class="nl-popup-close" type="button" aria-label="Close" onclick="closeNewsletterPopup()">&times;</button>
+    <div class="nl-popup-icon" id="nlPopupIcon">&#10003;</div>
+    <h3 class="nl-popup-title" id="nlPopupTitle">You're on the list!</h3>
+    <p class="nl-popup-msg" id="nlPopupMsg">Thanks for subscribing &mdash; the latest detailing tips and Crown updates are headed to your inbox.</p>
+    <button class="nl-popup-btn" type="button" onclick="closeNewsletterPopup()">Done</button>
+  </div>
+</div>
+<style>
+  .nl-popup-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;
+    padding:24px;background:rgba(6,6,6,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease;}
+  .nl-popup-overlay.show{opacity:1;visibility:visible;}
+  .nl-popup-card{position:relative;width:100%;max-width:420px;background:#141414;border:1px solid rgba(244,200,126,.28);
+    border-radius:20px;padding:42px 34px 32px;text-align:center;box-shadow:0 40px 90px rgba(0,0,0,.6);
+    transform:translateY(16px) scale(.96);transition:transform .3s cubic-bezier(.2,.8,.2,1);font-family:'Inter',-apple-system,sans-serif;}
+  .nl-popup-overlay.show .nl-popup-card{transform:translateY(0) scale(1);}
+  .nl-popup-close{position:absolute;top:14px;right:16px;background:none;border:none;color:#8a857c;font-size:26px;line-height:1;cursor:pointer;padding:4px 8px;}
+  .nl-popup-close:hover{color:#f4f1ea;}
+  .nl-popup-icon{width:68px;height:68px;margin:0 auto 20px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:34px;background:rgba(63,174,107,.14);border:2px solid #3fae6b;color:#3fae6b;}
+  .nl-popup-card.is-error .nl-popup-icon{background:rgba(226,87,76,.14);border-color:#e2574c;color:#e2574c;}
+  .nl-popup-title{font-family:'Playfair Display',Georgia,serif;font-size:25px;font-weight:700;color:#fff;margin-bottom:12px;}
+  .nl-popup-msg{font-size:15px;line-height:1.6;color:#b8b2a8;margin-bottom:26px;}
+  .nl-popup-btn{background:#f4c87e;color:#16130c;border:none;border-radius:10px;padding:13px 34px;font-size:13px;
+    font-weight:800;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:transform .15s,box-shadow .2s;}
+  .nl-popup-btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(244,200,126,.3);}
+</style>
+<script>
+  function showNewsletterPopup(type, email){
+    var card = document.querySelector('#nlPopup .nl-popup-card');
+    var icon = document.getElementById('nlPopupIcon');
+    var title = document.getElementById('nlPopupTitle');
+    var msg = document.getElementById('nlPopupMsg');
+    if(type === 'error'){
+      card.classList.add('is-error');
+      icon.innerHTML = '!';
+      title.textContent = 'Something went wrong';
+      msg.textContent = "We couldn't process your subscription just now. Please try again, or call us at (940) 217-8680.";
+    } else {
+      card.classList.remove('is-error');
+      icon.innerHTML = '\u2713';
+      title.textContent = "You're on the list!";
+      msg.innerHTML = (email ? '<strong style="color:#f4c87e">' + email + '</strong> has been added. ' : '') +
+        'The latest detailing tips and Crown updates are headed to your inbox.';
+    }
+    document.getElementById('nlPopup').classList.add('show');
+  }
+  function closeNewsletterPopup(){ document.getElementById('nlPopup').classList.remove('show'); }
+  document.addEventListener('click', function(e){ if(e.target && e.target.id === 'nlPopup') closeNewsletterPopup(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeNewsletterPopup(); });
 </script>
 </body>
 </html>
