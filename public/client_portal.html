@@ -40,7 +40,9 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-wei
 .pill.paid{background:rgba(67,185,127,.15);color:var(--green)}
 .pill.unpaid,.pill.sent,.pill.overdue{background:rgba(226,104,95,.15);color:var(--red)}
 .pill.draft,.pill.new{background:rgba(227,179,65,.15);color:var(--amber)}
-.pill.scheduled,.pill.in-progress{background:rgba(244,200,126,.15);color:var(--gold)}
+.pill.scheduled,.pill.in-progress,.pill.signed{background:rgba(244,200,126,.15);color:var(--gold)}
+.pill.cancelled{background:rgba(150,150,150,.18);color:#9aa0a6;text-decoration:line-through}
+.pill.completed{background:rgba(67,185,127,.15);color:var(--green)}
 
 /* LOGIN */
 #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
@@ -141,7 +143,7 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-wei
     </div>
     <div class="nav-link active" data-view="dashboard" onclick="nav('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</div>
     <div class="nav-link" data-view="invoices" onclick="nav('invoices')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Invoices<span class="nav-badge hidden" id="invBadge">0</span></div>
-    <div class="nav-link" data-view="projects" onclick="nav('projects')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Project Timeline</div>
+    <div class="nav-link" data-view="projects" onclick="nav('projects')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Sales Agreements</div>
     <div class="nav-link" data-view="requests" onclick="nav('requests')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Service Requests</div>
     <div class="nav-link" data-view="documents" onclick="nav('documents')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>Receipts &amp; Docs</div>
     <div class="spacer"></div>
@@ -201,10 +203,10 @@ async function loadDashboard(){
     const r = await fetch(API+'/api/client/dashboard',{headers:authHeaders()});
     if(r.status===401){ logout(); return; }
     const d = await r.json();
-    DASH = d.dashboard || {invoices:[],projects:[],tickets:[],activity:[]};
+    DASH = d.dashboard || {invoices:[],projects:[],salesAgreements:[],tickets:[],activity:[]};
     const unpaid = (DASH.invoices||[]).filter(i=>i.status!=='paid').length;
     const b=document.getElementById('invBadge'); if(unpaid>0){b.textContent=unpaid;b.classList.remove('hidden');} else b.classList.add('hidden');
-  }catch(e){ DASH={invoices:[],projects:[],tickets:[],activity:[]}; }
+  }catch(e){ DASH={invoices:[],projects:[],salesAgreements:[],tickets:[],activity:[]}; }
 }
 async function loadRequests(){
   try{ const d = await (await fetch(API+'/api/client/service-requests',{headers:authHeaders()})).json(); REQUESTS = d.requests||[]; }catch(e){ REQUESTS=[]; }
@@ -218,9 +220,9 @@ function nav(view){
 }
 
 function viewDashboard(){
-  const inv = DASH.invoices||[], proj = DASH.projects||[];
+  const inv = DASH.invoices||[];
   const outstanding = inv.filter(i=>i.status!=='paid').reduce((s,i)=>s+Number(i.total_amount||0),0);
-  const activeProjects = proj.filter(p=>p.status!=='completed').length;
+  const agreementsCount = (DASH.salesAgreements||[]).filter(a=>(a.status||'')!=='cancelled').length;
   const openReq = REQUESTS.filter(r=>r.status!=='completed'&&r.status!=='closed').length;
   const recent = inv.slice(0,4).map(i=>`<div class="list-item"><div><div>${esc(i.invoice_number||('Invoice #'+i.id))}</div><div class="muted sm">${fmtDate(i.issue_date||i.created_at)}</div></div><div style="text-align:right"><div>${money(i.total_amount)}</div><span class="pill ${esc(i.status)}">${esc(i.status)}</span></div></div>`).join('') || '<p class="muted sm">No invoices yet.</p>';
   document.getElementById('main').innerHTML = `
@@ -228,7 +230,7 @@ function viewDashboard(){
     <div class="page-sub">Here's an overview of your account.</div>
     <div class="stat-grid">
       <div class="stat"><div class="label">Outstanding Balance</div><div class="value">${money(outstanding)}</div></div>
-      <div class="stat"><div class="label">Active Projects</div><div class="value">${activeProjects}</div></div>
+      <div class="stat" onclick="nav('projects')" style="cursor:pointer;"><div class="label">Sales Agreements</div><div class="value">${agreementsCount}</div></div>
       <div class="stat"><div class="label">Open Requests</div><div class="value">${openReq}</div></div>
     </div>
     <div class="card"><h3 style="margin-bottom:8px;">Recent Invoices</h3>${recent}
@@ -250,21 +252,44 @@ function viewInvoices(){
   document.getElementById('main').innerHTML = `<div class="page-title">Invoices</div><div class="page-sub">Review and pay your invoices securely without leaving the portal.</div><div class="card">${rows}</div>`;
 }
 
+function saServiceLabelClient(t){
+  const m={ceramic_coating:'Ceramic Coating',paint_correction:'Paint Correction',interior_detailing:'Interior Detailing'};
+  return m[t]||(t?String(t).replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):'Service');
+}
 function viewProjects(){
-  const proj = DASH.projects||[];
-  if(!proj.length){ document.getElementById('main').innerHTML = `<div class="page-title">Project Timeline</div><div class="page-sub">Track the progress of your vehicle.</div><div class="card"><p class="muted sm">No active projects yet. Once work begins, your timeline appears here.</p></div>`; return; }
-  document.getElementById('main').innerHTML = `<div class="page-title">Project Timeline</div><div class="page-sub">Track the progress of your vehicle.</div>
-    ${proj.map(p=>{
-      const total=Number(p.total_milestones||0), done=Number(p.completed_milestones||0);
-      const pct = total? Math.round(done/total*100):0;
-      return `<div class="card mt"><div style="display:flex;justify-content:space-between;align-items:center;">
-        <div><h3>${esc(p.name||p.project_name||'Project')}</h3><div class="muted sm">${esc(p.status||'in progress')}</div></div>
-        <span class="pill ${esc(p.status==='completed'?'paid':'in-progress')}">${esc(p.status||'active')}</span></div>
-        <div class="progress"><span style="width:${pct}%"></span></div>
-        <div class="muted sm mt">${done} of ${total} milestones complete (${pct}%)</div>
-        <div id="ml-${p.id}" class="mt"></div></div>`;
-    }).join('')}`;
-  proj.forEach(p=>loadMilestones(p.id));
+  const list = DASH.salesAgreements||[];
+  const title = `<div class="page-title">Sales Agreements</div><div class="page-sub">Your service agreements with Crown Ceramic Coating.</div>`;
+  if(!list.length){ document.getElementById('main').innerHTML = title + `<div class="card"><p class="muted sm">No sales agreements yet. Once we prepare one for you, it will appear here.</p></div>`; return; }
+  const invoices = DASH.invoices||[];
+  const cards = list.map(a=>{
+    const price = Number(a.price||0);
+    const reqDep = !!a.require_deposit && Number(a.deposit_pct||0)>0;
+    const pct = Number(a.deposit_pct||0);
+    const dep = reqDep ? (Number(a.deposit)|| Math.round(price*pct)/100) : 0;
+    const bal = Math.round((price-dep)*100)/100;
+    // Linked invoice payment status (if any)
+    const linked = invoices.filter(i=> i.id===a.invoice_id || i.id===a.balance_invoice_id);
+    const payRows = linked.map(i=>`<div class="list-item" style="padding:8px 0;">
+        <div><div class="sm">${esc(i.invoice_number||('Invoice #'+i.id))}</div><div class="muted sm">${esc(i.short_description||'')}</div></div>
+        <div style="display:flex;align-items:center;gap:12px;"><div class="sm">${money(i.total_amount)}</div><span class="pill ${esc(i.status)}">${esc(i.status)}</span>
+        ${i.status!=='paid'?`<button class="btn btn-primary" onclick="openPay(${i.id})">Pay</button>`:''}</div></div>`).join('');
+    const payTerms = reqDep
+      ? `Down payment ${pct}% (${money(dep)}) at signing · Balance ${money(bal)} on completion`
+      : `Full amount ${money(price)} due on completion`;
+    const st = (a.status||'draft');
+    return `<div class="card mt">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div><h3>${esc(saServiceLabelClient(a.service_type))}${a.package_name?(' — '+esc(a.package_name)):''}</h3>
+          <div class="muted sm">${esc(a.agreement_number||'')}${a.vehicle?(' · '+esc(a.vehicle)):''} · ${fmtDate(a.created_at)}</div></div>
+        <span class="pill ${st==='completed'?'paid':(st==='cancelled'?'cancelled':'in-progress')}">${esc(st)}</span>
+      </div>
+      <div class="mt"><span class="muted sm">Total</span><div style="font-size:18px;font-weight:600;">${money(price)}</div></div>
+      <div class="muted sm mt">${esc(payTerms)}</div>
+      ${payRows?`<div class="mt">${payRows}</div>`:''}
+      ${a.terms?`<details class="mt"><summary class="muted sm" style="cursor:pointer;">View services performed</summary><div class="sm" style="white-space:pre-wrap;margin-top:8px;line-height:1.55;">${esc(a.terms)}</div></details>`:''}
+    </div>`;
+  }).join('');
+  document.getElementById('main').innerHTML = title + cards;
 }
 async function loadMilestones(pid){
   try{

@@ -12256,11 +12256,24 @@ app.get('/api/client/dashboard', authenticateClient, async (req, res) => {
             console.log('[WARNING] Could not load activity');
         }
         
+        // Sales agreements for this customer (shown in the portal's "Sales Agreements" view).
+        let salesAgreements = [];
+        try {
+            const saRes = await pool.query(
+                'SELECT * FROM sales_agreements WHERE lead_id = $1 ORDER BY created_at DESC',
+                [clientId]
+            );
+            salesAgreements = saRes.rows;
+        } catch (e) {
+            console.log('[WARNING] sales_agreements table not available:', e.message);
+        }
+
         res.json({
             success: true,
             dashboard: {
                 invoices: invoicesResult.rows,
                 projects,
+                salesAgreements,
                 tickets,
                 activity
             }
