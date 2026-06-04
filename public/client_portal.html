@@ -162,6 +162,21 @@ let TOKEN = localStorage.getItem('cc_client_token') || '';
 let CLIENT = JSON.parse(localStorage.getItem('cc_client') || 'null');
 let DASH = null, REQUESTS = [], STRIPE = null, STRIPE_PK = '';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// STRIPE PUBLISHABLE KEY
+// The card form needs your Stripe *publishable* key (it starts with "pk_live_"
+// for real payments, or "pk_test_" while testing). This key is meant to be public,
+// so it is safe to put here.
+//
+// EASIEST FIX: paste your publishable key between the quotes below, e.g.
+//   const STRIPE_PK_FALLBACK = 'pk_live_51Abc...';
+// Find it in Stripe → Developers → API keys → "Publishable key".
+//
+// (If you'd rather set the STRIPE_PUBLISHABLE_KEY environment variable on your
+//  server instead, you can leave this blank — that will be used automatically.)
+// ─────────────────────────────────────────────────────────────────────────────
+const STRIPE_PK_FALLBACK = '';
+
 function authHeaders(){ return { 'Authorization':'Bearer '+TOKEN, 'Content-Type':'application/json' }; }
 function money(n){ return '$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function fmtDate(d){ return d ? new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'; }
@@ -193,7 +208,7 @@ async function startApp(){
   document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   // load stripe publishable key
-  try{ const c = await (await fetch(API+'/api/config/stripe')).json(); STRIPE_PK = c.publishableKey||''; if(STRIPE_PK && window.Stripe) STRIPE = Stripe(STRIPE_PK); }catch(e){}
+  try{ const c = await (await fetch(API+'/api/config/stripe')).json(); STRIPE_PK = c.publishableKey||STRIPE_PK_FALLBACK||''; if(STRIPE_PK && window.Stripe) STRIPE = Stripe(STRIPE_PK); }catch(e){ if(STRIPE_PK_FALLBACK && window.Stripe){ STRIPE_PK = STRIPE_PK_FALLBACK; STRIPE = Stripe(STRIPE_PK); } }
   await loadDashboard();
   await loadRequests();
   nav('dashboard');
@@ -466,7 +481,8 @@ async function payGoto(step){
       payState.clientSecret = d.clientSecret; payState.breakdown = d.breakdown||payState.breakdown; payState.mounted=false;
       // Robustly initialize Stripe from the key returned here, in case the initial
       // config load missed it or raced — so the card form always renders when keys exist.
-      if(!STRIPE && d.publishableKey && window.Stripe){ STRIPE_PK = d.publishableKey; STRIPE = Stripe(STRIPE_PK); }
+      const pk = d.publishableKey || STRIPE_PK_FALLBACK;
+      if(!STRIPE && pk && window.Stripe){ STRIPE_PK = pk; STRIPE = Stripe(STRIPE_PK); }
     }catch(e){ alert('Could not start payment.'); return; }
   }
   payState.step = step; renderPayModal();

@@ -2836,7 +2836,7 @@ async function handleSubmit(event) {
         source: 'Contact Page'
     };
 
-    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Sending...'; }
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
     try {
         // 1) Create/update the lead first — this is what reaches the admin portal.
         const response = await fetch(`${window.location.origin}/api/leads`, {

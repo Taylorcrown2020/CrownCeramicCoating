@@ -25002,11 +25002,11 @@ app.post('/api/public/consultations', async (req, res) => {
         if (!leadRow) {
             leadRow = (await pool.query(
                 `INSERT INTO leads (name, email, phone, status, lead_temperature, source, notes, created_at, updated_at)
-                 VALUES ($1, $2, $3, 'new', 'warm', 'website-consultation', $4, NOW(), NOW()) RETURNING id`,
+                 VALUES ($1, $2, $3, 'new', 'hot', 'website-consultation', $4, NOW(), NOW()) RETURNING id`,
                 [name, email, phone || null, noteText])).rows[0];
         } else {
             await pool.query(
-                `UPDATE leads SET lead_temperature = 'warm', last_contact_date = NULL, updated_at = NOW(),
+                `UPDATE leads SET lead_temperature = 'hot', last_contact_date = NULL, updated_at = NOW(),
                         notes = COALESCE(notes || E'\\n\\n', '') || $2 WHERE id = $1`,
                 [leadRow.id, noteText]).catch(() => {});
         }
@@ -25098,11 +25098,11 @@ app.post('/api/public/schedule', async (req, res) => {
         if (!leadRow) {
             leadRow = (await pool.query(
                 `INSERT INTO leads (name, email, phone, status, lead_temperature, source, notes, created_at, updated_at)
-                 VALUES ($1, $2, $3, 'new', 'warm', 'website-schedule', $4, NOW(), NOW()) RETURNING id`,
+                 VALUES ($1, $2, $3, 'new', 'hot', 'website-schedule', $4, NOW(), NOW()) RETURNING id`,
                 [name, email, phone || null, note])).rows[0];
         } else {
             await pool.query(
-                `UPDATE leads SET lead_temperature = 'warm', updated_at = NOW(),
+                `UPDATE leads SET lead_temperature = 'hot', updated_at = NOW(),
                         notes = COALESCE(notes || E'\\n\\n', '') || $2 WHERE id = $1`,
                 [leadRow.id, note]).catch(() => {});
         }
