@@ -2109,6 +2109,12 @@ window.addEventListener('load', function() {
         .footer-legal-links { gap: 18px; }
     }
     </style>
+<style id="crown-perf-cv">
+/* Crown perf: skip rendering/painting of off-screen sections until scrolled near (faster load + scroll) */
+@media (min-width:1px){
+  section:not(:first-of-type), footer { content-visibility:auto; contain-intrinsic-size:auto 800px; }
+}
+</style>
 </head>
 <body>
 
@@ -2182,7 +2188,7 @@ window.addEventListener('load', function() {
 <section class="contact-hero">
     <div class="hero-background">
         <!-- Desktop: Video plays automatically -->
-        <video 
+        <video poster="pexels-mahdibafande-17639816.jpg" preload="none" 
             id="heroVideo"
             class="hero-video" 
             autoplay 
@@ -2190,13 +2196,13 @@ window.addEventListener('load', function() {
             loop 
             playsinline
             webkit-playsinline
-            preload="auto"
+           
         >
-            <source src="7565824-hd_2048_1080_25fps.mp4" type="video/mp4">
+            <source src="13460847_2160_3840_60fps.mp4" type="video/mp4">
         </video>
         
         <!-- Mobile: Static image (NO PLAY BUTTON!) -->
-        <img 
+        <img decoding="async" 
             src="pexels-mahdibafande-17639816.jpg" 
             alt="Contact Crown Ceramic Coating" 
             class="hero-mobile-image"
@@ -2402,7 +2408,7 @@ window.addEventListener('load', function() {
                 <div class="testimonial-quote-icon">"</div>
                 <p class="testimonial-text">We pride ourselves on delivering exceptional results that exceed expectations. Our team combines over a decade of expertise with pecision skill to bring your car's paint to life.</p>
                 <div class="testimonial-author">
-                    <img src="" alt="Quality Icon" class="testimonial-avatar">
+                    <img decoding="async" loading="lazy" src="" alt="Quality Icon" class="testimonial-avatar">
                     <div class="testimonial-author-info">
                         <div class="testimonial-author-name">Quality First</div>
                         <div class="testimonial-author-title">Decade of Expertise</div>
@@ -2414,7 +2420,7 @@ window.addEventListener('load', function() {
                 <div class="testimonial-quote-icon">"</div>
                 <p class="testimonial-text">From initial consultation to final delivery, we maintain clear communication and transparency throughout every project. You'll always know what's happening and when.</p>
                 <div class="testimonial-author">
-                    <img src="" alt="Communication Icon" class="testimonial-avatar">
+                    <img decoding="async" loading="lazy" src="" alt="Communication Icon" class="testimonial-avatar">
                     <div class="testimonial-author-info">
                         <div class="testimonial-author-name">Clear Communication</div>
                         <div class="testimonial-author-title">Always Transparent</div>
@@ -2426,7 +2432,7 @@ window.addEventListener('load', function() {
                 <div class="testimonial-quote-icon">"</div>
                 <p class="testimonial-text">Our commitment doesn't end at delivery. We provide ongoing support and maintenance to ensure your vehicle continues to shine at its best.</p>
                 <div class="testimonial-author">
-                    <img src="" alt="Support Icon" class="testimonial-avatar">
+                    <img decoding="async" loading="lazy" src="" alt="Support Icon" class="testimonial-avatar">
                     <div class="testimonial-author-info">
                         <div class="testimonial-author-name">Ongoing Support</div>
                         <div class="testimonial-author-title">We're Here to Help</div>
@@ -3513,6 +3519,10 @@ function dismissBubble() {
         setTimeout(patchToggle, 50);   // wait for page scripts to define toggleChatbot
     });
 })();
+</script>
+<script id="crown-vid-opt">
+/* Crown perf: only run the hero video while it is on screen (stops 4K decode lag during scroll) */
+(function(){if(window.__crownVidOpt)return;window.__crownVidOpt=1;function init(){var v=document.getElementById("heroVideo")||document.querySelector(".hero-video");if(!v)return;try{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var p=v.play();if(p&&p.catch)p.catch(function(){});}else{try{v.pause();}catch(_){}}});},{threshold:0.05});io.observe(v);}catch(_){var p=v.play&&v.play();if(p&&p.catch)p.catch(function(){});}}if(document.readyState!=="loading")init();else document.addEventListener("DOMContentLoaded",init);})();
 </script>
 </body>
 </html>

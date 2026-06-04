@@ -45,7 +45,7 @@ const PLATFORM_BREVO_KEY = process.env.BREVO_API_KEY || process.env.PLATFORM_BRE
 if (!PLATFORM_BREVO_KEY) {
     console.error('');
     console.error('╔══════════════════════════════════════════════════════════════╗');
-    console.error('║  ⚠️  CRITICAL: BREVO_API_KEY environment variable NOT SET!   ║');
+    console.error('║    CRITICAL: BREVO_API_KEY environment variable NOT SET!   ║');
     console.error('║  All email and SMS sends WILL FAIL until this is configured. ║');
     console.error('║  Go to Render → your service → Environment → Add:            ║');
     console.error('║  BREVO_API_KEY = your-brevo-api-key                          ║');
@@ -443,7 +443,7 @@ app.post('/api/stripe/webhook', express.raw({type: 'application/json'}), async (
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     
     if (!webhookSecret) {
-        console.error('️ STRIPE_WEBHOOK_SECRET not set - webhooks will fail!');
+        console.error(' STRIPE_WEBHOOK_SECRET not set - webhooks will fail!');
         return res.status(500).send('Webhook secret not configured');
     }
     
@@ -453,7 +453,7 @@ app.post('/api/stripe/webhook', express.raw({type: 'application/json'}), async (
         event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
         console.log(`[WEBHOOK] Received event: ${event.type}`);
     } catch (err) {
-        console.error('️  Webhook signature verification failed:', err.message);
+        console.error('  Webhook signature verification failed:', err.message);
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
     
@@ -706,7 +706,7 @@ app.post('/api/brevo/webhook', async (req, res) => {
         const incomingMsgId = event['message-id'];
         
         if (!incomingMsgId) {
-            console.log(`[BREVO WEBHOOK] ️ WARNING: No message-id in event`);
+            console.log(`[BREVO WEBHOOK]  WARNING: No message-id in event`);
             return res.json({ received: true, warning: 'No message-id provided' });
         }
 
@@ -722,7 +722,7 @@ app.post('/api/brevo/webhook', async (req, res) => {
         );
 
         if (emailLogResult.rows.length === 0) {
-            console.log(`[BREVO WEBHOOK] ️ No email_log found for message-id: ${incomingMsgId}`);
+            console.log(`[BREVO WEBHOOK]  No email_log found for message-id: ${incomingMsgId}`);
             return res.json({ received: true, warning: 'No matching email_log found' });
         }
 
@@ -759,7 +759,7 @@ app.post('/api/brevo/webhook', async (req, res) => {
         
         // Handle CLICKED event
         else if (event.event === 'click' || event.event === 'unique_click') {
-            console.log(`[BREVO WEBHOOK] ️ EMAIL LINK CLICKED`);
+            console.log(`[BREVO WEBHOOK]  EMAIL LINK CLICKED`);
             const clickUrl = event.link || event.url || 'unknown';
             await pool.query(
                 `UPDATE email_log 
@@ -1255,7 +1255,7 @@ async function sendTrackedEmail({ leadId, to, subject, html, isMarketing = false
     
     console.log(`[EMAIL]  Email validation passed for ${to}`);
     if (validation.warning) {
-        console.warn(`[EMAIL] ️  Warning: ${validation.warning}`);
+        console.warn(`[EMAIL]   Warning: ${validation.warning}`);
     }
 
     // 4. Inject 1×1 open-tracking pixel (skip for confirmation emails)
@@ -2202,7 +2202,7 @@ async function initializeDatabase(){
             console.log(' Default admin user created');
             console.log('   Username: admin');
             console.log('   Password: Admin123!');
-            console.log('   ️  CHANGE THIS PASSWORD IMMEDIATELY!');
+            console.log('     CHANGE THIS PASSWORD IMMEDIATELY!');
             console.log('========================================');
             console.log('');
         }
@@ -3569,7 +3569,7 @@ app.delete('/api/leads/:id', authenticateToken, async (req, res) => {
 
         await pool.query(`DELETE FROM leads WHERE id = $1`, [leadId]);
         
-        console.log(`✅ [DELETE COMPLETE] ${leadEmail} completely wiped from system`);
+        console.log(` [DELETE COMPLETE] ${leadEmail} completely wiped from system`);
 
         res.json({
             success: true,
@@ -4792,7 +4792,7 @@ app.post('/api/leads', async (req, res) => {
                     [existing.id, `Lead re-engaged via contact form. New message: ${message || details || 'No message provided'}`]
                 );
             } catch (noteError) {
-                console.error('️ Failed to create note (non-critical):', noteError);
+                console.error(' Failed to create note (non-critical):', noteError);
                 // Continue anyway - this is not critical to the lead update
             }
 
@@ -4855,7 +4855,7 @@ app.post('/api/leads', async (req, res) => {
                 crownMailAsync(mailOptions);
                 console.log(' Re-engagement notification queued to admin');
             } catch (emailError) {
-                console.error('️ Failed to send re-engagement notification email:', emailError);
+                console.error(' Failed to send re-engagement notification email:', emailError);
                 // Don't fail the request if email fails
             }
 
@@ -5984,7 +5984,7 @@ app.post('/api/invoices/:id/payment-link', authenticateToken, async (req, res) =
         
         // Check if payment link already exists
         if (invoice.stripe_payment_link) {
-            console.log('ℹ️ Using existing payment link for invoice:', invoice.invoice_number);
+            console.log(' Using existing payment link for invoice:', invoice.invoice_number);
             return res.json({
                 success: true,
                 paymentLink: invoice.stripe_payment_link,
@@ -10729,7 +10729,7 @@ async function processSubscriptionWebhook(event) {
             
             console.log(`[SUB WEBHOOK]  Converted lead ${lead.id} to CUSTOMER (was: ${lead.name || leadEmail})`);
         } else {
-            console.log(`[SUB WEBHOOK] ️  Warning: No lead ID available for ${leadEmail}`);
+            console.log(`[SUB WEBHOOK]   Warning: No lead ID available for ${leadEmail}`);
         }
 
         // Create client portal account regardless (even if lead creation somehow failed above)
@@ -10794,12 +10794,12 @@ async function processSubscriptionWebhook(event) {
                         </p>
 
                         <div style="background:#FF6B3511;border:2px solid #FF6B3533;border-radius:8px;padding:20px 24px;margin:28px 0;">
-                            <div style="font-size:15px;font-weight:800;color:#FF6B35;margin-bottom:8px;">📅 Next Step: Schedule Your Setup Call</div>
+                            <div style="font-size:15px;font-weight:800;color:#FF6B35;margin-bottom:8px;"> Next Step: Schedule Your Setup Call</div>
                             <p style="font-size:13px;color:#555;margin:0 0 16px 0;line-height:1.7;">
                                 To activate your <strong>email sending, SMS messaging, and domain verification</strong>, you'll need a quick 15-minute setup call with our team. We'll get everything configured so you can start reaching leads from day one.
                             </p>
                             <a href="${BASE_URL}/schedule.html?type=setup" style="display:inline-block;background:#FF6B35;color:#fff;text-decoration:none;font-weight:700;font-size:13px;padding:12px 24px;border-radius:6px;">
-                                📅 Book Your Setup Call →
+                                 Book Your Setup Call →
                             </a>
                             <p style="font-size:11px;color:#888;margin:12px 0 0 0;">Takes 15 minutes. We handle everything — no technical knowledge required.</p>
                         </div>
@@ -10896,7 +10896,7 @@ async function processSubscriptionWebhook(event) {
         let ourInvoiceNumber = null; // Will be set if invoice is created
         
         if (!leadDbId) {
-            console.log(`[SUB WEBHOOK] ️ Cannot create invoice - no leadDbId found for ${email}`);
+            console.log(`[SUB WEBHOOK]  Cannot create invoice - no leadDbId found for ${email}`);
             console.log(`[SUB WEBHOOK] Subscription: ${subId}, Email: ${email}`);
         }
         
@@ -11630,7 +11630,7 @@ app.get('/api/track/open/:emailLogId', async (req, res) => {
         
         // Don't track opens from email client prefetch scanners
         if (isLikelyPrefetch) {
-            console.log(`[TRACKING] ️ SKIPPED - Automated prefetch detected`);
+            console.log(`[TRACKING]  SKIPPED - Automated prefetch detected`);
             return sendPixel();
         }
         
@@ -11640,7 +11640,7 @@ app.get('/api/track/open/:emailLogId', async (req, res) => {
             console.log(`[TRACKING] Seconds since sent: ${Math.floor(secondsSinceSent)}`);
             
             if (secondsSinceSent < 5) {
-                console.log(`[TRACKING] ️ SKIPPED - Opened too quickly (${Math.floor(secondsSinceSent)}s < 5s)`);
+                console.log(`[TRACKING]  SKIPPED - Opened too quickly (${Math.floor(secondsSinceSent)}s < 5s)`);
                 return sendPixel();
             }
             
@@ -14167,7 +14167,7 @@ async function trackEngagement(leadId, engagementType, details = '') {
                            engagementType === 'website_visit_contact';
         const newTemperature = shouldBeHot ? 'hot' : 'cold';
         
-        console.log(`[ENGAGEMENT] ️  TEMPERATURE DECISION:`);
+        console.log(`[ENGAGEMENT]   TEMPERATURE DECISION:`);
         console.log(`   - Current: ${lead.lead_temperature || 'null'}`);
         console.log(`   - New: ${newTemperature}`);
         console.log(`   - Should be hot? ${shouldBeHot}`);
@@ -14276,7 +14276,7 @@ app.get('/api/track/click/:leadId', async (req, res) => {
         const { url, email_id } = req.query;
         
         console.log(`\n========================================`);
-        console.log(`[TRACKING] ️  EMAIL LINK CLICKED!`);
+        console.log(`[TRACKING]   EMAIL LINK CLICKED!`);
         console.log(`[TRACKING] Lead ID: ${leadId}`);
         console.log(`[TRACKING] Email ID: ${email_id}`);
         console.log(`[TRACKING] URL: ${url}`);
@@ -14326,11 +14326,11 @@ app.get('/api/track/click/:leadId', async (req, res) => {
             if (result?.temperature === 'hot') {
                 console.log(`[TRACKING]  LEAD ${leadId} IS NOW HOT `);
             } else {
-                console.log(`[TRACKING] ️ WARNING: Lead did not become hot - check trackEngagement function`);
+                console.log(`[TRACKING]  WARNING: Lead did not become hot - check trackEngagement function`);
             }
         } else {
             // All other email types (invoice, subscription, appointment) — track click but don't force hot
-            console.log(`[TRACKING] ℹ️  Email type '${emailType}' click tracked (no hot conversion for this type)`);
+            console.log(`[TRACKING]   Email type '${emailType}' click tracked (no hot conversion for this type)`);
         }
         
         // Redirect to the actual URL
@@ -14461,7 +14461,7 @@ app.post('/api/admin/reset-all-leads', authenticateToken, async (req, res) => {
                 `DELETE FROM email_log WHERE lead_id = ANY($1::int[])`,
                 [leadIds]
             );
-            console.log(`[ADMIN] ️  Deleted ${deleteResult.rowCount} email_log records`);
+            console.log(`[ADMIN]   Deleted ${deleteResult.rowCount} email_log records`);
         }
         
         // Reset ALL leads (hot + cold) but NOT dead/closed leads
@@ -19401,7 +19401,7 @@ app.get('/api/client/domain/status', authenticateClient, async (req, res) => {
             dkimVerified: dkimOk,
             dnsRecords,
             message: newStatus === 'verified'
-                ? '✅ Domain verified! All users under this domain can now send email.'
+                ? ' Domain verified! All users under this domain can now send email.'
                 : '⏳ DNS records not yet detected. DNS propagation can take up to 48 hours.'
         });
     } catch(e) {
@@ -19608,22 +19608,22 @@ app.put('/api/client/email-settings', authenticateClient, async (req, res) => {
                     });
                     if (addRes.status === 201 || addRes.status === 200) {
                         brevoSenderStatus = 'registered';
-                        console.log(`[BREVO AUTO-REGISTER] ✅ Registered sender ${effectiveSenderEmail} in platform Brevo`);
+                        console.log(`[BREVO AUTO-REGISTER]  Registered sender ${effectiveSenderEmail} in platform Brevo`);
                     } else {
                         brevoSenderStatus = `warning: ${addRes.body?.message || 'Could not auto-register sender'}`;
-                        console.warn(`[BREVO AUTO-REGISTER] ⚠️ ${brevoSenderStatus}`);
+                        console.warn(`[BREVO AUTO-REGISTER]  ${brevoSenderStatus}`);
                     }
                 } else {
                     brevoSenderStatus = 'already_registered';
-                    console.log(`[BREVO AUTO-REGISTER] ℹ️ Sender ${effectiveSenderEmail} already registered`);
+                    console.log(`[BREVO AUTO-REGISTER]  Sender ${effectiveSenderEmail} already registered`);
                 }
             } catch(brevoRegErr) {
                 brevoSenderStatus = 'error: ' + brevoRegErr.message;
-                console.error('[BREVO AUTO-REGISTER] ❌', brevoRegErr.message);
+                console.error('[BREVO AUTO-REGISTER] ', brevoRegErr.message);
             }
         } else if (!PLATFORM_BREVO_KEY) {
             brevoSenderStatus = 'platform_key_missing';
-            console.error('[BREVO AUTO-REGISTER] ❌ PLATFORM_BREVO_KEY env var is not set — emails WILL fail!');
+            console.error('[BREVO AUTO-REGISTER]  PLATFORM_BREVO_KEY env var is not set — emails WILL fail!');
         }
 
         // Return the freshly-saved settings so the frontend can confirm what was persisted
@@ -22902,13 +22902,13 @@ async function migrateExistingLeadsToTemperature() {
         if (result.rows.length > 0) {
             console.log(`[MIGRATION]  Updated ${result.rows.length} leads to 'cold' temperature`);
         } else {
-            console.log('[MIGRATION] ℹ️  All leads already have temperature values');
+            console.log('[MIGRATION]   All leads already have temperature values');
         }
         
         return { success: true, migrated: result.rows.length };
         
     } catch (error) {
-        console.error('[MIGRATION] ️  Migration error (non-critical):', error.message);
+        console.error('[MIGRATION]   Migration error (non-critical):', error.message);
         // Don't fail startup if migration has issues
         return { success: false, error: error.message };
     }
@@ -24033,7 +24033,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
     <div id="errorMsg" class="error-msg"></div>
     <div id="formContent">${formContent}</div>
     <div class="success-msg" id="successMsg">
-        <div class="success-icon">✅</div>
+        <div class="success-icon"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
         <div class="success-title">You're all set!</div>
         <div class="success-text" id="successText">We'll be in touch shortly.</div>
     </div>
@@ -24521,7 +24521,7 @@ async function startServer() {
         //  THIS LINE MUST BE HERE
         const emailConfigured = await verifyEmailConfig();
         if (!emailConfigured) {
-            console.warn('️  Email functionality may not work properly');
+            console.warn('  Email functionality may not work properly');
         }
         
         // Start background job to auto-confirm email deliveries
@@ -25175,6 +25175,8 @@ app.post('/api/public/schedule', async (req, res) => {
                 ? `A down payment of ${_pct}% (${crownMoney(_dep)}) is due upon signing this agreement to reserve your service. The remaining balance of ${crownMoney(_bal)} is due upon completion of the service.`
                 : `The full amount of ${crownMoney(_total)} is due upon completion of the service.`;
             doc.font('Helvetica').fontSize(10).fillColor('#333333').text(_payClause, { align: 'left' });
+            doc.moveDown(0.3);
+            doc.font('Helvetica-Oblique').fontSize(9).fillColor('#666666').text('Prices shown are before tax. Applicable sales tax (8.25%) and a card processing fee are added to each invoice.', { align: 'left' });
             doc.moveDown(0.8);
             if (a.terms) {
                 doc.font('Helvetica-Bold').fontSize(12).fillColor('#000000').text('Scope / Terms');
@@ -25204,17 +25206,26 @@ app.post('/api/public/schedule', async (req, res) => {
             doc.font('Helvetica-Bold').text('Due date: ', { continued: true }).font('Helvetica').text(inv.due_date ? new Date(inv.due_date).toLocaleDateString('en-US') : 'On receipt');
             doc.moveDown(1);
             const x = 50, w = doc.page.width - 100; let y = doc.y;
+            const sub = parseFloat(inv.subtotal) || 0;
+            const tax = parseFloat(inv.tax_amount) || 0;
+            const total = parseFloat(inv.total_amount) || 0;
+            const fee = Math.round((total - sub - tax) * 100) / 100;
             doc.rect(x, y, w, 24).fill('#c9a14a');
             doc.fillColor('#1a1a1a').font('Helvetica-Bold').fontSize(10);
             doc.text('Description', x + 10, y + 7);
             doc.text('Amount', x + w - 90, y + 7, { width: 80, align: 'right' });
             y += 24;
-            doc.fillColor('#000000').font('Helvetica').fontSize(10);
-            doc.rect(x, y, w, 28).stroke('#e0e0e0');
-            doc.text(lineDesc || inv.short_description || 'Services', x + 10, y + 9, { width: w - 120 });
-            doc.text(crownMoney(inv.total_amount), x + w - 90, y + 9, { width: 80, align: 'right' });
-            y += 28;
-            doc.font('Helvetica-Bold').fontSize(13).fillColor('#000000').text('Total: ' + crownMoney(inv.total_amount), x, y + 16, { width: w, align: 'right' });
+            const rowLine = (label, amt, bold) => {
+                doc.fillColor('#000000').font(bold ? 'Helvetica-Bold' : 'Helvetica').fontSize(10);
+                doc.rect(x, y, w, 26).stroke('#e0e0e0');
+                doc.text(label, x + 10, y + 8, { width: w - 120 });
+                doc.text(crownMoney(amt), x + w - 90, y + 8, { width: 80, align: 'right' });
+                y += 26;
+            };
+            rowLine(lineDesc || inv.short_description || 'Services', sub);
+            rowLine('Sales tax (8.25%)', tax);
+            if (fee > 0) rowLine('Card processing fee', fee);
+            doc.font('Helvetica-Bold').fontSize(13).fillColor('#000000').text('Total: ' + crownMoney(total), x, y + 14, { width: w, align: 'right' });
             doc.moveDown(3);
             doc.font('Helvetica').fontSize(9).fillColor('#888888').text('Please remit payment by the due date. Questions? Call (940) 217-8680. Thank you for your business!', 50);
             return crownPdfToBuffer(doc);
@@ -25262,6 +25273,26 @@ app.post('/api/public/schedule', async (req, res) => {
                 console.error('[SALES-AGREEMENT] list error:', e.message);
                 // Never hard-fail the tab — return an empty list so the UI renders cleanly.
                 res.json({ success: true, agreements: [], warning: 'Could not load agreements: ' + e.message });
+            }
+        });
+
+        // Client-portal: download your own sales agreement as a PDF.
+        app.get('/api/client/sales-agreements/:id/pdf', authenticateClient, async (req, res) => {
+            try {
+                await ensurePortalSchema();
+                const leadId = await resolveLeadId(req.user.id, req.user.email);
+                const r = await pool.query('SELECT * FROM sales_agreements WHERE id = $1', [req.params.id]);
+                const a = r.rows[0];
+                if (!a || String(a.lead_id) !== String(leadId)) {
+                    return res.status(404).json({ success: false, message: 'Agreement not found.' });
+                }
+                const pdf = await crownAgreementPDFBuffer(a);
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `attachment; filename="Sales-Agreement-${a.agreement_number || a.id}.pdf"`);
+                res.send(pdf);
+            } catch (e) {
+                console.error('[CLIENT SA PDF] error:', e.message);
+                res.status(500).json({ success: false, message: 'Could not generate the agreement PDF.' });
             }
         });
 
@@ -25320,20 +25351,33 @@ app.post('/api/public/schedule', async (req, res) => {
                     + (package_name ? ' — ' + package_name : '')
                     + (vehicle ? ' (' + vehicle + ')' : '')).slice(0, 480);
 
-                // Helper: create an invoice + line item.
-                const makeInvoice = async (total, dueDate, shortDesc, noteText) => {
+                // Helper: create an invoice that automatically includes 8.25% sales tax and the
+                // card processing fee (Stripe 2.9% + $0.30), broken out as their own line items.
+                const CROWN_TAX_RATE = 0.0825;
+                const STRIPE_PCT = 0.029, STRIPE_FLAT = 0.30;
+                const makeInvoice = async (baseAmount, dueDate, shortDesc, noteText) => {
+                    const subtotal = Math.round((parseFloat(baseAmount) || 0) * 100) / 100;
+                    const tax = Math.round(subtotal * CROWN_TAX_RATE * 100) / 100;
+                    const fee = Math.round(((subtotal + tax) * STRIPE_PCT + STRIPE_FLAT) * 100) / 100;
+                    const total = Math.round((subtotal + tax + fee) * 100) / 100;
                     const invoice_number = generateInvoiceNumber();
                     const invRes = await pool.query(
                         `INSERT INTO invoices
                             (invoice_number, lead_id, issue_date, due_date, subtotal, tax_rate, tax_amount,
                              discount_amount, total_amount, status, short_description, notes, created_by)
-                         VALUES ($1,$2,$3,$4,$5,0,0,0,$6,'sent',$7,$8,$9) RETURNING *`,
-                        [invoice_number, lead_id, new Date(), dueDate, total, total,
+                         VALUES ($1,$2,$3,$4,$5,$6,$7,0,$8,'sent',$9,$10,$11) RETURNING *`,
+                        [invoice_number, lead_id, new Date(), dueDate, subtotal, CROWN_TAX_RATE, tax, total,
                          String(shortDesc).slice(0, 255), noteText, (req.user && req.user.id) || null]);
                     const inv = invRes.rows[0];
                     await pool.query(
                         `INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, amount)
-                         VALUES ($1,$2,1,$3,$4)`, [inv.id, String(shortDesc).slice(0, 500), total, total]);
+                         VALUES ($1,$2,1,$3,$4)`, [inv.id, String(shortDesc).slice(0, 500), subtotal, subtotal]);
+                    await pool.query(
+                        `INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, amount)
+                         VALUES ($1,'Sales tax (8.25%)',1,$2,$3)`, [inv.id, tax, tax]);
+                    await pool.query(
+                        `INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, amount)
+                         VALUES ($1,'Card processing fee',1,$2,$3)`, [inv.id, fee, fee]);
                     return inv;
                 };
 
@@ -25348,8 +25392,8 @@ app.post('/api/public/schedule', async (req, res) => {
                         if (reqDep) {
                             depositInvoice = await makeInvoice(
                                 depAmount, new Date(),
-                                `Down payment (${pct}%) — ${baseDesc}`,
-                                `Down payment for sales agreement ${agreement_number} (due at signing).`);
+                                `Deposit (${pct}%) — ${baseDesc}`,
+                                `Deposit for sales agreement ${agreement_number} (due at signing).`);
                             balanceInvoice = await makeInvoice(
                                 balAmount, completionDue,
                                 `Final balance (due on completion) — ${baseDesc}`,
@@ -25410,9 +25454,9 @@ app.post('/api/public/schedule', async (req, res) => {
                                     const isDeposit = depositInvoice && inv.id === depositInvoice.id;
                                     await crownStoreDocument({
                                         leadId: lead_id, buffer: buf,
-                                        filename: `Invoice-${inv.invoice_number}${isDeposit ? '-DownPayment' : (balanceInvoice && inv.id === balanceInvoice.id ? '-Balance' : '')}.pdf`,
+                                        filename: `Invoice-${inv.invoice_number}${isDeposit ? '-Deposit' : (balanceInvoice && inv.id === balanceInvoice.id ? '-Balance' : '')}.pdf`,
                                         mime: 'application/pdf', documentType: 'invoice',
-                                        description: (isDeposit ? 'Down-payment invoice ' : (balanceInvoice && inv.id === balanceInvoice.id ? 'Final balance invoice ' : 'Invoice ')) + inv.invoice_number,
+                                        description: (isDeposit ? 'Deposit invoice ' : (balanceInvoice && inv.id === balanceInvoice.id ? 'Final balance invoice ' : 'Invoice ')) + inv.invoice_number,
                                         userId: (req.user && req.user.id)
                                     });
                                 }
@@ -25584,7 +25628,7 @@ app.post('/api/public/schedule', async (req, res) => {
             console.log(` Port: ${PORT}`);
             console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
             console.log(` Local: http://localhost:${PORT}`);
-            console.log(` Email: ${emailConfigured ? 'Configured ' : 'Not configured ️'}`);
+            console.log(` Email: ${emailConfigured ? 'Configured ' : 'Not configured '}`);
             console.log('========================================');
             console.log('');
         });
@@ -26109,7 +26153,7 @@ async function sendClientEmail({ portalId, leadId, leadEmail, senderUserEmail, a
     const masterBrevoKey = PLATFORM_BREVO_KEY;
     if (!masterBrevoKey) {
         await pool.query(`UPDATE client_email_log SET status='failed', error_message='BREVO_API_KEY env var not set on server' WHERE id=$1`, [logId]);
-        console.error('[CLIENT EMAIL] ❌ CRITICAL: BREVO_API_KEY environment variable is not set on Render!');
+        console.error('[CLIENT EMAIL]  CRITICAL: BREVO_API_KEY environment variable is not set on Render!');
         throw new Error('Email service not configured. The BREVO_API_KEY environment variable must be set on your Render server. Go to Render → your service → Environment, and add BREVO_API_KEY with your Brevo API key.');
     }
     if (!fromEmail) {
@@ -26151,10 +26195,10 @@ async function sendClientEmail({ portalId, leadId, leadEmail, senderUserEmail, a
             brevoMessageId: msgId
         });
 
-        console.log(`[CLIENT EMAIL] ✅ Sent via platform Brevo from ${fromEmail} → ${leadEmail}`);
+        console.log(`[CLIENT EMAIL]  Sent via platform Brevo from ${fromEmail} → ${leadEmail}`);
         return { success: true, logId, messageId: msgId, method: 'brevo' };
     } catch(brevoErr) {
-        console.error('[CLIENT EMAIL] ❌ Platform Brevo send failed:', brevoErr.message);
+        console.error('[CLIENT EMAIL]  Platform Brevo send failed:', brevoErr.message);
         await pool.query(`UPDATE client_email_log SET status='failed', error_message=$2 WHERE id=$1`, [logId, brevoErr.message]);
         throw brevoErr;
     }

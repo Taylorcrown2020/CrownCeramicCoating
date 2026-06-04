@@ -287,9 +287,28 @@ function viewProjects(){
       <div class="muted sm mt">${esc(payTerms)}</div>
       ${payRows?`<div class="mt">${payRows}</div>`:''}
       ${a.terms?`<details class="mt"><summary class="muted sm" style="cursor:pointer;">View services performed</summary><div class="sm" style="white-space:pre-wrap;margin-top:8px;line-height:1.55;">${esc(a.terms)}</div></details>`:''}
+      <div class="mt"><button class="btn btn-secondary" onclick="downloadAgreement(${a.id},this)" style="display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download agreement</button></div>
     </div>`;
   }).join('');
   document.getElementById('main').innerHTML = title + cards;
+}
+async function downloadAgreement(id, btn){
+  const orig = btn ? btn.innerHTML : '';
+  if(btn){ btn.disabled = true; btn.textContent = 'Preparing…'; }
+  try{
+    const r = await fetch(API+`/api/client/sales-agreements/${id}/pdf`, { headers:{ 'Authorization':'Bearer '+TOKEN } });
+    if(!r.ok) throw new Error('download failed');
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `Sales-Agreement-${id}.pdf`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  }catch(e){
+    alert('Sorry — we couldn’t prepare that agreement. Please try again or contact us.');
+  }finally{
+    if(btn){ btn.disabled = false; btn.innerHTML = orig; }
+  }
 }
 async function loadMilestones(pid){
   try{

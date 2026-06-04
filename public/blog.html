@@ -1707,6 +1707,12 @@ window.addEventListener('load', function() {
         .footer-legal-links { gap: 18px; }
     }
     </style>
+<style id="crown-perf-cv">
+/* Crown perf: skip rendering/painting of off-screen sections until scrolled near (faster load + scroll) */
+@media (min-width:1px){
+  section:not(:first-of-type), footer { content-visibility:auto; contain-intrinsic-size:auto 800px; }
+}
+</style>
 </head>
 <body>
 
@@ -1780,7 +1786,7 @@ window.addEventListener('load', function() {
 <section class="blog-hero">
     <div class="hero-background">
         <!-- Desktop: Video plays automatically -->
-        <video 
+        <video poster="pexels-ricardo-olvera-225422504-18061788.jpg" preload="none" 
             id="heroVideo"
             class="hero-video" 
             autoplay 
@@ -1788,13 +1794,13 @@ window.addEventListener('load', function() {
             loop 
             playsinline
             webkit-playsinline
-            preload="auto"
+           
         >
-            <source src="BLOG.mp4" type="video/mp4">
+            <source src="13024264_1920_1080_24fps.mp4" type="video/mp4">
         </video>
         
         <!-- Mobile: Static image (NO PLAY BUTTON!) -->
-        <img 
+        <img decoding="async" 
             src="pexels-ricardo-olvera-225422504-18061788.jpg" 
             alt="Crown Ceramic Coating Blog" 
             class="hero-mobile-image"
@@ -2868,6 +2874,10 @@ function dismissBubble() {
   function closeNewsletterPopup(){ document.getElementById('nlPopup').classList.remove('show'); }
   document.addEventListener('click', function(e){ if(e.target && e.target.id === 'nlPopup') closeNewsletterPopup(); });
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeNewsletterPopup(); });
+</script>
+<script id="crown-vid-opt">
+/* Crown perf: only run the hero video while it is on screen (stops 4K decode lag during scroll) */
+(function(){if(window.__crownVidOpt)return;window.__crownVidOpt=1;function init(){var v=document.getElementById("heroVideo")||document.querySelector(".hero-video");if(!v)return;try{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var p=v.play();if(p&&p.catch)p.catch(function(){});}else{try{v.pause();}catch(_){}}});},{threshold:0.05});io.observe(v);}catch(_){var p=v.play&&v.play();if(p&&p.catch)p.catch(function(){});}}if(document.readyState!=="loading")init();else document.addEventListener("DOMContentLoaded",init);})();
 </script>
 </body>
 </html>

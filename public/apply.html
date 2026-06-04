@@ -663,6 +663,12 @@
         .footer-legal-links { gap: 18px; }
     }
     </style>
+<style id="crown-perf-cv">
+/* Crown perf: skip rendering/painting of off-screen sections until scrolled near (faster load + scroll) */
+@media (min-width:1px){
+  section:not(:first-of-type), footer { content-visibility:auto; contain-intrinsic-size:auto 800px; }
+}
+</style>
 </head>
 <body>
 
@@ -1063,5 +1069,9 @@
     </div>
 </footer>
 
+<script id="crown-vid-opt">
+/* Crown perf: only run the hero video while it is on screen (stops 4K decode lag during scroll) */
+(function(){if(window.__crownVidOpt)return;window.__crownVidOpt=1;function init(){var v=document.getElementById("heroVideo")||document.querySelector(".hero-video");if(!v)return;try{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var p=v.play();if(p&&p.catch)p.catch(function(){});}else{try{v.pause();}catch(_){}}});},{threshold:0.05});io.observe(v);}catch(_){var p=v.play&&v.play();if(p&&p.catch)p.catch(function(){});}}if(document.readyState!=="loading")init();else document.addEventListener("DOMContentLoaded",init);})();
+</script>
 </body>
 </html>

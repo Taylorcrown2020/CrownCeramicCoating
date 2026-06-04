@@ -1688,6 +1688,12 @@ window.addEventListener('load', function() {
         .footer-legal-links { gap: 18px; }
     }
     </style>
+<style id="crown-perf-cv">
+/* Crown perf: skip rendering/painting of off-screen sections until scrolled near (faster load + scroll) */
+@media (min-width:1px){
+  section:not(:first-of-type), footer { content-visibility:auto; contain-intrinsic-size:auto 800px; }
+}
+</style>
 </head>
 <body>
 
@@ -1857,10 +1863,10 @@ window.addEventListener('load', function() {
 <!-- HERO -->
 <section class="about-hero">
     <div class="hero-background">
-        <video id="heroVideo" class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
+        <video poster="pexels-gdtography-277628-911738.jpg" preload="none" id="heroVideo" class="hero-video" autoplay muted loop playsinline webkit-playsinline>
             <source src="3066432-uhd_4096_2160_24fps.mp4" type="video/mp4">
         </video>
-        <img src="pexels-gdtography-277628-911738.jpg" alt="Crown Ceramic Coating pricing" class="hero-mobile-image" loading="eager">
+        <img decoding="async" src="pexels-gdtography-277628-911738.jpg" alt="Crown Ceramic Coating pricing" class="hero-mobile-image" loading="eager">
     </div>
     <div class="hero-content">
         <div class="hero-text">
@@ -2848,6 +2854,10 @@ function dismissBubble() {
         setTimeout(patchToggle, 50);   // wait for page scripts to define toggleChatbot
     });
 })();
+</script>
+<script id="crown-vid-opt">
+/* Crown perf: only run the hero video while it is on screen (stops 4K decode lag during scroll) */
+(function(){if(window.__crownVidOpt)return;window.__crownVidOpt=1;function init(){var v=document.getElementById("heroVideo")||document.querySelector(".hero-video");if(!v)return;try{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var p=v.play();if(p&&p.catch)p.catch(function(){});}else{try{v.pause();}catch(_){}}});},{threshold:0.05});io.observe(v);}catch(_){var p=v.play&&v.play();if(p&&p.catch)p.catch(function(){});}}if(document.readyState!=="loading")init();else document.addEventListener("DOMContentLoaded",init);})();
 </script>
 </body>
 </html>

@@ -1688,6 +1688,12 @@ window.addEventListener('load', function() {
         .footer-legal-links { gap: 18px; }
     }
     </style>
+<style id="crown-perf-cv">
+/* Crown perf: skip rendering/painting of off-screen sections until scrolled near (faster load + scroll) */
+@media (min-width:1px){
+  section:not(:first-of-type), footer { content-visibility:auto; contain-intrinsic-size:auto 800px; }
+}
+</style>
 </head>
 <body>
 
@@ -1761,7 +1767,7 @@ window.addEventListener('load', function() {
 <section class="about-hero">
     <div class="hero-background">
         <!-- Desktop: Video plays automatically -->
-        <video 
+        <video poster="pexels-gdtography-277628-911738.jpg" preload="none" 
             id="heroVideo"
             class="hero-video" 
             autoplay 
@@ -1769,13 +1775,13 @@ window.addEventListener('load', function() {
             loop 
             playsinline
             webkit-playsinline
-            preload="auto"
+           
         >
-            <source src="4779866-hd_1920_1080_30fps.mp4" type="video/mp4">
+            <source src="13127448_1920_1080_60fps.mp4" type="video/mp4">
         </video>
         
         <!-- Mobile: Static image (NO PLAY BUTTON!) -->
-        <img 
+        <img decoding="async" 
             src="pexels-gdtography-277628-911738.jpg"
             alt="About Crown Ceramic Coating" 
             class="hero-mobile-image"
@@ -1799,7 +1805,7 @@ window.addEventListener('load', function() {
         <!-- Story Item 1 -->
         <div class="story-item">
             <div class="story-image">
-                <img src="public/pexels-altman-12883026.jpg" alt="Crown Ceramic Coating Team" loading="lazy">
+                <img decoding="async" src="public/pexels-altman-12883026.jpg" alt="Crown Ceramic Coating Team" loading="lazy">
             </div>
             <div class="story-content">
                 <div class="story-label">OUR STORY</div>
@@ -1812,7 +1818,7 @@ window.addEventListener('load', function() {
         <!-- Story Item 2 - Reverse -->
         <div class="story-item reverse">
             <div class="story-image">
-                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop" alt="Team Collaboration" loading="lazy">
+                <img decoding="async" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop" alt="Team Collaboration" loading="lazy">
             </div>
             <div class="story-content">
                 <div class="story-label">OUR APPROACH</div>
@@ -1825,7 +1831,7 @@ window.addEventListener('load', function() {
         <!-- Story Item 3 -->
         <div class="story-item">
             <div class="story-image">
-                <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop" alt="Innovation and Technology" loading="lazy">
+                <img decoding="async" src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop" alt="Innovation and Technology" loading="lazy">
             </div>
             <div class="story-content">
                 <div class="story-label">OUR COMMITMENT</div>
@@ -1849,7 +1855,7 @@ window.addEventListener('load', function() {
                 <div class="testimonial-quote-icon">"</div>
                 <p class="testimonial-text">We're obsessed with quality. Every line of code, every design element, every strategy is crafted with meticulous attention to detail and a commitment to delivering exceptional results that exceed expectations.</p>
                 <div class="testimonial-author">
-                    <img src="" alt="Excellence Icon" class="testimonial-avatar">
+                    <img decoding="async" loading="lazy" src="" alt="Excellence Icon" class="testimonial-avatar">
                     <div class="testimonial-author-info">
                         <div class="testimonial-author-name">Excellence</div>
                         <div class="testimonial-author-title">Our Standard</div>
@@ -1861,7 +1867,7 @@ window.addEventListener('load', function() {
                 <div class="testimonial-quote-icon">"</div>
                 <p class="testimonial-text">The digital landscape never stops evolving, and neither do we. We constantly explore new technologies, methodologies, and creative approaches to deliver cutting-edge solutions that keep you ahead of the curve.</p>
                 <div class="testimonial-author">
-                    <img src="" alt="Innovation Icon" class="testimonial-avatar">
+                    <img decoding="async" loading="lazy" src="" alt="Innovation Icon" class="testimonial-avatar">
                     <div class="testimonial-author-info">
                         <div class="testimonial-author-name">Innovation</div>
                         <div class="testimonial-author-title">Our Edge</div>
@@ -1873,7 +1879,7 @@ window.addEventListener('load', function() {
                 <div class="testimonial-quote-icon">"</div>
                 <p class="testimonial-text">Great results come from great partnerships. We work closely with our clients, treating your goals as our own and your success as our success. Your vision drives everything we do.</p>
                 <div class="testimonial-author">
-                    <img src="" alt="Collaboration Icon" class="testimonial-avatar">
+                    <img decoding="async" loading="lazy" src="" alt="Collaboration Icon" class="testimonial-avatar">
                     <div class="testimonial-author-info">
                         <div class="testimonial-author-name">Collaboration</div>
                         <div class="testimonial-author-title">Our Method</div>
@@ -2734,6 +2740,10 @@ function dismissBubble() {
         setTimeout(patchToggle, 50);   // wait for page scripts to define toggleChatbot
     });
 })();
+</script>
+<script id="crown-vid-opt">
+/* Crown perf: only run the hero video while it is on screen (stops 4K decode lag during scroll) */
+(function(){if(window.__crownVidOpt)return;window.__crownVidOpt=1;function init(){var v=document.getElementById("heroVideo")||document.querySelector(".hero-video");if(!v)return;try{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var p=v.play();if(p&&p.catch)p.catch(function(){});}else{try{v.pause();}catch(_){}}});},{threshold:0.05});io.observe(v);}catch(_){var p=v.play&&v.play();if(p&&p.catch)p.catch(function(){});}}if(document.readyState!=="loading")init();else document.addEventListener("DOMContentLoaded",init);})();
 </script>
 </body>
 </html>
