@@ -464,8 +464,13 @@ app.post('/api/stripe/webhook', express.raw({type: 'application/json'}), async (
             const piInvoiceId = pi.metadata && pi.metadata.invoice_id;
             if (piInvoiceId) {
                 try {
-                    await markInvoicePaidById(piInvoiceId, pi.id);
-                    console.log(`[WEBHOOK] payment_intent.succeeded -> invoice ${piInvoiceId} marked PAID`);
+                    const markPaid = global.markInvoicePaidById;
+                    if (typeof markPaid === 'function') {
+                        await markPaid(piInvoiceId, pi.id);
+                        console.log(`[WEBHOOK] payment_intent.succeeded -> invoice ${piInvoiceId} marked PAID`);
+                    } else {
+                        console.error('[WEBHOOK] payment_intent.succeeded: mark-paid handler not available');
+                    }
                 } catch (e) { console.error('[WEBHOOK] payment_intent.succeeded error:', e.message); }
             }
             break;
@@ -24735,6 +24740,10 @@ async function markInvoicePaidById(invoiceId, reference) {
     }
     return inv;
 }
+// Expose mark-paid for handlers registered earlier in the file (the Stripe webhook
+// is mounted near the top, before this definition). Assigning here at module load
+// guarantees it's available by the time any webhook/request fires.
+global.markInvoicePaidById = markInvoicePaidById;
 
 // Ensure portal-specific tables/columns exist (safe to call repeatedly).
 async function ensurePortalSchema() {
@@ -24872,6 +24881,37 @@ app.post('/api/client/invoices/:id/payment-intent', authenticateClient, async (r
     } catch (e) {
         console.error('[CLIENT] payment-intent error:', e.message);
         res.status(500).json({ success: false, message: 'Could not start payment. ' + e.message });
+    }
+});
+
+// Client: confirm a just-completed card payment and mark the invoice paid immediately.
+// This does NOT depend on the Stripe webhook — it verifies the PaymentIntent directly
+// with Stripe, so the invoice flips to "paid" in both portals the moment payment succeeds.
+app.post('/api/client/invoices/:id/confirm-paid', authenticateClient, async (req, res) => {
+    try {
+        const clientId = await resolveLeadId(req.user.id, req.user.email) || req.user.id;
+        const r = await pool.query('SELECT * FROM invoices WHERE id = $1 AND lead_id = $2', [req.params.id, clientId]);
+        if (r.rows.length === 0) return res.status(404).json({ success: false, message: 'Invoice not found.' });
+        const invoice = r.rows[0];
+        if (invoice.status === 'paid') return res.json({ success: true, invoice, alreadyPaid: true });
+
+        const piId = (req.body && req.body.payment_intent_id) || invoice.stripe_payment_intent_id;
+        if (!piId) return res.status(400).json({ success: false, message: 'No payment to confirm.' });
+
+        // Verify with Stripe that the payment actually went through (can't be spoofed by the client).
+        const pi = await stripe.paymentIntents.retrieve(piId);
+        if (!pi || (pi.status !== 'succeeded' && pi.status !== 'processing')) {
+            return res.status(402).json({ success: false, message: 'Payment not completed yet.', status: pi && pi.status });
+        }
+        // Defense: make sure this PaymentIntent is actually for this invoice.
+        if (pi.metadata && pi.metadata.invoice_id && String(pi.metadata.invoice_id) !== String(invoice.id)) {
+            return res.status(400).json({ success: false, message: 'Payment does not match this invoice.' });
+        }
+        const updated = await markInvoicePaidById(invoice.id, pi.id);
+        res.json({ success: true, invoice: updated || invoice });
+    } catch (e) {
+        console.error('[CLIENT] confirm-paid error:', e.message);
+        res.status(500).json({ success: false, message: 'Could not confirm payment.' });
     }
 });
 

@@ -515,6 +515,13 @@ async function confirmPay(){
   });
   if(error){ if(msg){ msg.style.color='var(--red)'; msg.textContent = error.message || 'Payment failed. Please check your card details.'; } btn.disabled=false; btn.textContent='Pay '+money(payState.breakdown.total); return; }
   if(paymentIntent && (paymentIntent.status==='succeeded' || paymentIntent.status==='processing')){
+    // Mark the invoice paid on our side right away (verified against Stripe) so it updates
+    // in both the client portal and the admin portal without waiting on a webhook.
+    try{
+      await fetch(API+`/api/client/invoices/${payState.invoiceId}/confirm-paid`,{
+        method:'POST', headers:authHeaders(), body: JSON.stringify({ payment_intent_id: paymentIntent.id })
+      });
+    }catch(_){}
     payState.step='done'; renderPayModal();
   } else { if(msg) msg.textContent='Payment could not be completed.'; btn.disabled=false; btn.textContent='Pay '+money(payState.breakdown.total); }
 }
