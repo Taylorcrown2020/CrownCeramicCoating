@@ -420,6 +420,20 @@ const servicePackages = {
 
 const { transporter, verifyEmailConfig } = require('./email-config.js');
 
+// Fire-and-forget email: send in the background so slow SMTP never blocks (or hangs)
+// the HTTP response. Errors are logged, not surfaced to the user.
+function crownMailAsync(opts) {
+    try {
+        if (typeof transporter !== 'undefined' && transporter) {
+            Promise.resolve(transporter.sendMail(opts))
+                .then(() => {})
+                .catch(err => console.warn('[MAIL] background send failed:', err && err.message));
+        }
+    } catch (err) {
+        console.warn('[MAIL] background send error:', err && err.message);
+    }
+}
+
 // ==================== ENHANCED WEBHOOK HANDLER ====================
 // This should REPLACE your existing webhook handler
 // Make sure this route comes BEFORE app.use(express.json())
@@ -4838,8 +4852,8 @@ app.post('/api/leads', async (req, res) => {
                     html: notificationHTML
                 };
 
-                await transporter.sendMail(mailOptions);
-                console.log(' Re-engagement notification email sent to admin');
+                crownMailAsync(mailOptions);
+                console.log(' Re-engagement notification queued to admin');
             } catch (emailError) {
                 console.error('️ Failed to send re-engagement notification email:', emailError);
                 // Don't fail the request if email fails
@@ -24744,6 +24758,12 @@ async function ensurePortalSchema() {
     await pool.query(`DO $$ BEGIN
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sales_agreements' AND column_name='invoice_id')
         THEN ALTER TABLE sales_agreements ADD COLUMN invoice_id INTEGER; END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sales_agreements' AND column_name='balance_invoice_id')
+        THEN ALTER TABLE sales_agreements ADD COLUMN balance_invoice_id INTEGER; END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sales_agreements' AND column_name='require_deposit')
+        THEN ALTER TABLE sales_agreements ADD COLUMN require_deposit BOOLEAN DEFAULT FALSE; END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sales_agreements' AND column_name='deposit_pct')
+        THEN ALTER TABLE sales_agreements ADD COLUMN deposit_pct NUMERIC(5,2) DEFAULT 0; END IF;
     END $$;`).catch(() => {});
     await pool.query(`DO $$ BEGIN
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='invoices' AND column_name='stripe_payment_intent_id')
@@ -24912,24 +24932,18 @@ app.post('/api/admin/service-requests/:id/respond', authenticateToken, async (re
              WHERE id = $2
              RETURNING *`, [response.trim(), req.params.id])).rows[0];
 
-        // Best-effort customer email (never fails the request if email isn't configured).
+        // Customer email goes out in the background so the reply returns instantly.
         if (reqRow.customer_email) {
-            try {
-                if (typeof transporter !== 'undefined' && transporter) {
-                    const safe = String(response).replace(/</g, '&lt;').replace(/\n/g, '<br>');
-                    await transporter.sendMail({
-                        to: reqRow.customer_email,
-                        subject: `Re: your ${reqRow.service_type || 'service'} request — Crown Ceramic Coating`,
-                        html: `<p>Hi ${reqRow.customer_name || 'there'},</p>
-                               <p>Thanks for your ${reqRow.service_type || 'service'} request. Here's our reply:</p>
-                               <blockquote style="border-left:3px solid #c9a14a;padding:6px 14px;color:#333;background:#faf7f0;">${safe}</blockquote>
-                               <p>You can also view this in your client portal. Reply to this email or call (940) 217-8680 with any questions.</p>
-                               <p>— Crown Ceramic Coating</p>`
-                    });
-                }
-            } catch (mailErr) {
-                console.warn('[SERVICE-REQUEST] reply email skipped:', mailErr.message);
-            }
+            const safe = String(response).replace(/</g, '&lt;').replace(/\n/g, '<br>');
+            crownMailAsync({
+                to: reqRow.customer_email,
+                subject: `Re: your ${reqRow.service_type || 'service'} request — Crown Ceramic Coating`,
+                html: `<p>Hi ${reqRow.customer_name || 'there'},</p>
+                       <p>Thanks for your ${reqRow.service_type || 'service'} request. Here's our reply:</p>
+                       <blockquote style="border-left:3px solid #c9a14a;padding:6px 14px;color:#333;background:#faf7f0;">${safe}</blockquote>
+                       <p>You can also view this in your client portal. Reply to this email or call (940) 217-8680 with any questions.</p>
+                       <p>— Crown Ceramic Coating</p>`
+            });
         }
 
         res.json({ success: true, request: updated });
@@ -24970,17 +24984,15 @@ app.post('/api/public/consultations', async (req, res) => {
              VALUES ($1, $2, $3, 'consultation', 'scheduled', $4, NOW()) RETURNING *`,
             [email, name, scheduledTime, noteText])).rows[0];
 
-        // Best-effort confirmation email (won't fail the request if email isn't configured).
-        try {
-            if (typeof transporter !== 'undefined' && transporter) {
-                const when = new Date(scheduledTime).toLocaleString('en-US', { timeZone: 'America/Chicago' });
-                await transporter.sendMail({
-                    to: email,
-                    subject: 'Your Crown Ceramic Coating consultation request',
-                    html: `<p>Hi ${name},</p><p>Thanks for requesting a consultation${service ? ' for <strong>' + service + '</strong>' : ''}. We have you down for <strong>${when} (CST)</strong> and will confirm shortly.</p><p>— Crown Ceramic Coating</p>`
-                });
-            }
-        } catch (mailErr) { console.warn('[CONSULT] confirmation email skipped:', mailErr.message); }
+        // Confirmation email goes out in the background so booking returns instantly.
+        {
+            const when = new Date(scheduledTime).toLocaleString('en-US', { timeZone: 'America/Chicago' });
+            crownMailAsync({
+                to: email,
+                subject: 'Your Crown Ceramic Coating consultation request',
+                html: `<p>Hi ${name},</p><p>Thanks for requesting a consultation${service ? ' for <strong>' + service + '</strong>' : ''}. We have you down for <strong>${when} (CST)</strong> and will confirm shortly.</p><p>— Crown Ceramic Coating</p>`
+            });
+        }
 
         res.json({ success: true, appointment: apt });
     } catch (e) {
@@ -25071,17 +25083,13 @@ app.post('/api/public/schedule', async (req, res) => {
         const when = new Date(scheduledTime).toLocaleDateString('en-US',
             { timeZone: 'America/Chicago', weekday: 'long', month: 'long', day: 'numeric' });
 
-        try {
-            if (typeof transporter !== 'undefined' && transporter) {
-                await transporter.sendMail({
-                    to: email,
-                    subject: 'Your Crown Ceramic Coating appointment request',
-                    html: `<p>Hi ${name},</p><p>Thanks for booking with Crown Ceramic Coating. We have your `
-                        + `${eventType === 'service' ? 'service appointment' : 'consultation'} request for <strong>${when}</strong> `
-                        + `and will confirm shortly.</p><p>— Crown Ceramic Coating</p>`
-                });
-            }
-        } catch (mailErr) { console.warn('[SCHEDULE] confirmation email skipped:', mailErr.message); }
+        crownMailAsync({
+            to: email,
+            subject: 'Your Crown Ceramic Coating appointment request',
+            html: `<p>Hi ${name},</p><p>Thanks for booking with Crown Ceramic Coating. We have your `
+                + `${eventType === 'service' ? 'service appointment' : 'consultation'} request for <strong>${when}</strong> `
+                + `and will confirm shortly.</p><p>— Crown Ceramic Coating</p>`
+        });
 
         res.json({ success: true, when, appointment: apt });
     } catch (e) {
@@ -25122,6 +25130,11 @@ app.post('/api/public/schedule', async (req, res) => {
             doc.moveDown(0.2);
             doc.fontSize(10).font('Helvetica').fillColor('#666666').text(a.agreement_number || '', { align: 'center' });
             doc.fillColor('#000000'); doc.moveDown(1.2);
+            const _total = parseFloat(a.price) || 0;
+            const _reqDep = !!a.require_deposit && (parseFloat(a.deposit_pct) || 0) > 0;
+            const _pct = parseFloat(a.deposit_pct) || 0;
+            const _dep = _reqDep ? (parseFloat(a.deposit) || Math.round(_total * _pct) / 100) : 0;
+            const _bal = Math.round((_total - _dep) * 100) / 100;
             const rows = [
                 ['Customer', a.customer_name || '—'],
                 ['Email', a.customer_email || '—'],
@@ -25129,16 +25142,27 @@ app.post('/api/public/schedule', async (req, res) => {
                 ['Package', a.package_name || '—'],
                 ['Vehicle', a.vehicle || '—'],
                 ['Start date', a.start_date ? new Date(a.start_date).toLocaleDateString('en-US') : 'To be scheduled'],
-                ['Total price', crownMoney(a.price)],
-                ['Deposit', crownMoney(a.deposit)]
+                ['Total price', crownMoney(_total)]
             ];
+            if (_reqDep) {
+                rows.push(['Down payment', `${_pct}%  —  ${crownMoney(_dep)} (due at signing)`]);
+                rows.push(['Balance on completion', crownMoney(_bal)]);
+            }
             doc.fontSize(11);
             rows.forEach(([k, v]) => {
                 doc.font('Helvetica-Bold').fillColor('#444444').text(k + ': ', { continued: true });
                 doc.font('Helvetica').fillColor('#111111').text(String(v));
                 doc.moveDown(0.3);
             });
-            doc.moveDown(0.5);
+            doc.moveDown(0.6);
+            // Payment terms (computed)
+            doc.font('Helvetica-Bold').fontSize(12).fillColor('#000000').text('Payment Terms');
+            doc.moveDown(0.2);
+            const _payClause = _reqDep
+                ? `A down payment of ${_pct}% (${crownMoney(_dep)}) is due upon signing this agreement to reserve your service. The remaining balance of ${crownMoney(_bal)} is due upon completion of the service.`
+                : `The full amount of ${crownMoney(_total)} is due upon completion of the service.`;
+            doc.font('Helvetica').fontSize(10).fillColor('#333333').text(_payClause, { align: 'left' });
+            doc.moveDown(0.8);
             if (a.terms) {
                 doc.font('Helvetica-Bold').fontSize(12).fillColor('#000000').text('Scope / Terms');
                 doc.moveDown(0.2);
@@ -25246,7 +25270,7 @@ app.post('/api/public/schedule', async (req, res) => {
         app.post('/api/sales-agreements', authenticateToken, async (req, res) => {
             try {
                 await ensurePortalSchema();
-                const { lead_id, service_type, package_name, vehicle, price, deposit,
+                const { lead_id, service_type, package_name, vehicle, price,
                         start_date, status, terms, notes } = req.body || {};
                 if (!service_type) return res.status(400).json({ success: false, message: 'A service type is required.' });
 
@@ -25256,118 +25280,170 @@ app.post('/api/public/schedule', async (req, res) => {
                     const lr = await pool.query('SELECT * FROM leads WHERE id = $1', [lead_id]);
                     if (lr.rows[0]) { leadRow = lr.rows[0]; customer_name = leadRow.name; customer_email = leadRow.email; }
                 }
+
                 const agreement_number = 'SA-' + Date.now().toString(36).toUpperCase();
                 const amount = parseFloat(price) || 0;
+
+                // Down-payment split.
+                const reqDep = !!req.body.require_deposit && (parseFloat(req.body.deposit_pct) || 0) > 0 && amount > 0;
+                const pct = reqDep ? Math.min(Math.max(parseFloat(req.body.deposit_pct) || 0, 0), 100) : 0;
+                const depAmount = reqDep ? Math.round(amount * pct) / 100 : 0;
+                const balAmount = Math.round((amount - depAmount) * 100) / 100;
+
                 const r = await pool.query(`
                     INSERT INTO sales_agreements
                         (agreement_number, lead_id, customer_name, customer_email, service_type,
-                         package_name, vehicle, price, deposit, start_date, status, terms, notes)
-                    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
+                         package_name, vehicle, price, deposit, start_date, status, terms, notes,
+                         require_deposit, deposit_pct)
+                    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *`,
                     [agreement_number, lead_id || null, customer_name, customer_email, service_type,
-                     package_name || null, vehicle || null, amount, deposit || 0,
-                     start_date || null, status || 'draft', terms || null, notes || null]);
+                     package_name || null, vehicle || null, amount, depAmount,
+                     start_date || null, status || 'draft', terms || null, notes || null,
+                     reqDep, pct]);
                 const agreement = r.rows[0];
-                const automation = { invoice: false, documents: false, emailed: false, isCustomer: !!(leadRow && leadRow.is_customer) };
+                const automation = { invoice: false, invoiceCount: 0, documents: false, emailed: false, isCustomer: !!(leadRow && leadRow.is_customer) };
 
-                const lineDesc = (crownServiceLabel(service_type)
+                const baseDesc = (crownServiceLabel(service_type)
                     + (package_name ? ' — ' + package_name : '')
-                    + (vehicle ? ' (' + vehicle + ')' : '')).slice(0, 500);
+                    + (vehicle ? ' (' + vehicle + ')' : '')).slice(0, 480);
 
-                // 1) Auto-create a matching invoice attached to the lead/customer.
-                let invoice = null;
+                // Helper: create an invoice + line item.
+                const makeInvoice = async (total, dueDate, shortDesc, noteText) => {
+                    const invoice_number = generateInvoiceNumber();
+                    const invRes = await pool.query(
+                        `INSERT INTO invoices
+                            (invoice_number, lead_id, issue_date, due_date, subtotal, tax_rate, tax_amount,
+                             discount_amount, total_amount, status, short_description, notes, created_by)
+                         VALUES ($1,$2,$3,$4,$5,0,0,0,$6,'sent',$7,$8,$9) RETURNING *`,
+                        [invoice_number, lead_id, new Date(), dueDate, total, total,
+                         String(shortDesc).slice(0, 255), noteText, (req.user && req.user.id) || null]);
+                    const inv = invRes.rows[0];
+                    await pool.query(
+                        `INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, amount)
+                         VALUES ($1,$2,1,$3,$4)`, [inv.id, String(shortDesc).slice(0, 500), total, total]);
+                    return inv;
+                };
+
+                // 1) Auto-create invoice(s) attached to the lead/customer.
+                //    - With down payment: a deposit invoice (due now) + a balance invoice (due on completion).
+                //    - Without: a single invoice for the full amount (due on completion).
+                const invoices = [];
+                let depositInvoice = null, balanceInvoice = null, fullInvoice = null;
                 if (lead_id && amount > 0) {
                     try {
-                        const invoice_number = generateInvoiceNumber();
-                        const issue = new Date();
-                        const due = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
-                        const invRes = await pool.query(
-                            `INSERT INTO invoices
-                                (invoice_number, lead_id, issue_date, due_date, subtotal, tax_rate, tax_amount,
-                                 discount_amount, total_amount, status, short_description, notes, created_by)
-                             VALUES ($1,$2,$3,$4,$5,0,0,0,$6,'sent',$7,$8,$9) RETURNING *`,
-                            [invoice_number, lead_id, issue, due, amount, amount, lineDesc.slice(0, 255),
-                             'Auto-generated from sales agreement ' + agreement_number, (req.user && req.user.id) || null]);
-                        invoice = invRes.rows[0];
-                        await pool.query(
-                            `INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, amount)
-                             VALUES ($1,$2,1,$3,$4)`, [invoice.id, lineDesc, amount, amount]);
-                        await pool.query('UPDATE sales_agreements SET invoice_id = $1 WHERE id = $2', [invoice.id, agreement.id]).catch(() => {});
-                        agreement.invoice_id = invoice.id;
-                        automation.invoice = true;
+                        const completionDue = start_date ? new Date(start_date) : new Date(Date.now() + 30 * 864e5);
+                        if (reqDep) {
+                            depositInvoice = await makeInvoice(
+                                depAmount, new Date(),
+                                `Down payment (${pct}%) — ${baseDesc}`,
+                                `Down payment for sales agreement ${agreement_number} (due at signing).`);
+                            balanceInvoice = await makeInvoice(
+                                balAmount, completionDue,
+                                `Final balance (due on completion) — ${baseDesc}`,
+                                `Final balance for sales agreement ${agreement_number} (due upon completion of service).`);
+                            invoices.push(depositInvoice, balanceInvoice);
+                            await pool.query('UPDATE sales_agreements SET invoice_id = $1, balance_invoice_id = $2 WHERE id = $3',
+                                [depositInvoice.id, balanceInvoice.id, agreement.id]).catch(() => {});
+                            agreement.invoice_id = depositInvoice.id;
+                            agreement.balance_invoice_id = balanceInvoice.id;
+                        } else {
+                            fullInvoice = await makeInvoice(
+                                amount, completionDue,
+                                baseDesc,
+                                `Full amount due upon completion of service. Sales agreement ${agreement_number}.`);
+                            invoices.push(fullInvoice);
+                            await pool.query('UPDATE sales_agreements SET invoice_id = $1 WHERE id = $2',
+                                [fullInvoice.id, agreement.id]).catch(() => {});
+                            agreement.invoice_id = fullInvoice.id;
+                        }
+                        automation.invoice = invoices.length > 0;
+                        automation.invoiceCount = invoices.length;
                     } catch (invErr) {
                         console.error('[SALES-AGREEMENT] auto-invoice error:', invErr.message);
                     }
                 }
 
-                // 2) Build PDFs for the agreement (and invoice).
-                let agreementPdf = null, invoicePdf = null;
-                try { agreementPdf = await crownAgreementPDFBuffer(agreement); }
-                catch (e) { console.error('[SALES-AGREEMENT] agreement PDF error:', e.message); }
-                if (invoice) {
-                    try { invoicePdf = await crownInvoicePDFBuffer(invoice, leadRow || { name: customer_name, email: customer_email }, lineDesc); }
-                    catch (e) { console.error('[SALES-AGREEMENT] invoice PDF error:', e.message); }
-                }
+                // Respond immediately — the agreement and invoice(s) are already saved to the
+                // database, so the admin UI updates right away. PDF generation, document storage,
+                // and the customer email run in the background so a slow mail server can never
+                // make the "Create" button hang.
+                automation.emailQueued = !!customer_email;
+                automation.emailed = !!customer_email; // queued = will send
+                res.json({ success: true, agreement, invoices, automation });
 
-                // 3) Store both on the customer's account log / client-portal documents.
-                //    Documents are keyed by lead_id, which the client portal reads — so once the
-                //    lead is (or becomes) a customer, these appear in their portal automatically.
-                if (lead_id) {
+                // ---- background: PDFs → portal documents → email (does not block the response) ----
+                (async () => {
                     try {
-                        if (agreementPdf) await crownStoreDocument({
-                            leadId: lead_id, buffer: agreementPdf,
-                            filename: `Sales-Agreement-${agreement.agreement_number}.pdf`,
-                            mime: 'application/pdf', documentType: 'sales_agreement',
-                            description: `Sales agreement ${agreement.agreement_number}`,
-                            userId: (req.user && req.user.id)
-                        });
-                        if (invoicePdf) await crownStoreDocument({
-                            leadId: lead_id, buffer: invoicePdf,
-                            filename: `Invoice-${invoice.invoice_number}.pdf`,
-                            mime: 'application/pdf', documentType: 'invoice',
-                            description: `Invoice ${invoice.invoice_number}`,
-                            userId: (req.user && req.user.id)
-                        });
-                        automation.documents = !!(agreementPdf || invoicePdf);
-                    } catch (docErr) {
-                        console.error('[SALES-AGREEMENT] store documents error:', docErr.message);
-                    }
-                }
+                        let agreementPdf = null;
+                        try { agreementPdf = await crownAgreementPDFBuffer(agreement); }
+                        catch (e) { console.error('[SALES-AGREEMENT] agreement PDF error:', e.message); }
+                        const leadForPdf = leadRow || { name: customer_name, email: customer_email };
+                        const invoicePdfs = [];
+                        for (const inv of invoices) {
+                            try { invoicePdfs.push({ inv, buf: await crownInvoicePDFBuffer(inv, leadForPdf, inv.short_description || baseDesc) }); }
+                            catch (e) { console.error('[SALES-AGREEMENT] invoice PDF error:', e.message); }
+                        }
 
-                // 4) Email the customer/lead on file, with the agreement + invoice attached.
-                if (customer_email && typeof transporter !== 'undefined' && transporter) {
-                    try {
-                        const attachments = [];
-                        if (agreementPdf) attachments.push({ filename: `Sales-Agreement-${agreement.agreement_number}.pdf`, content: agreementPdf });
-                        if (invoicePdf) attachments.push({ filename: `Invoice-${invoice.invoice_number}.pdf`, content: invoicePdf });
-                        const total = crownMoney(amount);
-                        await transporter.sendMail({
-                            to: customer_email,
-                            subject: `Your Crown Ceramic Coating agreement${invoice ? ' & invoice' : ''} — ${agreement.agreement_number}`,
-                            html: `
-                                <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:560px;">
-                                    <div style="background:#0a0a0a;padding:20px 24px;border-radius:10px 10px 0 0;">
-                                        <span style="color:#c9a14a;font-size:18px;font-weight:bold;letter-spacing:1px;">CROWN CERAMIC COATING</span>
-                                    </div>
-                                    <div style="border:1px solid #eee;border-top:none;padding:24px;border-radius:0 0 10px 10px;">
-                                        <p>Hi ${customer_name || 'there'},</p>
-                                        <p>Thank you for choosing Crown Ceramic Coating. Your sales agreement
-                                        <strong>${agreement.agreement_number}</strong> for
-                                        <strong>${crownServiceLabel(service_type)}${package_name ? ' — ' + package_name : ''}</strong>
-                                        is attached.</p>
-                                        ${invoice ? `<p>We've also attached <strong>invoice ${invoice.invoice_number}</strong> for <strong>${total}</strong>, due within 14 days. ${leadRow && leadRow.is_customer ? 'You can also view and pay it anytime from your client portal.' : ''}</p>` : ''}
-                                        <p>If you have any questions, just reply to this email or call us at (940) 217-8680.</p>
-                                        <p style="margin-top:22px;">— The Crown Ceramic Coating Team</p>
-                                    </div>
-                                </div>`,
-                            attachments
-                        });
-                        automation.emailed = true;
-                    } catch (mailErr) {
-                        console.error('[SALES-AGREEMENT] email error:', mailErr.message);
-                    }
-                }
+                        if (lead_id) {
+                            try {
+                                if (agreementPdf) await crownStoreDocument({
+                                    leadId: lead_id, buffer: agreementPdf,
+                                    filename: `Sales-Agreement-${agreement.agreement_number}.pdf`,
+                                    mime: 'application/pdf', documentType: 'sales_agreement',
+                                    description: `Sales agreement ${agreement.agreement_number}`,
+                                    userId: (req.user && req.user.id)
+                                });
+                                for (const { inv, buf } of invoicePdfs) {
+                                    const isDeposit = depositInvoice && inv.id === depositInvoice.id;
+                                    await crownStoreDocument({
+                                        leadId: lead_id, buffer: buf,
+                                        filename: `Invoice-${inv.invoice_number}${isDeposit ? '-DownPayment' : (balanceInvoice && inv.id === balanceInvoice.id ? '-Balance' : '')}.pdf`,
+                                        mime: 'application/pdf', documentType: 'invoice',
+                                        description: (isDeposit ? 'Down-payment invoice ' : (balanceInvoice && inv.id === balanceInvoice.id ? 'Final balance invoice ' : 'Invoice ')) + inv.invoice_number,
+                                        userId: (req.user && req.user.id)
+                                    });
+                                }
+                            } catch (docErr) {
+                                console.error('[SALES-AGREEMENT] store documents error:', docErr.message);
+                            }
+                        }
 
-                res.json({ success: true, agreement, invoice: invoice || null, automation });
+                        if (customer_email) {
+                            const attachments = [];
+                            if (agreementPdf) attachments.push({ filename: `Sales-Agreement-${agreement.agreement_number}.pdf`, content: agreementPdf });
+                            for (const { inv, buf } of invoicePdfs) {
+                                attachments.push({ filename: `Invoice-${inv.invoice_number}.pdf`, content: buf });
+                            }
+                            const payLine = reqDep
+                                ? `<p>This agreement requires a <strong>${pct}% down payment of ${crownMoney(depAmount)}</strong> to reserve your service, with the remaining <strong>${crownMoney(balAmount)}</strong> due upon completion. We've attached both invoices.</p>`
+                                : `<p>The full amount of <strong>${crownMoney(amount)}</strong> is due upon completion of the service. The invoice is attached.</p>`;
+                            crownMailAsync({
+                                to: customer_email,
+                                subject: `Your Crown Ceramic Coating agreement${invoices.length ? ' & invoice' + (invoices.length > 1 ? 's' : '') : ''} — ${agreement.agreement_number}`,
+                                html: `
+                                    <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:560px;">
+                                        <div style="background:#0a0a0a;padding:20px 24px;border-radius:10px 10px 0 0;">
+                                            <span style="color:#c9a14a;font-size:18px;font-weight:bold;letter-spacing:1px;">CROWN CERAMIC COATING</span>
+                                        </div>
+                                        <div style="border:1px solid #eee;border-top:none;padding:24px;border-radius:0 0 10px 10px;">
+                                            <p>Hi ${customer_name || 'there'},</p>
+                                            <p>Thank you for choosing Crown Ceramic Coating. Your sales agreement
+                                            <strong>${agreement.agreement_number}</strong> for
+                                            <strong>${crownServiceLabel(service_type)}${package_name ? ' — ' + package_name : ''}</strong>
+                                            is attached.</p>
+                                            ${payLine}
+                                            ${leadRow && leadRow.is_customer ? '<p>You can also view and pay your invoice(s) anytime from your client portal.</p>' : ''}
+                                            <p>If you have any questions, just reply to this email or call us at (940) 217-8680.</p>
+                                            <p style="margin-top:22px;">— The Crown Ceramic Coating Team</p>
+                                        </div>
+                                    </div>`,
+                                attachments
+                            });
+                        }
+                    } catch (bgErr) {
+                        console.error('[SALES-AGREEMENT] background processing error:', bgErr.message);
+                    }
+                })();
             } catch (e) {
                 console.error('[SALES-AGREEMENT] create error:', e.message);
                 res.status(500).json({ success: false, message: 'Could not create agreement.' });
@@ -25377,7 +25453,7 @@ app.post('/api/public/schedule', async (req, res) => {
         // Update fields / status.
         app.patch('/api/sales-agreements/:id', authenticateToken, async (req, res) => {
             try {
-                const allowed = ['lead_id','service_type','package_name','vehicle','price','deposit','start_date','status','terms','notes'];
+                const allowed = ['lead_id','service_type','package_name','vehicle','price','deposit','start_date','status','terms','notes','require_deposit','deposit_pct'];
                 const sets = [], vals = [];
                 let i = 1;
                 for (const k of allowed) {
@@ -25399,16 +25475,39 @@ app.post('/api/public/schedule', async (req, res) => {
                 const r = await pool.query(
                     `UPDATE sales_agreements SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`, vals);
                 if (r.rows.length === 0) return res.status(404).json({ success: false, message: 'Agreement not found.' });
-                res.json({ success: true, agreement: r.rows[0] });
+                const agr = r.rows[0];
+
+                // If the agreement was cancelled, remove its invoice(s) immediately so the
+                // customer's account/dashboard no longer shows anything owed for it.
+                if (String((req.body && req.body.status) || '').toLowerCase() === 'cancelled') {
+                    const ids = [agr.invoice_id, agr.balance_invoice_id].filter(Boolean);
+                    if (ids.length) {
+                        // Mark cancelled first (so it drops off "owed" even if a delete is ever blocked),
+                        // then delete. invoice_items cascade; expenses.invoice_id is set null automatically.
+                        await pool.query(`UPDATE invoices SET status = 'cancelled' WHERE id = ANY($1::int[])`, [ids]).catch(() => {});
+                        await pool.query(`DELETE FROM invoices WHERE id = ANY($1::int[])`, [ids])
+                            .catch(e => console.warn('[SALES-AGREEMENT] cancel invoice cleanup:', e.message));
+                        await pool.query('UPDATE sales_agreements SET invoice_id = NULL, balance_invoice_id = NULL WHERE id = $1', [agr.id]).catch(() => {});
+                        agr.invoice_id = null; agr.balance_invoice_id = null;
+                    }
+                }
+                res.json({ success: true, agreement: agr });
             } catch (e) {
                 console.error('[SALES-AGREEMENT] update error:', e.message);
                 res.status(500).json({ success: false, message: 'Could not update agreement.' });
             }
         });
 
-        // Delete.
+        // Delete (also removes any invoices created from this agreement).
         app.delete('/api/sales-agreements/:id', authenticateToken, async (req, res) => {
             try {
+                const agr = (await pool.query('SELECT invoice_id, balance_invoice_id FROM sales_agreements WHERE id = $1', [req.params.id])).rows[0];
+                if (agr) {
+                    const ids = [agr.invoice_id, agr.balance_invoice_id].filter(Boolean);
+                    if (ids.length) {
+                        await pool.query(`DELETE FROM invoices WHERE id = ANY($1::int[])`, [ids]).catch(() => {});
+                    }
+                }
                 await pool.query('DELETE FROM sales_agreements WHERE id = $1', [req.params.id]);
                 res.json({ success: true });
             } catch (e) {

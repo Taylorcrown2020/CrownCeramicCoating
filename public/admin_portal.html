@@ -21494,6 +21494,101 @@ async function renderSalesAgreements(content) {
         </div>`;
 }
 
+const SA_SERVICE_TERMS = {
+    ceramic_coating: 'Scope: Professional ceramic coating application including a thorough wash, decontamination, and surface preparation, followed by the coating per the selected package. Paint correction, if required, is quoted separately. The coating needs a 12–24 hour cure window during which the vehicle must be kept dry. Coating warranty is provided per the selected package. Final price may vary with vehicle size and paint condition.',
+    paint_correction: 'Scope: Multi-step paint correction — wash, decontamination, and machine polishing — to reduce or remove swirls, scratches, oxidation, and water spots to the agreed level. Because results depend on paint thickness and condition, not all defects can be safely removed. Final price may vary with vehicle size and paint condition.',
+    interior_detailing: 'Scope: Interior detailing per the selected package, including vacuum, surface cleaning, and conditioning of applicable surfaces. Excessive staining, pet hair, odor, or biohazard cleanup may incur an additional charge, quoted before any extra work begins. Final price may vary with vehicle size and condition.'
+};
+// Preset "what's performed" detail per package — auto-fills so you never type it.
+const SA_PACKAGE_TERMS = {
+    'Crown Essential — Single-Layer Ceramic (1 yr)':
+`Crown Essential — Single-Layer Ceramic Coating (1-year protection)
+What's included:
+• Hand wash and full chemical decontamination
+• Iron/fallout removal and clay treatment
+• One layer of professional ceramic coating on the painted panels
+• Hydrophobic, UV- and chemical-resistant protection
+Note: Paint correction (swirl/scratch removal) is quoted separately if needed. Coating requires a 12–24 hour cure window during which the vehicle must stay dry.`,
+    'Crown Signature — Multi-Layer Ceramic (3 yr)':
+`Crown Signature — Multi-Layer Ceramic Coating (3-year protection)
+What's included:
+• Hand wash and full chemical decontamination
+• Iron/fallout removal and clay treatment
+• Light gloss-enhancement polish
+• Multiple layers of professional ceramic coating on the painted panels
+• Coating applied to wheel faces and exterior glass
+• Hydrophobic, UV- and chemical-resistant protection
+Note: Heavy paint correction is quoted separately. 12–24 hour cure window; keep the vehicle dry.`,
+    'Crown Concours — Elite Ceramic (5+ yr)':
+`Crown Concours — Elite Ceramic Coating (5+ year protection)
+What's included:
+• Hand wash and full multi-stage decontamination (iron, clay, tar)
+• Paint prep polishing for maximum bonding and clarity
+• Multiple layers of our top-tier ceramic coating
+• Coating applied to paint, wheel faces, glass, and exterior trim
+• Maximum gloss, slickness, and long-term durability
+Note: Multi-stage correction for heavily defected paint may be quoted separately. 12–24 hour cure window; keep the vehicle dry.`,
+    'Gloss Enhancement — Single-Stage Polish':
+`Gloss Enhancement — Single-Stage Polish
+What's included:
+• Hand wash and chemical decontamination
+• Clay treatment
+• Single-stage machine polish to boost gloss and remove light swirls/marring
+Note: This is a one-step enhancement — deeper scratches may remain. Results depend on paint condition.`,
+    'Two-Stage Correction':
+`Two-Stage Paint Correction
+What's included:
+• Hand wash and full decontamination (iron, clay, tar)
+• Compounding stage to remove the majority of swirls, scratches, and oxidation
+• Refinement polishing stage for high clarity and gloss
+Note: Not all deep defects can be safely removed; correction level depends on paint thickness and condition.`,
+    'Multi-Stage Show Finish':
+`Multi-Stage Show Finish
+What's included:
+• Hand wash and full decontamination
+• Multiple compounding and polishing stages for a near-flawless, show-quality finish
+• Paint-depth checks throughout to protect the clear coat
+Note: Highest level of correction; results depend on paint thickness and condition.`,
+    'Maintenance Detail':
+`Maintenance Detail
+What's included:
+• Thorough vacuum of seats, carpets, and mats
+• Wipe-down of dash, console, and door panels
+• Interior glass cleaning
+• Light surface clean and refresh
+Note: Heavy staining, pet hair, or odor removal is quoted separately.`,
+    'Full Interior Detail':
+`Full Interior Detail
+What's included:
+• Deep vacuum of all surfaces, trunk, and crevices
+• Shampoo/extraction of carpets and cloth seats (or leather clean & condition)
+• Cleaning of all plastics, vinyl, and trim
+• Interior glass and detailed touchpoints
+Note: Excessive staining, pet hair, or biohazard cleanup is quoted before any extra work begins.`,
+    'Full Detail (In & Out)':
+`Full Detail (In & Out)
+What's included:
+• Complete Full Interior Detail (vacuum, shampoo/extraction, leather/plastic cleaning)
+• Exterior hand wash and chemical decontamination
+• Spray sealant or wax for added gloss and protection
+• Wheels, tires, and exterior glass cleaned
+Note: Paint correction and ceramic coating are separate services.`
+};
+// All preset strings, used to detect whether the terms box still holds an (overwritable) preset.
+const SA_ALL_PRESETS = Object.values(SA_SERVICE_TERMS).concat(Object.values(SA_PACKAGE_TERMS));
+// Fill the scope/terms box with the best preset (package-specific if chosen, else service),
+// unless the admin has typed their own custom text.
+function saApplyPreset() {
+    const termsEl = document.getElementById('saTerms');
+    if (!termsEl) return;
+    const cur = (termsEl.value || '').trim();
+    const isPreset = cur === '' || SA_ALL_PRESETS.some(t => t.trim() === cur);
+    if (!isPreset) return; // admin customised it — leave alone
+    const st = document.getElementById('saServiceType') && document.getElementById('saServiceType').value;
+    const pkg = document.getElementById('saPackage') && document.getElementById('saPackage').value;
+    if (pkg && SA_PACKAGE_TERMS[pkg]) termsEl.value = SA_PACKAGE_TERMS[pkg];
+    else if (st && SA_SERVICE_TERMS[st]) termsEl.value = SA_SERVICE_TERMS[st];
+}
 function saPackageOptions(serviceType, selected) {
     const list = (SA_SERVICES[serviceType] && SA_SERVICES[serviceType].packages) || [];
     return ['<option value="">Select a package…</option>'].concat(
@@ -21508,16 +21603,102 @@ function saPackageOptions(serviceType, selected) {
 function saOnServiceChange() {
     const st = document.getElementById('saServiceType').value;
     document.getElementById('saPackage').innerHTML = saPackageOptions(st, '');
+    saApplyPreset();
     saSyncPrice();
 }
-// When a package is chosen, suggest its price (admin can still edit the final amount).
+// When a package is chosen, suggest its price + fill its preset scope (admin can still edit).
 function saSyncPrice() {
     const sel = document.getElementById('saPackage');
     const priceEl = document.getElementById('saPrice');
-    if (!sel || !priceEl) return;
-    const opt = sel.options[sel.selectedIndex];
-    const price = opt && opt.getAttribute('data-price');
-    if (price) priceEl.value = Number(price).toFixed(2);
+    if (sel && priceEl) {
+        const opt = sel.options[sel.selectedIndex];
+        const price = opt && opt.getAttribute('data-price');
+        if (price) priceEl.value = Number(price).toFixed(2);
+    }
+    saApplyPreset();
+    saSyncDeposit();
+}
+function saToggleDeposit() {
+    const reqEl = document.getElementById('saRequireDeposit');
+    const row = document.getElementById('saDepRow');
+    if (row) row.style.display = (reqEl && reqEl.checked) ? 'grid' : 'none';
+    saSyncDeposit();
+}
+// Show the live down-payment / balance split.
+function saSyncDeposit() {
+    const calc = document.getElementById('saDepCalc');
+    if (!calc) return;
+    const reqEl = document.getElementById('saRequireDeposit');
+    if (!(reqEl && reqEl.checked)) { calc.innerHTML = ''; return; }
+    const price = parseFloat(document.getElementById('saPrice') && document.getElementById('saPrice').value) || 0;
+    const pctEl = document.getElementById('saDepositPct');
+    const pct = Math.min(Math.max(parseFloat(pctEl && pctEl.value) || 0, 0), 100);
+    const dep = Math.round(price * pct) / 100;
+    const bal = Math.round((price - dep) * 100) / 100;
+    const fmt = n => '$' + (n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    calc.innerHTML = `Down payment now: <strong style="color:#c9a14a;">${fmt(dep)}</strong><br>Balance due on completion: <strong>${fmt(bal)}</strong>`;
+}
+
+// Live, formatted preview of the agreement from the current form values (mirrors the PDF).
+function saPreviewAgreement() {
+    const fmt = n => '$' + (Number(n) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const g = id => document.getElementById(id);
+    const st = g('saServiceType').value;
+    const serviceLabel = (SA_SERVICES[st] && SA_SERVICES[st].label) || st || '—';
+    const pkg = g('saPackage').value || '—';
+    const vehicle = g('saVehicle').value.trim() || '—';
+    const price = parseFloat(g('saPrice').value) || 0;
+    const start = g('saStart').value;
+    const startTxt = start ? new Date(start + 'T12:00:00').toLocaleDateString('en-US') : 'To be scheduled';
+    const reqDep = !!(g('saRequireDeposit') && g('saRequireDeposit').checked);
+    const pct = reqDep ? Math.min(Math.max(parseFloat(g('saDepositPct').value) || 0, 0), 100) : 0;
+    const dep = reqDep ? Math.round(price * pct) / 100 : 0;
+    const bal = Math.round((price - dep) * 100) / 100;
+    const terms = (g('saTerms').value || '').trim();
+    const leadSel = g('saLeadId');
+    const clientTxt = (leadSel && leadSel.selectedIndex > 0) ? leadSel.options[leadSel.selectedIndex].textContent.trim() : 'Unassigned';
+    const payClause = reqDep
+        ? `A down payment of ${pct}% (${fmt(dep)}) is due upon signing this agreement to reserve your service. The remaining balance of ${fmt(bal)} is due upon completion of the service.`
+        : `The full amount of ${fmt(price)} is due upon completion of the service.`;
+    const row = (k, v) => `<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid #eee;"><div style="min-width:150px;color:#666;font-weight:600;">${k}</div><div style="color:#111;">${v}</div></div>`;
+    const esc = s => saEsc(s);
+    const html = `
+      <div style="background:#fff;color:#1a1a1a;border-radius:12px;max-width:640px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+        <div style="background:#0a0a0a;padding:22px 26px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:flex-start;">
+           <div><div style="color:#c9a14a;font-size:18px;font-weight:800;letter-spacing:1px;">CROWN CERAMIC COATING</div>
+           <div style="color:#cfc6b4;font-size:11px;margin-top:3px;">Ceramic Coating • Paint Correction • Detailing — Rockwall &amp; Dallas, TX</div></div>
+           <button onclick="closeSalesAgreementPreview()" style="background:none;border:none;color:#bbb;font-size:26px;cursor:pointer;line-height:1;">&times;</button>
+        </div>
+        <div style="padding:26px;">
+           <h2 style="text-align:center;font-family:'Playfair Display',Georgia,serif;margin:0 0 4px;color:#111;">Sales Agreement</h2>
+           <p style="text-align:center;color:#999;font-size:12px;margin:0 0 20px;">Preview — this agreement has not been created yet</p>
+           ${row('Customer', esc(clientTxt))}
+           ${row('Service', esc(serviceLabel))}
+           ${row('Package', esc(pkg))}
+           ${row('Vehicle', esc(vehicle))}
+           ${row('Start date', esc(startTxt))}
+           ${row('Total price', fmt(price))}
+           ${reqDep ? row('Down payment', pct + '% — ' + fmt(dep) + ' (due at signing)') : ''}
+           ${reqDep ? row('Balance on completion', fmt(bal)) : ''}
+           <h3 style="margin:20px 0 6px;font-size:15px;color:#111;">Payment Terms</h3>
+           <p style="color:#444;font-size:13px;line-height:1.6;margin:0;">${esc(payClause)}</p>
+           <h3 style="margin:20px 0 6px;font-size:15px;color:#111;">Services Performed</h3>
+           <div style="color:#444;font-size:13px;line-height:1.6;white-space:pre-wrap;">${terms ? esc(terms) : '<span style="color:#aaa;">Select a service &amp; package and this fills in automatically.</span>'}</div>
+           <p style="margin-top:26px;color:#555;font-size:12px;">Authorized signature: ______________________________&nbsp;&nbsp;&nbsp;Date: ____________</p>
+           <div style="text-align:right;margin-top:18px;">
+             <button class="btn btn-secondary" onclick="closeSalesAgreementPreview()" style="padding:8px 16px;">Close preview</button>
+           </div>
+        </div>
+      </div>`;
+    let ov = document.getElementById('saPreviewOverlay');
+    if (!ov) { ov = document.createElement('div'); ov.id = 'saPreviewOverlay'; document.body.appendChild(ov); }
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+    ov.onclick = (ev) => { if (ev.target === ov) closeSalesAgreementPreview(); };
+    ov.innerHTML = html;
+}
+function closeSalesAgreementPreview() {
+    const o = document.getElementById('saPreviewOverlay');
+    if (o) o.remove();
 }
 
 async function openSalesAgreementModal(id) {
@@ -21572,18 +21753,27 @@ async function openSalesAgreementModal(id) {
                     <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Vehicle (year / make / model)</label>
                     <input id="saVehicle" value="${saEsc(e.vehicle || '')}" placeholder="e.g. 2022 Tesla Model 3" style="width:100%;padding:10px;border-radius:8px;">
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
                     <div>
-                        <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Price ($)</label>
-                        <input id="saPrice" type="number" step="0.01" value="${e.price != null ? e.price : ''}" style="width:100%;padding:10px;border-radius:8px;">
-                    </div>
-                    <div>
-                        <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Deposit ($)</label>
-                        <input id="saDeposit" type="number" step="0.01" value="${e.deposit != null ? e.deposit : ''}" style="width:100%;padding:10px;border-radius:8px;">
+                        <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Total price ($)</label>
+                        <input id="saPrice" type="number" step="0.01" value="${e.price != null ? e.price : ''}" oninput="saSyncDeposit()" style="width:100%;padding:10px;border-radius:8px;">
                     </div>
                     <div>
                         <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Start date</label>
                         <input id="saStart" type="date" value="${e.start_date ? String(e.start_date).split('T')[0] : ''}" style="width:100%;padding:10px;border-radius:8px;">
+                    </div>
+                </div>
+                <div style="background:rgba(201,161,74,0.06);border:1px solid rgba(201,161,74,0.22);border-radius:10px;padding:14px 16px;">
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:600;">
+                        <input type="checkbox" id="saRequireDeposit" onchange="saToggleDeposit()" ${e.require_deposit ? 'checked' : ''} style="width:16px;height:16px;cursor:pointer;">
+                        Require a down payment toward the total
+                    </label>
+                    <div id="saDepRow" style="display:${e.require_deposit ? 'grid' : 'none'};grid-template-columns:150px 1fr;gap:14px;align-items:center;margin-top:12px;">
+                        <div>
+                            <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Down payment %</label>
+                            <input id="saDepositPct" type="number" min="0" max="100" step="1" value="${e.deposit_pct != null && e.deposit_pct !== 0 ? e.deposit_pct : 50}" oninput="saSyncDeposit()" style="width:100%;padding:10px;border-radius:8px;">
+                        </div>
+                        <div id="saDepCalc" style="font-size:13px;line-height:1.6;color:var(--text-muted,#bbb);"></div>
                     </div>
                 </div>
                 <div>
@@ -21591,8 +21781,8 @@ async function openSalesAgreementModal(id) {
                     <select id="saStatus" style="width:100%;padding:10px;border-radius:8px;">${statusOpts}</select>
                 </div>
                 <div>
-                    <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Scope / terms</label>
-                    <textarea id="saTerms" rows="3" placeholder="What's included, prep required, cure time, warranty terms…" style="width:100%;padding:10px;border-radius:8px;">${saEsc(e.terms || '')}</textarea>
+                    <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Services performed <span style="color:var(--text-muted,#888);font-weight:400;">(preset — auto-fills from the package; edit only if you need to)</span></label>
+                    <textarea id="saTerms" rows="9" placeholder="Pick a service & package and this fills in automatically…" style="width:100%;padding:10px;border-radius:8px;font-size:13px;line-height:1.5;">${saEsc(e.terms || '')}</textarea>
                 </div>
                 <div>
                     <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Internal notes</label>
@@ -21604,10 +21794,13 @@ async function openSalesAgreementModal(id) {
             </div>`}
             <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:22px;">
                 <button class="btn btn-secondary" onclick="closeSalesAgreementModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="saPreviewAgreement()">👁 Preview</button>
                 <button class="btn btn-primary" id="saSaveBtn" onclick="saveSalesAgreement()">${editing ? 'Save Changes' : 'Create Agreement'}</button>
             </div>
         </div>`;
     document.body.appendChild(overlay);
+    saApplyPreset();
+    saSyncDeposit();
 }
 function closeSalesAgreementModal() {
     const o = document.getElementById('saModalOverlay');
@@ -21623,7 +21816,8 @@ async function saveSalesAgreement() {
         package_name: document.getElementById('saPackage').value,
         vehicle: document.getElementById('saVehicle').value.trim(),
         price: parseFloat(document.getElementById('saPrice').value) || 0,
-        deposit: parseFloat(document.getElementById('saDeposit').value) || 0,
+        require_deposit: !!(document.getElementById('saRequireDeposit') && document.getElementById('saRequireDeposit').checked),
+        deposit_pct: parseFloat(document.getElementById('saDepositPct') && document.getElementById('saDepositPct').value) || 0,
         start_date: document.getElementById('saStart').value || null,
         status: document.getElementById('saStatus').value,
         terms: document.getElementById('saTerms').value.trim(),
@@ -21642,9 +21836,10 @@ async function saveSalesAgreement() {
             showToast('Sales agreement updated.', 'success');
         } else {
             const a = data.automation || {};
+            const two = (a.invoiceCount || 0) === 2;
             let msg = 'Sales agreement created.';
-            if (a.invoice && a.emailed) msg += ' Invoice generated & emailed to the client.';
-            else if (a.invoice) msg += ' Invoice generated.';
+            if (a.invoice && a.emailed) msg += two ? ' Down-payment & balance invoices generated and emailed to the client.' : ' Invoice generated & emailed to the client.';
+            else if (a.invoice) msg += two ? ' Down-payment & balance invoices generated.' : ' Invoice generated.';
             else if (a.emailed) msg += ' Emailed to the client.';
             showToast(msg, 'success');
         }
