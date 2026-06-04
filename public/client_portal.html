@@ -422,12 +422,17 @@ function renderPayModal(){
     inner = `<div class="modal-body">${payStepsBar()}
       <h4 style="margin-bottom:6px;">Payment</h4>
       <div class="summary-line total" style="border:none;margin:0;padding:6px 0 14px;"><span>Total</span><span>${money(b.total)}</span></div>
-      <div id="payment-element"></div>
-      <div id="payMsg" class="pay-msg"></div>
-      <div style="display:flex;gap:10px;margin-top:16px;">
-        <button class="btn btn-ghost" id="payBack" onclick="payGoto(2)">Back</button>
-        <button class="btn btn-primary" style="flex:1" id="payBtn" onclick="confirmPay()">Pay ${money(b.total)}</button></div>
-      ${!STRIPE_PK?`<p class="pay-msg" style="color:var(--amber)">Payments are not configured yet (missing Stripe key).</p>`:''}</div>`;
+      ${STRIPE ? `
+        <div id="payment-element" style="min-height:64px;"><div class="muted sm">Loading secure card form…</div></div>
+        <div id="payMsg" class="pay-msg"></div>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn btn-ghost" id="payBack" onclick="payGoto(2)">Back</button>
+          <button class="btn btn-primary" style="flex:1" id="payBtn" onclick="confirmPay()">Pay ${money(b.total)}</button></div>
+        <p class="muted sm" style="margin-top:10px;text-align:center;">Secured by Stripe · your card is entered directly with Stripe and never stored on our servers.</p>
+      ` : `
+        <div class="pay-msg" style="color:var(--amber)">Card payment isn't available right now. Please call us at (940) 217-8680 and we'll take your payment over the phone.</div>
+        <div style="margin-top:14px;"><button class="btn btn-ghost" onclick="payGoto(2)">Back</button></div>
+      `}</div>`;
   } else if(payState.step==='done'){
     inner = `<div class="modal-body" style="text-align:center;padding:40px 24px;">
       <div style="width:60px;height:60px;border-radius:50%;background:rgba(67,185,127,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
@@ -444,30 +449,58 @@ function renderPayModal(){
 
 async function payGoto(step){
   if(step===3){
-    // create / fetch payment intent before showing card form
+    // Capture billing details entered in step 2 (used for the Stripe receipt + our records).
+    payState.billing = {
+      name:  (document.getElementById('bName')||{}).value || (CLIENT&&CLIENT.name)  || '',
+      email: (document.getElementById('bEmail')||{}).value || (CLIENT&&CLIENT.email) || '',
+      phone: (document.getElementById('bPhone')||{}).value || '',
+      address: (document.getElementById('bAddr')||{}).value || '',
+      city: (document.getElementById('bCity')||{}).value || '',
+      zip:  (document.getElementById('bZip')||{}).value || ''
+    };
+    // create / fetch payment intent before showing the card form
     try{
       const r = await fetch(API+`/api/client/invoices/${payState.invoiceId}/payment-intent`,{method:'POST',headers:authHeaders(),body:'{}'});
       const d = await r.json();
       if(!d.success){ alert(d.message||'Could not start payment.'); return; }
       payState.clientSecret = d.clientSecret; payState.breakdown = d.breakdown||payState.breakdown; payState.mounted=false;
+      // Robustly initialize Stripe from the key returned here, in case the initial
+      // config load missed it or raced — so the card form always renders when keys exist.
+      if(!STRIPE && d.publishableKey && window.Stripe){ STRIPE_PK = d.publishableKey; STRIPE = Stripe(STRIPE_PK); }
     }catch(e){ alert('Could not start payment.'); return; }
   }
   payState.step = step; renderPayModal();
 }
 function mountStripe(){
   if(!STRIPE || !payState.clientSecret) return;
-  payState.elements = STRIPE.elements({ clientSecret: payState.clientSecret, appearance:{ theme:'night', variables:{ colorPrimary:'#f4c87e' } } });
-  const pe = payState.elements.create('payment'); pe.mount('#payment-element'); payState.mounted = true;
+  const bil = payState.billing || {};
+  payState.elements = STRIPE.elements({ clientSecret: payState.clientSecret, appearance:{ theme:'night', variables:{ colorPrimary:'#f4c87e', colorBackground:'#141414', colorText:'#f4f1ea' } } });
+  const pe = payState.elements.create('payment', {
+    layout: 'tabs',
+    defaultValues: { billingDetails: {
+      name: bil.name||'', email: bil.email||'', phone: bil.phone||'',
+      address: { line1: bil.address||'', city: bil.city||'', postal_code: bil.zip||'', country: 'US' }
+    } }
+  });
+  const el = document.getElementById('payment-element'); if(el) el.innerHTML='';
+  pe.mount('#payment-element'); payState.mounted = true;
+  pe.on('ready', ()=>{ payState.mounted = true; });
 }
 async function confirmPay(){
   const msg = document.getElementById('payMsg'); const btn = document.getElementById('payBtn');
-  if(!STRIPE || !payState.elements){ msg.textContent='Payments are not available right now.'; return; }
-  btn.disabled=true; btn.textContent='Processing…'; msg.textContent='';
-  const { error, paymentIntent } = await STRIPE.confirmPayment({ elements: payState.elements, redirect:'if_required' });
-  if(error){ msg.style.color='var(--red)'; msg.textContent = error.message || 'Payment failed.'; btn.disabled=false; btn.textContent='Pay '+money(payState.breakdown.total); return; }
+  if(!STRIPE || !payState.elements){ if(msg) msg.textContent='Payments are not available right now.'; return; }
+  btn.disabled=true; btn.textContent='Processing…'; if(msg){ msg.style.color=''; msg.textContent=''; }
+  // Confirm the card payment inside the modal. redirect:'if_required' keeps the customer
+  // here (only redirects for methods that strictly need it, e.g. 3-D Secure) — never Stripe Checkout.
+  const { error, paymentIntent } = await STRIPE.confirmPayment({
+    elements: payState.elements,
+    confirmParams: { return_url: window.location.href },
+    redirect: 'if_required'
+  });
+  if(error){ if(msg){ msg.style.color='var(--red)'; msg.textContent = error.message || 'Payment failed. Please check your card details.'; } btn.disabled=false; btn.textContent='Pay '+money(payState.breakdown.total); return; }
   if(paymentIntent && (paymentIntent.status==='succeeded' || paymentIntent.status==='processing')){
     payState.step='done'; renderPayModal();
-  } else { msg.textContent='Payment could not be completed.'; btn.disabled=false; btn.textContent='Pay '+money(payState.breakdown.total); }
+  } else { if(msg) msg.textContent='Payment could not be completed.'; btn.disabled=false; btn.textContent='Pay '+money(payState.breakdown.total); }
 }
 async function afterPaid(){ closePay(); await loadDashboard(); nav('invoices'); }
 

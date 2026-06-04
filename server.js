@@ -24658,24 +24658,43 @@ const DEFAULT_TAX_RATE = parseFloat(process.env.SALES_TAX_RATE     || '8.25'); /
 // so the business receives the full invoice total after Stripe's cut.
 function buildCheckoutBreakdown(invoice) {
     const subtotal = Number(invoice.subtotal || 0);
+    const discount = Number(invoice.discount_amount || 0);
     let taxAmount  = Number(invoice.tax_amount || 0);
     let base       = Number(invoice.total_amount || 0);
+
+    // Normalize the stored tax rate to a percentage for display
+    // (some invoices stored it as a fraction, e.g. 0.0825 instead of 8.25).
+    let taxRatePct = Number(invoice.tax_rate || 0);
+    if (taxRatePct > 0 && taxRatePct < 1) taxRatePct = taxRatePct * 100;
+    if (!taxRatePct) taxRatePct = DEFAULT_TAX_RATE;
 
     // If the invoice was created without tax but a tax rate is configured, apply it.
     if (taxAmount === 0 && DEFAULT_TAX_RATE > 0 && subtotal > 0 && base <= subtotal + 0.001) {
         taxAmount = +(subtotal * (DEFAULT_TAX_RATE / 100)).toFixed(2);
-        base = +(subtotal + taxAmount - Number(invoice.discount_amount || 0)).toFixed(2);
+        base = +(subtotal + taxAmount - discount).toFixed(2);
     }
 
-    // Gross-up the processing fee so net to merchant == base.
-    const grand = +(((base + CARD_FEE_FIXED) / (1 - CARD_FEE_PERCENT))).toFixed(2);
-    const processingFee = +(grand - base).toFixed(2);
+    // Does the invoice total already include a card processing fee?
+    // Sales-agreement invoices bake subtotal + tax + fee into total_amount, so we must
+    // NOT gross-up a second fee on top — charge the invoice total exactly as it stands.
+    const itemsBeforeFee = +(subtotal + taxAmount - discount).toFixed(2);
+    const feeAlreadyIncluded = base > itemsBeforeFee + 0.01;
+
+    let processingFee, grand;
+    if (feeAlreadyIncluded) {
+        processingFee = +(base - itemsBeforeFee).toFixed(2);
+        grand = +base.toFixed(2);
+    } else {
+        // Gross-up a card processing fee so the merchant nets the full invoice total.
+        grand = +(((base + CARD_FEE_FIXED) / (1 - CARD_FEE_PERCENT))).toFixed(2);
+        processingFee = +(grand - base).toFixed(2);
+    }
 
     return {
         subtotal: +subtotal.toFixed(2),
         tax: +taxAmount.toFixed(2),
-        taxRate: Number(invoice.tax_rate || DEFAULT_TAX_RATE),
-        discount: +Number(invoice.discount_amount || 0).toFixed(2),
+        taxRate: +taxRatePct.toFixed(2),
+        discount: +discount.toFixed(2),
         invoiceTotal: +base.toFixed(2),
         processingFee,
         total: grand,
@@ -25366,7 +25385,7 @@ app.post('/api/public/schedule', async (req, res) => {
                             (invoice_number, lead_id, issue_date, due_date, subtotal, tax_rate, tax_amount,
                              discount_amount, total_amount, status, short_description, notes, created_by)
                          VALUES ($1,$2,$3,$4,$5,$6,$7,0,$8,'sent',$9,$10,$11) RETURNING *`,
-                        [invoice_number, lead_id, new Date(), dueDate, subtotal, CROWN_TAX_RATE, tax, total,
+                        [invoice_number, lead_id, new Date(), dueDate, subtotal, CROWN_TAX_RATE * 100, tax, total,
                          String(shortDesc).slice(0, 255), noteText, (req.user && req.user.id) || null]);
                     const inv = invRes.rows[0];
                     await pool.query(
