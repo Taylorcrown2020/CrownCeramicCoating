@@ -7371,7 +7371,7 @@ CROWN CERAMIC COATING`
         category: 'billing',
         body: `Hi {{clientName}},
 
-This is a friendly reminder that invoice {{invoiceNumber}} for ${{amount}} is due on {{dueDate}}.
+This is a friendly reminder that invoice {{invoiceNumber}} for \${{amount}} is due on {{dueDate}}.
 
 You can view and pay your invoice here: {{paymentLink}}
 
@@ -19899,15 +19899,8 @@ function renderLeadNotes(notes) {
 
 // In your follow-up rendering code (e.g., inside the loop that renders leads in categories), add notes display.
 // Assuming you have a function like renderCategoryLeads(category):
-// Append this to each lead's HTML:
-`
-<div class="notes-section" style="margin-top: 12px;">
-    <button onclick="toggleNotes(this)" class="btn btn-secondary btn-sm">View Notes</button>
-    <div class="notes-content" style="display: none; margin-top: 12px;">
-        ${renderLeadNotes(lead.notes)}
-    </div>
-</div>
-`
+// (Removed an orphaned template-literal snippet here that executed at load and threw
+//  "lead is not defined", which halted the rest of this script.)
 
 // Add toggle function
 function toggleNotes(button) {
@@ -21424,28 +21417,25 @@ const SA_SERVICES = {
     ceramic_coating: {
         label: 'Ceramic Coating',
         packages: [
-            'Entry Ceramic — 1 Year Protection',
-            'Premium Ceramic — 3 Year Protection',
-            'Elite Ceramic — 5 Year Protection',
-            'Signature Ceramic — 7+ Year / Multi-Layer'
+            { name: 'Crown Essential — Single-Layer Ceramic (1 yr)', price: 199.99 },
+            { name: 'Crown Signature — Multi-Layer Ceramic (3 yr)', price: 349.99 },
+            { name: 'Crown Concours — Elite Ceramic (5+ yr)', price: 499.99 }
+        ]
+    },
+    paint_correction: {
+        label: 'Paint Correction',
+        packages: [
+            { name: 'Gloss Enhancement — Single-Stage Polish', price: 799.99 },
+            { name: 'Two-Stage Correction', price: 999.99 },
+            { name: 'Multi-Stage Show Finish', price: 1299.99 }
         ]
     },
     interior_detailing: {
         label: 'Interior Detailing',
         packages: [
-            'Standard Interior Detail',
-            'Deep Interior Detail & Sanitize',
-            'Full Interior Restoration',
-            'Leather Clean & Condition Add-On'
-        ]
-    },
-    polishing: {
-        label: 'Polishing / Paint Correction',
-        packages: [
-            'Single-Stage Polish (Gloss Enhancement)',
-            'Two-Stage Paint Correction',
-            'Multi-Stage Show-Car Correction',
-            'Wheel & Trim Polish Add-On'
+            { name: 'Maintenance Detail', price: 99.99 },
+            { name: 'Full Interior Detail', price: 199.99 },
+            { name: 'Full Detail (In & Out)', price: 299.99 }
         ]
     }
 };
@@ -21459,13 +21449,16 @@ function saEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').rep
 async function renderSalesAgreements(content) {
     const token = getAuthToken();
     content.innerHTML = `<div style="padding:24px;color:var(--text-muted);">Loading sales agreements…</div>`;
+    let warning = '';
     try {
         const res = await fetch(`${API_URL}/api/sales-agreements`, { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        SA_CACHE = (data && data.agreements) || [];
+        let data = {};
+        try { data = await res.json(); } catch (_) { data = {}; }
+        SA_CACHE = (data && Array.isArray(data.agreements)) ? data.agreements : [];
+        if (!res.ok && !(data && data.agreements)) warning = (data && data.message) || '';
     } catch (e) {
-        content.innerHTML = `<div style="padding:24px;color:#e25;">Failed to load sales agreements.</div>`;
-        return;
+        // Don't show a dead-end error — render the (empty) UI so "New Sales Agreement" still works.
+        SA_CACHE = [];
     }
     const rows = SA_CACHE.map(a => {
         const created = a.created_at ? new Date(a.created_at).toLocaleDateString() : '';
@@ -21504,12 +21497,27 @@ async function renderSalesAgreements(content) {
 function saPackageOptions(serviceType, selected) {
     const list = (SA_SERVICES[serviceType] && SA_SERVICES[serviceType].packages) || [];
     return ['<option value="">Select a package…</option>'].concat(
-        list.map(p => `<option value="${saEsc(p)}" ${p === selected ? 'selected' : ''}>${saEsc(p)}</option>`)
+        list.map(p => {
+            const name = (typeof p === 'string') ? p : p.name;
+            const price = (typeof p === 'string') ? '' : p.price;
+            const label = price ? `${name} — $${Number(price).toFixed(2)}` : name;
+            return `<option value="${saEsc(name)}" data-price="${price}" ${name === selected ? 'selected' : ''}>${saEsc(label)}</option>`;
+        })
     ).join('');
 }
 function saOnServiceChange() {
     const st = document.getElementById('saServiceType').value;
     document.getElementById('saPackage').innerHTML = saPackageOptions(st, '');
+    saSyncPrice();
+}
+// When a package is chosen, suggest its price (admin can still edit the final amount).
+function saSyncPrice() {
+    const sel = document.getElementById('saPackage');
+    const priceEl = document.getElementById('saPrice');
+    if (!sel || !priceEl) return;
+    const opt = sel.options[sel.selectedIndex];
+    const price = opt && opt.getAttribute('data-price');
+    if (price) priceEl.value = Number(price).toFixed(2);
 }
 
 async function openSalesAgreementModal(id) {
@@ -21557,7 +21565,7 @@ async function openSalesAgreementModal(id) {
                     </div>
                     <div>
                         <label style="display:block;font-size:13px;margin-bottom:6px;color:var(--text-muted,#aaa);">Package</label>
-                        <select id="saPackage" style="width:100%;padding:10px;border-radius:8px;">${saPackageOptions(e.service_type, e.package_name)}</select>
+                        <select id="saPackage" onchange="saSyncPrice()" style="width:100%;padding:10px;border-radius:8px;">${saPackageOptions(e.service_type, e.package_name)}</select>
                     </div>
                 </div>
                 <div>
@@ -21591,6 +21599,9 @@ async function openSalesAgreementModal(id) {
                     <textarea id="saNotes" rows="2" style="width:100%;padding:10px;border-radius:8px;">${saEsc(e.notes || '')}</textarea>
                 </div>
             </div>
+            ${editing ? '' : `<div style="margin-top:14px;font-size:12.5px;color:var(--text-muted,#9a9a9a);background:rgba(201,161,74,0.08);border:1px solid rgba(201,161,74,0.28);border-radius:8px;padding:10px 12px;">
+                On <strong>create</strong>, an invoice for the price above is generated automatically, emailed to the client with this agreement attached, and added to their account log${''} & client portal.
+            </div>`}
             <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:22px;">
                 <button class="btn btn-secondary" onclick="closeSalesAgreementModal()">Cancel</button>
                 <button class="btn btn-primary" id="saSaveBtn" onclick="saveSalesAgreement()">${editing ? 'Save Changes' : 'Create Agreement'}</button>
@@ -21627,7 +21638,16 @@ async function saveSalesAgreement() {
         const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(body) });
         const data = await res.json();
         if (!data.success) { showToast(data.message || 'Could not save agreement.', 'error'); if (btn) { btn.disabled = false; btn.textContent = id ? 'Save Changes' : 'Create Agreement'; } return; }
-        showToast(id ? 'Sales agreement updated.' : 'Sales agreement created.', 'success');
+        if (id) {
+            showToast('Sales agreement updated.', 'success');
+        } else {
+            const a = data.automation || {};
+            let msg = 'Sales agreement created.';
+            if (a.invoice && a.emailed) msg += ' Invoice generated & emailed to the client.';
+            else if (a.invoice) msg += ' Invoice generated.';
+            else if (a.emailed) msg += ' Emailed to the client.';
+            showToast(msg, 'success');
+        }
         closeSalesAgreementModal();
         renderSection('salesAgreements');
     } catch (e) {

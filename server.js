@@ -24742,6 +24742,10 @@ async function ensurePortalSchema() {
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`);
     await pool.query(`DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sales_agreements' AND column_name='invoice_id')
+        THEN ALTER TABLE sales_agreements ADD COLUMN invoice_id INTEGER; END IF;
+    END $$;`).catch(() => {});
+    await pool.query(`DO $$ BEGIN
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='invoices' AND column_name='stripe_payment_intent_id')
         THEN ALTER TABLE invoices ADD COLUMN stripe_payment_intent_id VARCHAR(255); END IF;
     END $$;`).catch(() => {});
@@ -25091,6 +25095,109 @@ app.post('/api/public/schedule', async (req, res) => {
         // SALES AGREEMENTS (Crown Ceramic Coating)
         // ========================================
 
+        // --- helpers for sales-agreement automation (invoice + PDFs + email + portal) ---
+        function crownServiceLabel(t) {
+            const m = { ceramic_coating: 'Ceramic Coating', paint_correction: 'Paint Correction', interior_detailing: 'Interior Detailing' };
+            return m[t] || (t ? String(t).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Service');
+        }
+        function crownMoney(n) {
+            return '$' + (parseFloat(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function crownPdfToBuffer(doc) {
+            return new Promise((resolve, reject) => {
+                const chunks = [];
+                doc.on('data', c => chunks.push(c));
+                doc.on('end', () => resolve(Buffer.concat(chunks)));
+                doc.on('error', reject);
+                doc.end();
+            });
+        }
+        async function crownAgreementPDFBuffer(a) {
+            const doc = new PDFDocument({ margin: 50, size: 'LETTER', info: { Title: 'Sales Agreement ' + (a.agreement_number || ''), Author: 'Crown Ceramic Coating' } });
+            doc.rect(0, 0, doc.page.width, 90).fill('#0a0a0a');
+            doc.fillColor('#c9a14a').fontSize(20).font('Helvetica-Bold').text('CROWN CERAMIC COATING', 50, 30);
+            doc.fillColor('#f4f1ea').fontSize(9).font('Helvetica').text('Ceramic Coating • Paint Correction • Detailing — Rockwall & Dallas, TX', 50, 56);
+            doc.fillColor('#000000'); doc.y = 120;
+            doc.fontSize(22).font('Helvetica-Bold').text('Sales Agreement', { align: 'center' });
+            doc.moveDown(0.2);
+            doc.fontSize(10).font('Helvetica').fillColor('#666666').text(a.agreement_number || '', { align: 'center' });
+            doc.fillColor('#000000'); doc.moveDown(1.2);
+            const rows = [
+                ['Customer', a.customer_name || '—'],
+                ['Email', a.customer_email || '—'],
+                ['Service', crownServiceLabel(a.service_type)],
+                ['Package', a.package_name || '—'],
+                ['Vehicle', a.vehicle || '—'],
+                ['Start date', a.start_date ? new Date(a.start_date).toLocaleDateString('en-US') : 'To be scheduled'],
+                ['Total price', crownMoney(a.price)],
+                ['Deposit', crownMoney(a.deposit)]
+            ];
+            doc.fontSize(11);
+            rows.forEach(([k, v]) => {
+                doc.font('Helvetica-Bold').fillColor('#444444').text(k + ': ', { continued: true });
+                doc.font('Helvetica').fillColor('#111111').text(String(v));
+                doc.moveDown(0.3);
+            });
+            doc.moveDown(0.5);
+            if (a.terms) {
+                doc.font('Helvetica-Bold').fontSize(12).fillColor('#000000').text('Scope / Terms');
+                doc.moveDown(0.2);
+                doc.font('Helvetica').fontSize(10).fillColor('#333333').text(String(a.terms), { align: 'left' });
+                doc.moveDown(0.8);
+            }
+            doc.font('Helvetica').fontSize(9).fillColor('#888888').text('Final pricing may vary with vehicle size and paint condition as discussed at consultation. Thank you for choosing Crown Ceramic Coating.', { align: 'left' });
+            doc.moveDown(2);
+            doc.fillColor('#000000').fontSize(10).text('Authorized signature: ______________________________      Date: ______________');
+            return crownPdfToBuffer(doc);
+        }
+        async function crownInvoicePDFBuffer(inv, lead, lineDesc) {
+            const doc = new PDFDocument({ margin: 50, size: 'LETTER', info: { Title: 'Invoice ' + (inv.invoice_number || ''), Author: 'Crown Ceramic Coating' } });
+            doc.rect(0, 0, doc.page.width, 90).fill('#0a0a0a');
+            doc.fillColor('#c9a14a').fontSize(20).font('Helvetica-Bold').text('CROWN CERAMIC COATING', 50, 30);
+            doc.fillColor('#f4f1ea').fontSize(9).font('Helvetica').text('Rockwall & Dallas, TX • (940) 217-8680', 50, 56);
+            doc.fillColor('#000000'); doc.y = 120;
+            doc.fontSize(22).font('Helvetica-Bold').text('Invoice', { align: 'center' }); doc.moveDown(0.2);
+            doc.fontSize(10).font('Helvetica').fillColor('#666666').text(inv.invoice_number || '', { align: 'center' });
+            doc.fillColor('#000000'); doc.moveDown(1);
+            doc.fontSize(10);
+            doc.font('Helvetica-Bold').text('Bill to: ', { continued: true }).font('Helvetica').text((lead && lead.name) || inv.customer_name || '—');
+            if (lead && lead.email) { doc.font('Helvetica').fillColor('#555555').text(lead.email); doc.fillColor('#000000'); }
+            doc.moveDown(0.4);
+            doc.font('Helvetica-Bold').text('Issue date: ', { continued: true }).font('Helvetica').text(new Date(inv.issue_date || Date.now()).toLocaleDateString('en-US'));
+            doc.font('Helvetica-Bold').text('Due date: ', { continued: true }).font('Helvetica').text(inv.due_date ? new Date(inv.due_date).toLocaleDateString('en-US') : 'On receipt');
+            doc.moveDown(1);
+            const x = 50, w = doc.page.width - 100; let y = doc.y;
+            doc.rect(x, y, w, 24).fill('#c9a14a');
+            doc.fillColor('#1a1a1a').font('Helvetica-Bold').fontSize(10);
+            doc.text('Description', x + 10, y + 7);
+            doc.text('Amount', x + w - 90, y + 7, { width: 80, align: 'right' });
+            y += 24;
+            doc.fillColor('#000000').font('Helvetica').fontSize(10);
+            doc.rect(x, y, w, 28).stroke('#e0e0e0');
+            doc.text(lineDesc || inv.short_description || 'Services', x + 10, y + 9, { width: w - 120 });
+            doc.text(crownMoney(inv.total_amount), x + w - 90, y + 9, { width: 80, align: 'right' });
+            y += 28;
+            doc.font('Helvetica-Bold').fontSize(13).fillColor('#000000').text('Total: ' + crownMoney(inv.total_amount), x, y + 16, { width: w, align: 'right' });
+            doc.moveDown(3);
+            doc.font('Helvetica').fontSize(9).fillColor('#888888').text('Please remit payment by the due date. Questions? Call (940) 217-8680. Thank you for your business!', 50);
+            return crownPdfToBuffer(doc);
+        }
+        async function crownStoreDocument({ leadId, buffer, filename, mime, documentType, description, userId }) {
+            const fs = require('fs'); const pathMod = require('path');
+            const dir = pathMod.join(__dirname, 'uploads', 'documents');
+            try { fs.mkdirSync(dir, { recursive: true }); } catch (_) {}
+            const safe = (filename || 'document.pdf').replace(/[^\w.\-]+/g, '_');
+            const stored = Date.now() + '-' + Math.floor(Math.random() * 1e6) + '-' + safe;
+            const full = pathMod.join(dir, stored);
+            fs.writeFileSync(full, buffer);
+            try { fs.chmodSync(full, 0o644); } catch (_) {}
+            const r = await pool.query(
+                `INSERT INTO documents (lead_id, filename, original_filename, file_path, file_size, mime_type, document_type, uploaded_by, description, created_at)
+                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,CURRENT_TIMESTAMP) RETURNING id`,
+                [leadId, stored, safe, full, buffer.length, mime || 'application/pdf', documentType || 'document', userId || null, description || null]);
+            return r.rows[0];
+        }
+
         // Lightweight client list for the "assign to" dropdown (leads + customers).
         app.get('/api/sales-agreement-clients', authenticateToken, async (req, res) => {
             try {
@@ -25143,28 +25250,124 @@ app.post('/api/public/schedule', async (req, res) => {
                         start_date, status, terms, notes } = req.body || {};
                 if (!service_type) return res.status(400).json({ success: false, message: 'A service type is required.' });
 
-                // Resolve the assigned customer's name/email snapshot.
-                let customer_name = null, customer_email = null;
+                // Resolve the assigned customer's record + snapshot.
+                let customer_name = null, customer_email = null, leadRow = null;
                 if (lead_id) {
-                    const lr = await pool.query('SELECT name, email FROM leads WHERE id = $1', [lead_id]);
-                    if (lr.rows[0]) { customer_name = lr.rows[0].name; customer_email = lr.rows[0].email; }
+                    const lr = await pool.query('SELECT * FROM leads WHERE id = $1', [lead_id]);
+                    if (lr.rows[0]) { leadRow = lr.rows[0]; customer_name = leadRow.name; customer_email = leadRow.email; }
                 }
                 const agreement_number = 'SA-' + Date.now().toString(36).toUpperCase();
+                const amount = parseFloat(price) || 0;
                 const r = await pool.query(`
                     INSERT INTO sales_agreements
                         (agreement_number, lead_id, customer_name, customer_email, service_type,
                          package_name, vehicle, price, deposit, start_date, status, terms, notes)
                     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
                     [agreement_number, lead_id || null, customer_name, customer_email, service_type,
-                     package_name || null, vehicle || null, price || 0, deposit || 0,
+                     package_name || null, vehicle || null, amount, deposit || 0,
                      start_date || null, status || 'draft', terms || null, notes || null]);
-                // Auto-email the agreement PDF to the customer (defensive)
-                try {
-                    if ((customer_email || lead_id) && typeof global.__crownEmailAgreement === 'function') {
-                        global.__crownEmailAgreement(r.rows[0].id);
+                const agreement = r.rows[0];
+                const automation = { invoice: false, documents: false, emailed: false, isCustomer: !!(leadRow && leadRow.is_customer) };
+
+                const lineDesc = (crownServiceLabel(service_type)
+                    + (package_name ? ' — ' + package_name : '')
+                    + (vehicle ? ' (' + vehicle + ')' : '')).slice(0, 500);
+
+                // 1) Auto-create a matching invoice attached to the lead/customer.
+                let invoice = null;
+                if (lead_id && amount > 0) {
+                    try {
+                        const invoice_number = generateInvoiceNumber();
+                        const issue = new Date();
+                        const due = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+                        const invRes = await pool.query(
+                            `INSERT INTO invoices
+                                (invoice_number, lead_id, issue_date, due_date, subtotal, tax_rate, tax_amount,
+                                 discount_amount, total_amount, status, short_description, notes, created_by)
+                             VALUES ($1,$2,$3,$4,$5,0,0,0,$6,'sent',$7,$8,$9) RETURNING *`,
+                            [invoice_number, lead_id, issue, due, amount, amount, lineDesc.slice(0, 255),
+                             'Auto-generated from sales agreement ' + agreement_number, (req.user && req.user.id) || null]);
+                        invoice = invRes.rows[0];
+                        await pool.query(
+                            `INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, amount)
+                             VALUES ($1,$2,1,$3,$4)`, [invoice.id, lineDesc, amount, amount]);
+                        await pool.query('UPDATE sales_agreements SET invoice_id = $1 WHERE id = $2', [invoice.id, agreement.id]).catch(() => {});
+                        agreement.invoice_id = invoice.id;
+                        automation.invoice = true;
+                    } catch (invErr) {
+                        console.error('[SALES-AGREEMENT] auto-invoice error:', invErr.message);
                     }
-                } catch (_) {}
-                res.json({ success: true, agreement: r.rows[0] });
+                }
+
+                // 2) Build PDFs for the agreement (and invoice).
+                let agreementPdf = null, invoicePdf = null;
+                try { agreementPdf = await crownAgreementPDFBuffer(agreement); }
+                catch (e) { console.error('[SALES-AGREEMENT] agreement PDF error:', e.message); }
+                if (invoice) {
+                    try { invoicePdf = await crownInvoicePDFBuffer(invoice, leadRow || { name: customer_name, email: customer_email }, lineDesc); }
+                    catch (e) { console.error('[SALES-AGREEMENT] invoice PDF error:', e.message); }
+                }
+
+                // 3) Store both on the customer's account log / client-portal documents.
+                //    Documents are keyed by lead_id, which the client portal reads — so once the
+                //    lead is (or becomes) a customer, these appear in their portal automatically.
+                if (lead_id) {
+                    try {
+                        if (agreementPdf) await crownStoreDocument({
+                            leadId: lead_id, buffer: agreementPdf,
+                            filename: `Sales-Agreement-${agreement.agreement_number}.pdf`,
+                            mime: 'application/pdf', documentType: 'sales_agreement',
+                            description: `Sales agreement ${agreement.agreement_number}`,
+                            userId: (req.user && req.user.id)
+                        });
+                        if (invoicePdf) await crownStoreDocument({
+                            leadId: lead_id, buffer: invoicePdf,
+                            filename: `Invoice-${invoice.invoice_number}.pdf`,
+                            mime: 'application/pdf', documentType: 'invoice',
+                            description: `Invoice ${invoice.invoice_number}`,
+                            userId: (req.user && req.user.id)
+                        });
+                        automation.documents = !!(agreementPdf || invoicePdf);
+                    } catch (docErr) {
+                        console.error('[SALES-AGREEMENT] store documents error:', docErr.message);
+                    }
+                }
+
+                // 4) Email the customer/lead on file, with the agreement + invoice attached.
+                if (customer_email && typeof transporter !== 'undefined' && transporter) {
+                    try {
+                        const attachments = [];
+                        if (agreementPdf) attachments.push({ filename: `Sales-Agreement-${agreement.agreement_number}.pdf`, content: agreementPdf });
+                        if (invoicePdf) attachments.push({ filename: `Invoice-${invoice.invoice_number}.pdf`, content: invoicePdf });
+                        const total = crownMoney(amount);
+                        await transporter.sendMail({
+                            to: customer_email,
+                            subject: `Your Crown Ceramic Coating agreement${invoice ? ' & invoice' : ''} — ${agreement.agreement_number}`,
+                            html: `
+                                <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:560px;">
+                                    <div style="background:#0a0a0a;padding:20px 24px;border-radius:10px 10px 0 0;">
+                                        <span style="color:#c9a14a;font-size:18px;font-weight:bold;letter-spacing:1px;">CROWN CERAMIC COATING</span>
+                                    </div>
+                                    <div style="border:1px solid #eee;border-top:none;padding:24px;border-radius:0 0 10px 10px;">
+                                        <p>Hi ${customer_name || 'there'},</p>
+                                        <p>Thank you for choosing Crown Ceramic Coating. Your sales agreement
+                                        <strong>${agreement.agreement_number}</strong> for
+                                        <strong>${crownServiceLabel(service_type)}${package_name ? ' — ' + package_name : ''}</strong>
+                                        is attached.</p>
+                                        ${invoice ? `<p>We've also attached <strong>invoice ${invoice.invoice_number}</strong> for <strong>${total}</strong>, due within 14 days. ${leadRow && leadRow.is_customer ? 'You can also view and pay it anytime from your client portal.' : ''}</p>` : ''}
+                                        <p>If you have any questions, just reply to this email or call us at (940) 217-8680.</p>
+                                        <p style="margin-top:22px;">— The Crown Ceramic Coating Team</p>
+                                    </div>
+                                </div>`,
+                            attachments
+                        });
+                        automation.emailed = true;
+                    } catch (mailErr) {
+                        console.error('[SALES-AGREEMENT] email error:', mailErr.message);
+                    }
+                }
+
+                res.json({ success: true, agreement, invoice: invoice || null, automation });
             } catch (e) {
                 console.error('[SALES-AGREEMENT] create error:', e.message);
                 res.status(500).json({ success: false, message: 'Could not create agreement.' });
