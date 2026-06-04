@@ -2261,7 +2261,14 @@ window.addEventListener('load', function() {
             </div>
             <div class="form-group"><label>Tell Us About Your Vehicle *</label><textarea id="details" placeholder="Share the condition of your paint and what you're hoping to achieve — gloss, protection, swirl removal, etc." required></textarea></div>
             <div class="form-row" style="align-items:end;">
-                <div class="form-group"><label>Schedule a Consultation (optional)</label><input type="date" id="consultDate"><small id="consultHint" style="display:block;margin-top:6px;color:rgba(255,255,255,0.5);font-size:12px;"></small></div>
+                <div class="form-group"><label>Schedule a Consultation (optional)</label>
+                    <div id="consultDateWrap" style="position:relative;">
+                        <input type="hidden" id="consultDate">
+                        <button type="button" id="consultDateBtn">📅 Select a date…</button>
+                        <div id="consultCal" hidden></div>
+                    </div>
+                    <small id="consultHint" style="display:block;margin-top:6px;color:rgba(255,255,255,0.5);font-size:12px;"></small>
+                </div>
                 <div class="form-group"><label>Preferred Time</label>
                     <select id="consultTime">
                         <option value="">Select a time...</option>
@@ -3381,10 +3388,93 @@ function dismissBubble() {
 
     // ----- Live consultation availability: grey out already-booked slots -----
     (function initConsultAvailability() {
-        const dateEl = document.getElementById('consultDate');
+        const dateEl = document.getElementById('consultDate');     // hidden value (YYYY-MM-DD)
         const timeEl = document.getElementById('consultTime');
         const hintEl = document.getElementById('consultHint');
-        if (!dateEl || !timeEl) return;
+        const btn = document.getElementById('consultDateBtn');
+        const cal = document.getElementById('consultCal');
+        const wrap = document.getElementById('consultDateWrap');
+        if (!dateEl || !timeEl || !btn || !cal || !wrap) return;
+
+        // ---- styles for the calendar popover ----
+        const css = document.createElement('style');
+        css.textContent = `
+        #consultDateBtn{width:100%;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;text-align:left;cursor:pointer;font:inherit;}
+        #consultDateBtn:hover{border-color:#c9a14a;}
+        #consultCal{position:absolute;top:calc(100% + 6px);left:0;z-index:60;width:300px;max-width:92vw;background:#141414;border:1px solid rgba(201,161,74,0.35);border-radius:12px;padding:12px;box-shadow:0 18px 50px rgba(0,0,0,0.6);}
+        #consultCal .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+        #consultCal .cal-head button{background:none;border:none;color:#c9a14a;font-size:20px;line-height:1;cursor:pointer;padding:2px 10px;border-radius:6px;}
+        #consultCal .cal-head button:disabled{color:#555;cursor:not-allowed;}
+        #consultCal .cal-title{font-weight:700;color:#fff;font-size:14px;}
+        #consultCal .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;}
+        #consultCal .cal-dow span{text-align:center;font-size:11px;color:rgba(255,255,255,0.45);font-weight:700;}
+        #consultCal .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+        #consultCal .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;color:#eee;cursor:pointer;border:1px solid transparent;user-select:none;}
+        #consultCal .cal-day:hover{background:rgba(201,161,74,0.18);border-color:#c9a14a;}
+        #consultCal .cal-day.sel{background:#c9a14a;color:#0a0a0a;font-weight:700;}
+        #consultCal .cal-day.disabled,#consultCal .cal-day.disabled:hover{color:#4a4a4a;cursor:not-allowed;background:rgba(255,255,255,0.02);border-color:transparent;}
+        #consultCal .cal-day.empty,#consultCal .cal-day.empty:hover{visibility:hidden;cursor:default;background:none;border:none;}
+        #consultCal .cal-note{margin-top:10px;font-size:11px;color:rgba(255,255,255,0.45);text-align:center;}`;
+        document.head.appendChild(css);
+
+        const pad = n => String(n).padStart(2, '0');
+        const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const todayStr = ymd(today);
+        let view = new Date(today.getFullYear(), today.getMonth(), 1);
+        let selected = '';
+
+        function render() {
+            const y = view.getFullYear(), mo = view.getMonth();
+            const first = new Date(y, mo, 1);
+            const startDow = first.getDay();              // 0 = Sunday
+            const daysInMonth = new Date(y, mo + 1, 0).getDate();
+            const monthName = first.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+            const atCurrentMonth = (y === today.getFullYear() && mo === today.getMonth());
+            let cells = '';
+            for (let i = 0; i < startDow; i++) cells += '<div class="cal-day empty"></div>';
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dObj = new Date(y, mo, d);
+                const ds = ymd(dObj);
+                const isSunday = dObj.getDay() === 0;
+                const isTodayOrPast = ds <= todayStr;       // blocks the current day + past
+                const disabled = isSunday || isTodayOrPast; // Sundays + today are not bookable
+                const sel = ds === selected;
+                cells += `<div class="cal-day ${disabled ? 'disabled' : ''} ${sel ? 'sel' : ''}"`
+                    + (disabled ? ` title="${isSunday ? 'Closed Sundays' : 'Not available'}"` : ` data-date="${ds}"`)
+                    + `>${d}</div>`;
+            }
+            cal.innerHTML =
+                `<div class="cal-head">
+                    <button type="button" data-nav="prev" ${atCurrentMonth ? 'disabled' : ''}>&#8249;</button>
+                    <span class="cal-title">${monthName}</span>
+                    <button type="button" data-nav="next">&#8250;</button>
+                 </div>
+                 <div class="cal-dow"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+                 <div class="cal-grid">${cells}</div>
+                 <div class="cal-note">Closed Sundays &middot; no same-day booking</div>`;
+            const prev = cal.querySelector('[data-nav="prev"]');
+            const next = cal.querySelector('[data-nav="next"]');
+            if (prev) prev.onclick = () => { if (!atCurrentMonth) { view = new Date(y, mo - 1, 1); render(); } };
+            if (next) next.onclick = () => { view = new Date(y, mo + 1, 1); render(); };
+            cal.querySelectorAll('.cal-day[data-date]').forEach(el => {
+                el.onclick = () => selectDate(el.getAttribute('data-date'));
+            });
+        }
+
+        function selectDate(ds) {
+            selected = ds;
+            dateEl.value = ds;
+            const dObj = new Date(ds + 'T12:00:00');
+            btn.textContent = '📅 ' + dObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+            closeCal();
+            refresh();
+        }
+        function openCal() { render(); cal.hidden = false; }
+        function closeCal() { cal.hidden = true; }
+        btn.addEventListener('click', e => { e.stopPropagation(); cal.hidden ? openCal() : closeCal(); });
+        document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeCal(); });
+
         // 24h value -> display label, e.g. "13:00" -> "1:00 PM"
         function toLabel(v) {
             const [h, m] = v.split(':').map(Number);
@@ -3392,28 +3482,11 @@ function dismissBubble() {
             const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
             return `${h12}:${String(m).padStart(2, '0')} ${period}`;
         }
-        // Don't allow booking in the past.
-        // No same-day booking — earliest selectable date is tomorrow.
-        const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-        dateEl.min = tomorrow;
+        // Load available times for the chosen (already-validated) date.
         async function refresh() {
             const date = (dateEl.value || '').trim();
-            // reset
             Array.from(timeEl.options).forEach(o => { o.disabled = false; if (o.value) o.textContent = toLabel(o.value); });
             if (!date) { if (hintEl) hintEl.textContent = ''; return; }
-            // Closed Sundays — clear the pick and tell the visitor.
-            const picked = new Date(date + 'T12:00:00');
-            if (picked.getDay() === 0) {
-                if (hintEl) hintEl.textContent = 'We\u2019re closed on Sundays — please choose another day.';
-                dateEl.value = '';
-                return;
-            }
-            // No same-day.
-            if (date <= new Date().toISOString().split('T')[0]) {
-                if (hintEl) hintEl.textContent = 'Same-day booking isn\u2019t available — please choose a future date.';
-                dateEl.value = '';
-                return;
-            }
             if (hintEl) hintEl.textContent = 'Checking availability…';
             try {
                 const r = await fetch(`${window.location.origin}/api/public/booked-times?date=${encodeURIComponent(date)}`);
@@ -3431,7 +3504,6 @@ function dismissBubble() {
                 if (hintEl) hintEl.textContent = '';
             }
         }
-        dateEl.addEventListener('change', refresh);
     })();
 
     document.addEventListener('DOMContentLoaded', function () {
