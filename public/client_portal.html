@@ -11,6 +11,7 @@
     <!-- CROWN-SEO:END -->
 
 <script src="https://js.stripe.com/v3/"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&family=Archivo:wght@700;800;900&display=swap">
 <style>
 :root{
   --gold:#f4c87e; --gold-deep:#e6b86b; --bg:#0e0e0e; --panel:#171717; --panel-2:#1f1f1f;
@@ -367,6 +368,12 @@ function viewDocuments(){
 }
 function viewReceipt(id){
   const i = (DASH.invoices||[]).find(x=>x.id===id); if(!i) return;
+  const sub = Number(i.subtotal||0);
+  const tax = Number(i.tax_amount||0);
+  const tot = Number(i.total_amount||0);
+  const fee = Math.max(0, +(tot - sub - tax).toFixed(2));   // card processing fee baked into the total
+  let rate = Number(i.tax_rate||0); if(rate>0 && rate<1) rate = rate*100;
+  const taxLabel = rate>0 ? `Sales tax (${(+rate.toFixed(2))}%)` : 'Sales tax';
   const w = window.open('','_blank');
   w.document.write(`<title>Receipt ${esc(i.invoice_number||id)}</title>
    <body style="font-family:Arial;max-width:600px;margin:40px auto;color:#222;">
@@ -376,9 +383,10 @@ function viewReceipt(id){
    <b>Date paid:</b> ${fmtDate(i.paid_at)}<br>
    <b>Description:</b> ${esc(i.short_description||'Ceramic coating services')}</p>
    <table style="width:100%;border-collapse:collapse;margin-top:14px;">
-     <tr><td style="padding:8px 0;">Subtotal</td><td style="text-align:right;">${money(i.subtotal)}</td></tr>
-     <tr><td style="padding:8px 0;">Tax</td><td style="text-align:right;">${money(i.tax_amount)}</td></tr>
-     <tr style="border-top:2px solid #222;font-weight:bold;"><td style="padding:10px 0;">Total Paid</td><td style="text-align:right;">${money(i.total_amount)}</td></tr>
+     <tr><td style="padding:8px 0;">Subtotal</td><td style="text-align:right;">${money(sub)}</td></tr>
+     <tr><td style="padding:8px 0;">${taxLabel}</td><td style="text-align:right;">${money(tax)}</td></tr>
+     ${fee>0?`<tr><td style="padding:8px 0;">Card processing fee</td><td style="text-align:right;">${money(fee)}</td></tr>`:''}
+     <tr style="border-top:2px solid #222;font-weight:bold;"><td style="padding:10px 0;">Total Paid</td><td style="text-align:right;">${money(tot)}</td></tr>
    </table>
    <p style="color:#888;margin-top:20px;font-size:13px;">Payment method: ${esc(i.payment_method||'Card')} · Ref: ${esc(i.payment_reference||'')}</p>
    <p style="color:#888;font-size:13px;">Thank you for your business.</p>
@@ -530,5 +538,104 @@ async function afterPaid(){ closePay(); await loadDashboard(); nav('invoices'); 
 /* ---------------- INIT ---------------- */
 if(TOKEN && CLIENT){ startApp(); }
 </script>
+
+<!-- ===== mobile bottom tab bar (matches site) ===== -->
+<nav class="cp-tabbar">
+  <a class="cp-tab" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Home</span>
+  </a>
+  <a class="cp-tab" href="portfolio.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    <span>Work</span>
+  </a>
+  <a class="cp-fab" href="contact.html" aria-label="Book now">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </a>
+  <a class="cp-tab" href="pricing.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    <span>Pricing</span>
+  </a>
+  <a class="cp-tab active" href="client_portal.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Account</span>
+  </a>
+</nav>
+
+<style id="crown-mobile-portal">
+/* ===== revamp portal to match mobile site (white / gold / black) ===== */
+:root{
+  --gold:#caa14a; --gold-deep:#b07d2b; --bg:#f4f5f6; --panel:#ffffff; --panel-2:#f1f2f4;
+  --line:#e7e9ec; --text:#14161a; --muted:#8a9099; --gsoft:#f6edda;
+}
+body{ font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); }
+a{ color:var(--gold-deep); }
+
+.btn{ border-radius:30px; font-weight:700; }
+.btn-primary{ background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; }
+.btn-primary:hover{ background:#caa14a; color:#fff; transform:translateY(-1px); }
+.btn-ghost{ background:#fff; color:var(--text); border:1px solid var(--line); }
+.btn-ghost:hover{ border-color:var(--gold); color:var(--gold-deep); }
+
+input,select,textarea{ background:#fff; border:1px solid var(--line); color:var(--text); border-radius:12px; }
+input:focus,select:focus,textarea:focus{ border-color:var(--gold); }
+label{ color:var(--muted); }
+
+.card{ background:#fff; border:1px solid var(--line); border-radius:20px; box-shadow:0 6px 18px rgba(20,22,26,.06); }
+.stat{ background:#fff; border:1px solid var(--line); border-radius:18px; box-shadow:0 6px 18px rgba(20,22,26,.05); }
+.stat .value{ font-family:'Playfair Display',Georgia,serif; font-weight:600; color:var(--text); }
+.list-item{ border-bottom:1px solid var(--line); }
+.page-title{ font-family:'Playfair Display',Georgia,serif; font-weight:600; color:var(--text); }
+.page-sub{ color:var(--muted); }
+
+.pill.scheduled,.pill.in-progress,.pill.signed{ background:rgba(202,161,74,.16); color:var(--gold-deep); }
+.pill.draft,.pill.new{ background:rgba(202,161,74,.16); color:var(--gold-deep); }
+
+/* progress + timeline gold */
+.progress > span{ background:var(--gold); }
+.tl-dot.done{ background:var(--gold); border-color:var(--gold); }
+
+/* ----- LOGIN: light mobile screen ----- */
+#login{ background:linear-gradient(180deg,#fafbfc 0%,#eef0f2 100%); padding:24px; }
+#login .card{ border-radius:26px; padding:34px 28px; box-shadow:0 24px 60px rgba(20,22,26,.12); }
+.crown-badge{ background:var(--gsoft); }
+#login h2{ font-family:'Playfair Display',Georgia,serif; font-weight:600; color:var(--text); }
+
+/* ----- APP SHELL: light ----- */
+.sidebar{ background:#fff; border-right:1px solid var(--line); }
+.sidebar .brand{ color:var(--text); }
+.nav-link{ color:var(--muted); }
+.nav-link:hover{ background:#f4f5f6; color:var(--text); }
+.nav-link.active{ background:rgba(202,161,74,.14); color:var(--gold-deep); }
+.nav-badge{ background:var(--gold); color:#fff; }
+
+/* top mobile bar -> light app header */
+.mobile-bar{ background:#fff; border-bottom:1px solid var(--line); height:64px; }
+.mobile-bar .brand{ color:var(--text); font-family:'Archivo',sans-serif; font-weight:800; letter-spacing:2px; }
+.hamb{ color:var(--text); font-size:22px; }
+
+/* modal light */
+.overlay{ background:rgba(20,22,26,.5); }
+.modal{ background:#fff; border:1px solid var(--line); border-radius:22px; }
+.modal-head{ border-bottom:1px solid var(--line); }
+.x{ color:var(--muted); }
+
+/* ===== bottom tab bar ===== */
+.cp-tabbar{ display:none; position:fixed; left:0; right:0; bottom:0; z-index:60; align-items:center; justify-content:space-around;
+  background:#fff; border-top:1px solid var(--line); padding:10px 8px calc(env(safe-area-inset-bottom,0px) + 10px); }
+.cp-tab{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; color:#aeb3ba; font-size:10px; font-weight:600; text-decoration:none; }
+.cp-tab svg{ width:23px; height:23px; }
+.cp-tab.active{ color:var(--gold-deep); }
+.cp-fab{ flex:none; width:56px; height:56px; margin-top:-26px; background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff;
+  border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(202,161,74,.5); border:4px solid #fff; text-decoration:none; }
+.cp-fab svg{ width:26px; height:26px; }
+
+@media(max-width:820px){
+  .cp-tabbar{ display:flex; }
+  #login{ padding-bottom:120px; }
+  .main{ padding:80px 18px 110px !important; }
+}
+</style>
+
 </body>
 </html>
