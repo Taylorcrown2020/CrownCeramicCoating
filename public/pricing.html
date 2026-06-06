@@ -49,6 +49,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&family=Libre+Baskerville:wght@400;700&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&display=swap" rel="stylesheet">
     
 <!-- Google Analytics - Deferred Loading -->
 <script>
@@ -1704,22 +1705,23 @@ window.addEventListener('load', function() {
 
   <!-- ===================== LIST SCREEN ===================== -->
   <section class="mp-list" id="mpList">
+    <header class="mp-topbar">
+      <a class="mp-logo" href="index.html"><svg class="mp-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="mp-logo-wm"><b>CROWN</b><i>CERAMIC COATING</i></span></a>
+      <div class="mp-topbar-icons">
+        <button aria-label="Search" onclick="crownSearchOpen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.7" y2="16.7"/></svg></button>
+        <a aria-label="Account" href="client_portal.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+        <button aria-label="Menu" onclick="mpMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg></button>
+      </div>
+    </header>
     <div class="mp-list-scroll">
 
-      <!-- top bar -->
-      <header class="mp-top">
-        <div class="mp-loc">
-          <span class="mp-loc-label">Services in</span>
-          <span class="mp-loc-city">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Rockwall–Dallas, TX
-          </span>
-        </div>
-        <button class="mp-bell" onclick="mpMenu()" aria-label="Menu">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <span class="mp-bell-dot"></span>
-        </button>
-      </header>
+      <!-- dark page header -->
+      <div class="mp-hero">
+        <span class="mp-hero-kicker">Services &amp; Pricing</span>
+        <h1 class="mp-pagetitle">Our<br>Packages</h1>
+        <div class="mp-locrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Serving Rockwall&ndash;Dallas, TX</div>
+        <p class="mp-herosub">Transparent, fixed pricing for ceramic coating, paint correction &amp; detailing. Filter below to find the right fit for your vehicle.</p>
+      </div>
 
       <!-- search + filter -->
       <div class="mp-search-row">
@@ -1747,7 +1749,33 @@ window.addEventListener('load', function() {
       <div class="mp-cards" id="mpCards"></div>
       <p class="mp-empty" id="mpEmpty">No packages match your filters.</p>
 
-      <div style="height:96px"></div>
+      <!-- CTA band -->
+      <div class="mp-cta">
+        <h3>Ready for the<br>Crown Treatment?</h3>
+        <p>Tell us about your vehicle and get a free, honest quote within 24 hours.</p>
+        <button class="mp-cta-btn" onclick="openModal()">Get a Free Quote</button>
+      </div>
+
+      <!-- footer -->
+      <footer class="mp-foot">
+        <span class="mp-foot-logo"><svg class="mp-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Crown Ceramic Coating</span></span>
+        <p class="mp-foot-tag">Premium ceramic coating, paint correction &amp; detailing across the Dallas&ndash;Fort Worth metroplex.</p>
+        <div class="mp-foot-news">
+          <label>Get our latest offers &amp; detailing tips</label>
+          <div class="mp-foot-form"><input type="email" placeholder="Your email address..." autocomplete="email"><button onclick="window.location.href='contact.html'">Subscribe</button></div>
+        </div>
+        <div class="mp-foot-cols">
+          <div class="mp-foot-col"><h5>Services</h5><a href="pricing.html#ceramic">Ceramic Coating</a><a href="pricing.html#correction">Paint Correction</a><a href="pricing.html#detailing">Interior Detailing</a><a href="pricing.html">Maintenance Plans</a></div>
+          <div class="mp-foot-col"><h5>Company</h5><a href="about.html">About Us</a><a href="portfolio.html">Our Work</a><a href="process.html">Our Process</a><a href="contact.html">Contact</a></div>
+          <div class="mp-foot-col"><h5>Legal</h5><a href="contact.html">Warranty</a><a href="contact.html">Privacy</a><a href="contact.html">Terms</a></div>
+        </div>
+        <div class="mp-foot-social">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="tel:+19402178680" aria-label="Phone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>
+        </div>
+        <div class="mp-foot-bottom">&copy; 2026 Crown Ceramic Coating &middot; Rockwall&ndash;Dallas, TX &middot; All rights reserved</div>
+      </footer>
     </div>
 
     <!-- bottom nav -->
@@ -1757,11 +1785,11 @@ window.addEventListener('load', function() {
         <span>Home</span>
       </a>
       <a class="mp-tab" href="portfolio.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-        <span>Saved</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>Portfolio</span>
       </a>
       <button class="mp-tab mp-fab" onclick="openModal()" aria-label="Book now">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
       </button>
       <a class="mp-tab active" href="pricing.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1857,6 +1885,91 @@ window.addEventListener('load', function() {
     </div>
   </div>
 
+
+<!-- ===== nav search dropdown ===== -->
+<div class="cs-overlay" id="csOverlay" onclick="if(event.target===this)crownSearchClose()">
+  <div class="cs-panel">
+    <div class="cs-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.7" y2="16.7"/></svg>
+      <input id="csInput" type="text" placeholder="Search services, pricing, work..." oninput="crownSearchRun(this.value)" autocomplete="off">
+      <button class="cs-x" onclick="crownSearchClose()" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="cs-results" id="csResults"></div>
+  </div>
+</div>
+<style id="crown-search-css">
+.cs-overlay{ position:absolute; inset:0; z-index:120; background:rgba(20,22,26,.45); backdrop-filter:blur(2px); opacity:0; visibility:hidden; transition:opacity .25s, visibility .25s; }
+.cs-overlay.open{ opacity:1; visibility:visible; }
+.cs-panel{ position:absolute; top:0; left:0; right:0; background:#fff; border-radius:0 0 22px 22px; box-shadow:0 20px 44px rgba(0,0,0,.28); display:flex; flex-direction:column; max-height:86%; padding-top:calc(env(safe-area-inset-top,0px)); transform:translateY(-14px); opacity:0; transition:transform .28s cubic-bezier(.7,0,.2,1), opacity .25s; }
+.cs-overlay.open .cs-panel{ transform:translateY(0); opacity:1; }
+.cs-bar{ display:flex; align-items:center; gap:11px; padding:18px; border-bottom:1px solid #ececee; }
+.cs-bar > svg{ width:21px; height:21px; color:#8a9099; flex:none; }
+.cs-bar input{ flex:1; border:none; outline:none; font-size:16px; color:#14161a; font-family:inherit; background:none; }
+.cs-bar input::placeholder{ color:#8a9099; }
+.cs-x{ flex:none; width:32px; height:32px; border:none; background:#f4f5f6; color:#8a9099; border-radius:50%; font-size:13px; cursor:pointer; }
+.cs-results{ overflow-y:auto; -webkit-overflow-scrolling:touch; padding:6px 0 12px; }
+.cs-head{ padding:15px 18px 7px; font-size:11px; font-weight:800; letter-spacing:1.3px; text-transform:uppercase; color:#aeb3ba; }
+.cs-item{ display:flex; align-items:center; gap:13px; padding:12px 18px; text-decoration:none; }
+.cs-item:active{ background:#f7f7f8; }
+.cs-ic{ flex:none; width:40px; height:40px; border-radius:12px; background:#f6edda; color:#b07d2b; display:flex; align-items:center; justify-content:center; }
+.cs-ic svg{ width:20px; height:20px; }
+.cs-meta{ flex:1; min-width:0; }
+.cs-t{ display:block; font-size:15px; font-weight:700; color:#14161a; }
+.cs-d{ display:block; font-size:12.5px; color:#8a9099; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cs-arrow{ flex:none; color:#caa14a; display:flex; }
+.cs-arrow svg{ width:18px; height:18px; }
+.cs-empty{ padding:34px 18px; text-align:center; color:#8a9099; font-size:14px; line-height:1.6; }
+</style>
+<script>
+(function(){
+  var IP={
+    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+    sofa:'<path d="M4 12V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M2 14a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3H2z"/><path d="M5 17v2M19 17v2"/>',
+    droplet:'<path d="M12 2.7s5.5 5.6 5.5 9.8a5.5 5.5 0 0 1-11 0C6.5 8.3 12 2.7 12 2.7z"/>',
+    tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+    image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+    info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+    doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+    user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    route:'<circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M9 19h6a3 3 0 0 0 3-3V8"/>',
+    crown:'<path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z"/><line x1="3" y1="21" x2="21" y2="21"/>'
+  };
+  function ic(k){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+(IP[k]||IP.tag)+'</svg>'; }
+  var ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+  var DATA=[
+    {t:'Ceramic Coating', d:'Long-lasting gloss & paint protection', u:'pricing.html#ceramic', i:'shield', k:'ceramic coating 9h liquid glass gloss hydrophobic protection sealant nano', pop:1},
+    {t:'Paint Correction', d:'Remove swirls, scratches & oxidation', u:'pricing.html#correction', i:'layers', k:'paint correction polish swirl scratch oxidation buffing compound mirror', pop:1},
+    {t:'Interior Detailing', d:'Deep interior clean & protection', u:'pricing.html#detailing', i:'sofa', k:'interior detailing leather vacuum shampoo seats carpet odor clean steam'},
+    {t:'Paint Protection Film (PPF)', d:'Self-healing rock-chip defense', u:'pricing.html#ceramic', i:'shield', k:'ppf paint protection film clear bra rock chip self healing'},
+    {t:'Maintenance Plans', d:'Keep that coated shine year-round', u:'pricing.html', i:'droplet', k:'maintenance plan wash upkeep top up'},
+    {t:'Pricing & Packages', d:'See every package & price', u:'pricing.html', i:'tag', k:'pricing packages price cost plans quote how much', pop:1},
+    {t:'The Crown Treatment', d:'Why a Crown coating lasts', u:'index.html', i:'crown', k:'crown treatment gloss protection upkeep'},
+    {t:'Our Process', d:'How we do it, step by step', u:'process.html', i:'route', k:'process steps how it works inspect decontaminate correct coat cure'},
+    {t:'Portfolio / Our Work', d:'Browse before & after results', u:'portfolio.html', i:'image', k:'portfolio work gallery before after results photos exotics luxury trucks', pop:1},
+    {t:'About Us', d:'Our story & team', u:'about.html', i:'info', k:'about story team owner who we are mission'},
+    {t:'Blog & Insights', d:'Detailing tips & guides', u:'blog.html', i:'doc', k:'blog insights tips guide articles ceramic vs wax'},
+    {t:'Book / Get a Quote', d:'Request a free quote in 24 hrs', u:'contact.html', i:'cal', k:'book booking appointment quote schedule estimate free', pop:1},
+    {t:'Contact Us', d:'Call, email or message us', u:'contact.html', i:'phone', k:'contact phone email call message address location hours'},
+    {t:'Client Portal', d:'Invoices, agreements & account', u:'client_portal.html', i:'user', k:'portal account login invoices client agreements sign in receipts'}
+  ];
+  function row(e){ return '<a class="cs-item" href="'+e.u+'"><span class="cs-ic">'+ic(e.i)+'</span><span class="cs-meta"><span class="cs-t">'+e.t+'</span><span class="cs-d">'+e.d+'</span></span><span class="cs-arrow">'+ARROW+'</span></a>'; }
+  window.crownSearchOpen=function(){ var o=document.getElementById('csOverlay'); o.classList.add('open'); crownSearchRun(''); setTimeout(function(){ var i=document.getElementById('csInput'); if(i){ i.value=''; i.focus(); } },140); };
+  window.crownSearchClose=function(){ document.getElementById('csOverlay').classList.remove('open'); };
+  window.crownSearchRun=function(q){
+    q=(q||'').trim().toLowerCase();
+    var res=document.getElementById('csResults'), list, head;
+    if(!q){ list=DATA.filter(function(e){return e.pop;}); head='Popular'; }
+    else { var w=q.split(/\s+/); list=DATA.filter(function(e){ var h=(e.t+' '+e.k).toLowerCase(); return w.every(function(x){return h.indexOf(x)>-1;}); }); head=list.length+(list.length===1?' result':' results'); }
+    if(!list.length){ res.innerHTML='<div class="cs-empty">No matches for that. Try &ldquo;ceramic&rdquo;, &ldquo;pricing&rdquo;, &ldquo;portfolio&rdquo; or &ldquo;book&rdquo;.</div>'; return; }
+    res.innerHTML='<div class="cs-head">'+head+'</div>'+list.map(row).join('');
+  };
+})();
+</script>
+<!-- ===== end nav search dropdown ===== -->
+
   <!-- ===================== MENU ===================== -->
   <div class="mp-menu-overlay" id="mpMenuOv" onclick="if(event.target===this)mpMenuClose()">
     <div class="mp-menu-panel">
@@ -1901,7 +2014,49 @@ window.addEventListener('load', function() {
 
 /* ---------- LIST ---------- */
 .mp-list{ position:absolute; inset:0; display:flex; flex-direction:column; background:#f4f5f6; }
-.mp-list-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:calc(env(safe-area-inset-top,0px) + 18px) 20px 0; }
+.mp-topbar{ flex:none; display:flex; align-items:center; justify-content:space-between; padding:calc(env(safe-area-inset-top,0px) + 12px) 20px 12px; background:#fff; border-bottom:1px solid #ececee; z-index:5; }
+.mp-logo{ display:flex; align-items:center; gap:9px; text-decoration:none; }
+.mp-crown{ width:30px; height:30px; color:var(--g); flex:none; }
+.mp-logo-wm{ display:flex; flex-direction:column; line-height:1; }
+.mp-logo-wm b{ font-family:'Archivo',sans-serif; font-weight:900; font-size:16px; letter-spacing:1px; color:var(--ink); }
+.mp-logo-wm i{ font-style:normal; font-size:8px; font-weight:700; letter-spacing:3px; color:#b07d2b; margin-top:3px; }
+.mp-topbar-icons{ display:flex; align-items:center; gap:6px; }
+.mp-topbar-icons button, .mp-topbar-icons a{ width:40px; height:40px; border:none; background:none; color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.mp-topbar-icons svg{ width:21px; height:21px; }
+/* dark page header */
+.mp-hero{ margin:-18px -20px 26px; padding:calc(24px) 20px 28px; background:linear-gradient(160deg,#1f1f1f 0%,#0c0c0c 100%); }
+.mp-hero-kicker{ display:inline-block; font-family:'Archivo',sans-serif; font-weight:800; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--g); margin-bottom:12px; }
+.mp-pagetitle{ font-family:'Archivo',sans-serif; font-weight:900; font-size:44px; line-height:.9; letter-spacing:-1.4px; text-transform:uppercase; color:#fff; margin-bottom:14px; }
+.mp-locrow{ display:flex; align-items:center; gap:6px; color:rgba(255,255,255,.62); font-size:13px; font-weight:600; margin-bottom:14px; }
+.mp-locrow svg{ width:15px; height:15px; color:var(--g); }
+.mp-herosub{ color:rgba(255,255,255,.55); font-size:13.5px; line-height:1.6; max-width:96%; }
+
+/* dark CTA band */
+.mp-cta{ background:linear-gradient(135deg,#1b1b1b,#0d0d0d); border-radius:24px; padding:30px 24px; text-align:center; margin-top:30px; }
+.mp-cta h3{ font-family:'Archivo',sans-serif; font-weight:900; font-size:27px; text-transform:uppercase; color:#fff; line-height:1; letter-spacing:-.6px; margin-bottom:12px; }
+.mp-cta p{ color:rgba(255,255,255,.66); font-size:14px; line-height:1.6; margin-bottom:22px; }
+.mp-cta-btn{ width:100%; border:none; cursor:pointer; background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; font-size:15px; font-weight:700; padding:16px; border-radius:30px; box-shadow:0 12px 28px rgba(202,161,74,.4); }
+
+/* footer */
+.mp-foot{ background:#0e0e0e; margin:36px -20px 0; padding:40px 22px 30px; color:#fff; }
+.mp-foot-logo{ display:inline-flex; align-items:center; gap:11px; }
+.mp-foot-logo .mp-crown{ width:34px; height:34px; color:var(--g); }
+.mp-foot-logo > span{ font-family:'Archivo',sans-serif; font-weight:900; font-size:18px; letter-spacing:1px; color:#fff; text-transform:uppercase; }
+.mp-foot-tag{ color:rgba(255,255,255,.5); font-size:13px; line-height:1.6; margin:12px 0 26px; }
+.mp-foot-news label{ display:block; color:rgba(255,255,255,.8); font-size:13px; font-weight:600; margin-bottom:10px; }
+.mp-foot-form{ display:flex; gap:8px; margin-bottom:32px; }
+.mp-foot-form input{ flex:1; background:#1a1a1a; border:1px solid rgba(255,255,255,.12); color:#fff; border-radius:12px; padding:13px 14px; font-size:13px; font-family:inherit; outline:none; }
+.mp-foot-form input::placeholder{ color:rgba(255,255,255,.4); }
+.mp-foot-form button{ flex:none; border:none; cursor:pointer; background:var(--g); color:#fff; font-weight:700; font-size:13px; padding:0 18px; border-radius:12px; }
+.mp-foot-cols{ display:grid; grid-template-columns:1fr 1fr; gap:26px 16px; margin-bottom:30px; }
+.mp-foot-col:last-child{ grid-column:1 / -1; }
+.mp-foot-col h5{ color:#fff; font-family:'Archivo',sans-serif; font-weight:800; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:14px; }
+.mp-foot-col a{ display:block; color:rgba(255,255,255,.55); font-size:13.5px; text-decoration:none; padding:6px 0; }
+.mp-foot-social{ display:flex; gap:12px; padding:24px 0; border-top:1px solid rgba(255,255,255,.1); border-bottom:1px solid rgba(255,255,255,.1); }
+.mp-foot-social a{ width:42px; height:42px; border-radius:50%; border:1px solid rgba(255,255,255,.16); color:#fff; display:flex; align-items:center; justify-content:center; }
+.mp-foot-social svg{ width:19px; height:19px; }
+.mp-foot-bottom{ color:rgba(255,255,255,.4); font-size:11.5px; text-align:center; padding-top:24px; line-height:1.5; }
+.mp-list-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:18px 20px 0; }
 
 .mp-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
 .mp-loc-label{ display:block; color:var(--muted); font-size:12px; margin-bottom:3px; }
