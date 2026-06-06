@@ -4614,7 +4614,7 @@ nav:not(.m-tabbar) {
 
     <!-- HERO (image 1 style) -->
     <section class="m-hero2">
-      <img class="m-hero2-img" src="pexels-egeardaphotos-2148533277-34054735.jpg" alt="Freshly ceramic-coated vehicle">
+      <img class="m-hero2-img" src="pexels-radubradu-395822838-19524777.jpg" alt="Freshly ceramic-coated vehicle">
       <div class="m-hero2-shade"></div>
       <button class="m-hero-menu" aria-label="Menu" onclick="mOpenMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg></button>
       <div class="m-hero2-inner">
@@ -4967,20 +4967,22 @@ nav:not(.m-tabbar) {
 /* NOTE: position:absolute not fixed — fixed-inside-fixed breaks on iOS Safari (bottom:0 lands
    in the wrong place). .m-app is already position:fixed;inset:0 so absolute = same visual result. */
 .m-top2{ position:absolute; top:0; left:0; right:0; z-index:40; display:flex; align-items:center; justify-content:space-between;
-  padding:calc(env(safe-area-inset-top,0px) + 12px) 20px 12px; background:#fff; border-bottom:1px solid var(--line);
-  transform:translateY(-100%); opacity:0; pointer-events:none; transition:transform .4s cubic-bezier(.7,0,.2,1), opacity .3s ease; }
-.m-app.scrolled .m-top2{ transform:translateY(0); opacity:1; pointer-events:auto; }
+  padding:calc(env(safe-area-inset-top,0px) + 12px) 20px 12px; background:transparent; border-bottom:1px solid transparent; pointer-events:auto; transition:background .3s ease, border-color .3s ease; }
+.m-app.scrolled .m-top2{ background:#fff; border-bottom-color:var(--line); }
 .m-top2-logo{ display:flex; align-items:center; gap:9px; text-decoration:none; }
-.m-crown{ width:30px; height:30px; color:var(--g); flex:none; }
+.m-crown{ width:30px; height:30px; color:#fff; flex:none; transition:color .3s ease; }
+.m-app.scrolled .m-top2 .m-crown{ color:var(--g); }
 .m-logo-wm{ display:flex; flex-direction:column; line-height:1; }
-.m-logo-wm b{ font-family:'Archivo',sans-serif; font-weight:900; font-size:16px; letter-spacing:1px; color:var(--ink); }
+.m-logo-wm b{ font-family:'Archivo',sans-serif; font-weight:900; font-size:16px; letter-spacing:1px; color:#fff; transition:color .3s ease; }
+.m-app.scrolled .m-logo-wm b{ color:var(--ink); }
 .m-logo-wm i{ font-style:normal; font-size:8px; font-weight:700; letter-spacing:3px; color:var(--g-deep); margin-top:3px; }
 .m-top2-icons{ display:flex; align-items:center; gap:6px; }
-.m-top2-icons button, .m-top2-icons a{ width:40px; height:40px; border:none; background:none; color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.m-top2-icons button, .m-top2-icons a{ width:40px; height:40px; border:none; background:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:color .3s ease; }
+.m-app.scrolled .m-top2-icons button, .m-app.scrolled .m-top2-icons a{ color:var(--ink); }
 .m-top2-icons svg{ width:21px; height:21px; }
 
 /* scroll body */
-.m-scroll{ position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch; scroll-padding-top:74px; overscroll-behavior-y:contain; touch-action:pan-y; }
+.m-scroll{ position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; touch-action:pan-y; }
 .m-sec{ padding:38px 20px 0; }
 .m-scroll-pad{ height:20px; }
 
@@ -5162,15 +5164,7 @@ nav:not(.m-tabbar) {
       setScrolled(sc.scrollTop > threshold);
     }, {passive:true});
 
-    // Enhancement: IntersectionObserver for instant trigger when hero leaves view
-    if(window.IntersectionObserver && hero){
-      var io = new IntersectionObserver(function(entries){
-        entries.forEach(function(e){
-          if(!e.isIntersecting) setScrolled(true);
-        });
-      }, { root: sc, threshold: 0, rootMargin: '0px' });
-      io.observe(hero);
-    }
+    // Scroll listener above handles all cases reliably
     } )();
   window.mHome=function(el){
     if(el){ document.querySelectorAll('.m-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
