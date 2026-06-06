@@ -201,8 +201,8 @@ window.addEventListener('load', function() {
             font-weight: 600;
         }
         
-        nav {
-            background: #1a1a1a; /* Change from var(--black) to match hero */
+        nav:not(.m-tabbar) {
+            background: #1a1a1a;
             padding: 20px 60px;
             display: flex;
             justify-content: space-between;
@@ -210,12 +210,12 @@ window.addEventListener('load', function() {
             position: fixed;
             top: 40px;
             width: 100%;
-            z-index: 10000; /* CRITICAL: Higher than video overlay */
-            pointer-events: auto !important; /* Ensure nav is clickable */
+            z-index: 10000;
+            pointer-events: auto !important;
         }
         
-        nav * {
-            pointer-events: auto !important; /* All nav elements clickable */
+        nav:not(.m-tabbar) * {
+            pointer-events: auto !important;
         }
         
         .nav-container {
@@ -285,7 +285,7 @@ window.addEventListener('load', function() {
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
-            z-index: 1000;
+            z-index: 100000;
             list-style: none;
         }
 
@@ -4098,8 +4098,8 @@ window.addEventListener('load', function() {
         padding: 10px 16px;
     }
 
-nav {
-    padding: 12px 20px; /* Reduce padding on mobile */
+nav:not(.m-tabbar) {
+    padding: 12px 20px;
     top: 38px;
 }
     
@@ -4584,195 +4584,128 @@ nav {
 </style>
 <style id="crown-perf-cv">
 /* Crown perf: skip rendering/painting of off-screen sections until scrolled near (faster load + scroll) */
+/* NOTE: Must use "body >" so mobile sections inside .m-app > .m-scroll are NOT matched.
+   content-visibility:auto inside a fixed/absolute scroll container breaks rendering
+   because the browser can't detect those sections as "in view". */
 @media (min-width:1px){
-  section:not(:first-of-type), footer { content-visibility:auto; contain-intrinsic-size:auto 800px; }
+  body > section:not(:first-of-type), body > footer { content-visibility:auto; contain-intrinsic-size:auto 800px; }
 }
 </style>
 </head>
 <body>
 <!-- ============================================================
-     CROWN — MOBILE APP EXPERIENCE (index)  [injected]
-     White theme · gold accents · fonts match pricing.html
+     CROWN — MOBILE HOMEPAGE (single flow)  [injected]
+     ARCHITECH-style hero · editorial sections · footer
      ============================================================ -->
 <div class="m-app" id="mApp">
 
-  <!-- ===================== SCREEN 1 — HERO (photo) ===================== -->
-  <section class="m-hero" id="mHero">
-    <div class="m-hero-bg">
-      <img src="pexels-mert-celik-1876960105-29755710.jpg" alt="Freshly coated vehicle" class="m-hero-img">
+  <!-- ===== sticky top bar ===== -->
+  <header class="m-top2">
+    <a class="m-top2-logo" href="index.html"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="m-logo-wm"><b>CROWN</b><i>CERAMIC COATING</i></span></a>
+    <div class="m-top2-icons">
+      <button aria-label="Search" onclick="crownSearchOpen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.7" y2="16.7"/></svg></button>
+      <a aria-label="Account" href="client_portal.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+      <button aria-label="Menu" onclick="mOpenMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg></button>
     </div>
-    <header class="m-hero-top">
-      <span class="m-hero-spacer"></span>
-      <a href="#" class="m-hero-brand" onclick="return false;">
-        <span class="m-brand-mark">CROWN</span>
-        <span class="m-brand-sub">CERAMIC COATING</span>
-      </a>
-      <button class="m-menu-btn" aria-label="Open menu" onclick="mOpenMenu()">
-        <span></span><span></span><span></span>
+  </header>
+
+  <!-- ===== scroll body ===== -->
+  <div class="m-scroll" id="mScroll">
+
+    <!-- HERO (image 1 style) -->
+    <section class="m-hero2">
+      <img class="m-hero2-img" src="pexels-egeardaphotos-2148533277-34054735.jpg" alt="Freshly ceramic-coated vehicle">
+      <div class="m-hero2-shade"></div>
+      <button class="m-hero-menu" aria-label="Menu" onclick="mOpenMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg></button>
+      <div class="m-hero2-inner">
+        <h1 class="m-hero2-title">Protect<br>what you<br>drive.</h1>
+        <p class="m-hero2-copy">Premium ceramic coatings, paint correction and luxury detailing across Dallas&ndash;Fort Worth &mdash; protection and shine you can see in every reflection.</p>
+        <button class="m-hero2-btn" onclick="mScrollTo('mFind')">Get Started <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      </div>
+      <button class="m-scrollcue" onclick="mScrollTo('mFind')" aria-label="Scroll down">
+        <span>Scroll</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-    </header>
-    <div class="m-hero-foot">
-      <p class="m-hero-eyebrow">PREMIUM DETAILING · DALLAS–FORT WORTH</p>
-      <h1 class="m-hero-title">Showroom Shine.<br>Lasting Protection.</h1>
-      <p class="m-hero-copy">Professional-grade ceramic coatings, paint correction and luxury detailing — built on integrity and results you can see in the reflection.</p>
-      <button class="m-getstarted" onclick="mStart()">Get Started
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </button>
-    </div>
-  </section>
+    </section>
 
-  <!-- ===================== SCREEN 2 — APP HOME (white) ===================== -->
-  <section class="m-home" id="mHome">
-    <div class="m-home-scroll">
-
-      <!-- greeting -->
-      <header class="m-greet">
-        <div class="m-greet-left">
-          <span class="m-greet-hi">Good Evening!</span>
-          <span class="m-greet-name">Crown Ceramic Coating</span>
-        </div>
-        <button class="m-bell" aria-label="Menu" onclick="mOpenMenu()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <span class="m-bell-dot"></span>
-        </button>
-      </header>
-
-      <!-- search -->
+    <!-- EXPLORE SERVICES (search + tiles) -->
+    <section id="mFind" class="m-sec">
+      <h2 class="ed-h">Explore<br>Services</h2>
+      <p class="m-lead">Find exactly what your vehicle needs &mdash; from a full ceramic package to a quick maintenance detail.</p>
       <div class="m-search">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="mSearchInput" placeholder="Find the service you need today..." oninput="mFilterCats(this.value)" autocomplete="off">
       </div>
-
-      <!-- popular services -->
-      <div class="m-sec-head"><h2>Popular Services</h2></div>
       <div class="m-cats" id="mCats">
-        <a class="m-cat" href="pricing.html#ceramic" data-name="ceramic coating liquid glass 9h">
-          <span class="m-cat-img" style="background-image:url('pexels-cottonbro-5082237 (1).jpg')"></span>
-          <span class="m-cat-label">Ceramic<br>Coating</span>
-        </a>
-        <a class="m-cat" href="pricing.html#correction" data-name="paint correction polishing swirl scratch">
-          <span class="m-cat-img" style="background-image:url('pexels-autorecords-10186994.jpg')"></span>
-          <span class="m-cat-label">Paint<br>Correction</span>
-        </a>
-        <a class="m-cat" href="pricing.html#detailing" data-name="interior detailing deep clean leather">
-          <span class="m-cat-img" style="background-image:url('pexels-bylukemiller-14231686.jpg')"></span>
-          <span class="m-cat-label">Interior<br>Detail</span>
-        </a>
-        <a class="m-cat" href="pricing.html#ceramic" data-name="paint protection film ppf clear bra">
-          <span class="m-cat-img" style="background-image:url('pexels-entero-37208720.jpg')"></span>
-          <span class="m-cat-label">Protection<br>Film</span>
-        </a>
-        <a class="m-cat" href="pricing.html#ceramic" data-name="wheel coating brake dust rims">
-          <span class="m-cat-img" style="background-image:url('pexels-holyson-h-2154634702-35403673.jpg')"></span>
-          <span class="m-cat-label">Wheel<br>Coating</span>
-        </a>
-        <a class="m-cat" href="pricing.html#detailing" data-name="full detail wash exterior interior">
-          <span class="m-cat-img" style="background-image:url('pexels-ivan-kazlouski-234108500-12175729.jpg')"></span>
-          <span class="m-cat-label">Full<br>Detail</span>
-        </a>
-        <a class="m-cat" href="pricing.html#detailing" data-name="maintenance plan wash upkeep">
-          <span class="m-cat-img" style="background-image:url('pexels-mert-celik-1876960105-29755710.jpg')"></span>
-          <span class="m-cat-label">Maintenance<br>Plan</span>
-        </a>
-        <a class="m-cat" href="pricing.html" data-name="more all services packages pricing">
-          <span class="m-cat-img m-cat-more">20+</span>
-          <span class="m-cat-label">View<br>All</span>
-        </a>
+        <a class="m-cat" href="pricing.html#ceramic" data-name="ceramic coating liquid glass 9h"><span class="m-cat-img" style="background-image:url('pexels-cottonbro-5082237 (1).jpg')"></span><span class="m-cat-label">Ceramic<br>Coating</span></a>
+        <a class="m-cat" href="pricing.html#correction" data-name="paint correction polishing swirl"><span class="m-cat-img" style="background-image:url('pexels-autorecords-10186994.jpg')"></span><span class="m-cat-label">Paint<br>Correction</span></a>
+        <a class="m-cat" href="pricing.html#detailing" data-name="interior detailing deep clean leather"><span class="m-cat-img" style="background-image:url('pexels-bylukemiller-14231686.jpg')"></span><span class="m-cat-label">Interior<br>Detail</span></a>
+        <a class="m-cat" href="pricing.html#ceramic" data-name="paint protection film ppf clear bra"><span class="m-cat-img" style="background-image:url('pexels-entero-37208720.jpg')"></span><span class="m-cat-label">Protection<br>Film</span></a>
+        <a class="m-cat" href="pricing.html#ceramic" data-name="wheel coating brake dust rims"><span class="m-cat-img" style="background-image:url('pexels-holyson-h-2154634702-35403673.jpg')"></span><span class="m-cat-label">Wheel<br>Coating</span></a>
+        <a class="m-cat" href="pricing.html#detailing" data-name="full detail wash exterior interior"><span class="m-cat-img" style="background-image:url('pexels-ivan-kazlouski-234108500-12175729.jpg')"></span><span class="m-cat-label">Full<br>Detail</span></a>
+        <a class="m-cat" href="pricing.html#detailing" data-name="maintenance plan wash upkeep"><span class="m-cat-img" style="background-image:url('pexels-mert-celik-1876960105-29755710.jpg')"></span><span class="m-cat-label">Maintenance<br>Plan</span></a>
+        <a class="m-cat" href="pricing.html" data-name="more all services packages pricing"><span class="m-cat-img m-cat-more">20+</span><span class="m-cat-label">View<br>All</span></a>
       </div>
       <p class="m-cats-empty" id="mCatsEmpty">No services match that search.</p>
+    </section>
 
-      <!-- stats strip -->
-      <div class="m-stats">
-        <div class="m-stat"><span class="m-stat-n">100+</span><span class="m-stat-c">Vehicles Coated</span></div>
-        <div class="m-stat"><span class="m-stat-n">4.9★</span><span class="m-stat-c">Average Review</span></div>
-        <div class="m-stat"><span class="m-stat-n">10+ yrs</span><span class="m-stat-c">Experience</span></div>
+    <!-- EDITORIAL FEATURE: Crown Treatment -->
+    <section class="ed-feat">
+      <div class="ed-feat-imgwrap">
+        <div class="ed-feat-img" style="background-image:url('pexels-cottonbro-5082237 (1).jpg')"></div>
+        <a class="ed-feat-pill" href="process.html">Read More</a>
       </div>
+      <div class="ed-feat-body">
+        <span class="ed-feat-kicker">The Crown Treatment</span>
+        <p>A Crown ceramic coating turns your paint into liquid glass &mdash; a deep, wet, reflective shine wrapped in a hardened, hydrophobic shell. It shrugs off UV, chemicals and Texas road grime, sheds water on contact, and keeps your finish looking showroom-fresh for years, not weeks. Protection worthy of a crown.</p>
+      </div>
+    </section>
 
-      <!-- marquee band -->
-      <div class="ed-marquee">
-        <div class="ed-marquee-track">
-          <span>Fast Response</span><i>&#10033;</i><span>Free Quotes</span><i>&#10033;</i><span>5-Star Rated</span><i>&#10033;</i><span>Owner-Operated</span><i>&#10033;</i><span>Fast Response</span><i>&#10033;</i><span>Free Quotes</span><i>&#10033;</i><span>5-Star Rated</span><i>&#10033;</i><span>Owner-Operated</span><i>&#10033;</i>
+    <!-- EDITORIAL FEATURE: What We Do -->
+    <section class="ed-feat">
+      <div class="ed-feat-imgwrap">
+        <div class="ed-feat-img" style="background-image:url('pexels-bylukemiller-14231686.jpg')"></div>
+        <a class="ed-feat-pill" href="pricing.html">Read More</a>
+      </div>
+      <div class="ed-feat-body">
+        <span class="ed-feat-kicker">What We Do</span>
+        <p>Four core services, one obsession with doing things right. We layer professional-grade ceramic coatings, refine paint through single to multi-stage correction, reset interiors top to bottom, and shield vulnerable panels with self-healing film.</p>
+        <ul class="ed-list">
+          <li><a href="pricing.html#ceramic"><span>Ceramic Coating</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></li>
+          <li><a href="pricing.html#correction"><span>Paint Correction</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></li>
+          <li><a href="pricing.html#detailing"><span>Interior Detailing</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></li>
+          <li><a href="pricing.html#ceramic"><span>Paint Protection Film</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="ed-marquee">
+      <div class="ed-marquee-track">
+        <span>Fast Response</span><i>&#10033;</i><span>Free Quotes</span><i>&#10033;</i><span>5-Star Rated</span><i>&#10033;</i><span>Owner-Operated</span><i>&#10033;</i><span>Fast Response</span><i>&#10033;</i><span>Free Quotes</span><i>&#10033;</i><span>5-Star Rated</span><i>&#10033;</i><span>Owner-Operated</span><i>&#10033;</i>
+      </div>
+    </div>
+
+    <!-- EDITORIAL FEATURE: Our Process -->
+    <section class="ed-feat">
+      <div class="ed-feat-imgwrap">
+        <div class="ed-feat-img" style="background-image:url('pexels-entero-37208720.jpg')"></div>
+        <a class="ed-feat-pill" href="process.html">Read More</a>
+      </div>
+      <div class="ed-feat-body">
+        <span class="ed-feat-kicker">Our Process</span>
+        <p>Every vehicle follows the same meticulous path. We inspect and decontaminate, correct the paint under professional lighting, apply your coating panel by panel in a controlled bay, then cure, warranty and hand you a maintenance plan &mdash; nothing rushed, nothing hidden.</p>
+        <div class="ed-steps">
+          <div class="ed-step"><b>01</b><span>Inspect &amp; Decon</span></div>
+          <div class="ed-step"><b>02</b><span>Correct</span></div>
+          <div class="ed-step"><b>03</b><span>Coat</span></div>
+          <div class="ed-step"><b>04</b><span>Cure &amp; Protect</span></div>
         </div>
       </div>
+    </section>
 
-      <!-- the crown treatment -->
-      <div class="m-sec-head"><h2>The Crown Treatment</h2></div>
-      <p class="m-sec-sub">Protection worthy of a crown — three things every Crown job delivers.</p>
-      <div class="m-treat">
-        <article class="m-treat-card" style="background-image:url('pexels-cottonbro-5082237 (1).jpg')">
-          <span class="m-treat-no">01</span>
-          <div class="m-treat-foot">
-            <h3 class="m-treat-title">Mirror-Deep Gloss</h3>
-            <p class="m-treat-desc">Your paint becomes liquid glass — a deep, wet, reflective shine that turns heads in every parking lot.</p>
-            <div class="m-treat-stat"><strong>9H</strong><span>Surface hardness<br>95%+ gloss retention</span></div>
-          </div>
-        </article>
-        <article class="m-treat-card" style="background-image:url('pexels-radubradu-395822838-19524777.jpg')">
-          <span class="m-treat-no">02</span>
-          <div class="m-treat-foot">
-            <h3 class="m-treat-title">Years of Protection</h3>
-            <p class="m-treat-desc">A hardened, hydrophobic shell defends against UV fade, chemical etching and Texas road hazards.</p>
-            <div class="m-treat-stat"><strong>5-Yr</strong><span>Written warranty<br>UV &amp; chemical defense</span></div>
-          </div>
-        </article>
-        <article class="m-treat-card" style="background-image:url('pexels-entero-37208720.jpg')">
-          <span class="m-treat-no">03</span>
-          <div class="m-treat-foot">
-            <h3 class="m-treat-title">Effortless Upkeep</h3>
-            <p class="m-treat-desc">A coated car practically cleans itself — dirt and water sheet off, and washes take half the time.</p>
-            <div class="m-treat-stat"><strong>&frac12;</strong><span>The wash time<br>Self-cleaning finish</span></div>
-          </div>
-        </article>
-      </div>
-
-      <!-- what we do -->
-      <div class="m-sec-head"><h2>What We Do</h2></div>
-      <div class="m-do">
-        <a class="m-do-row" href="pricing.html#ceramic">
-          <span class="m-do-thumb" style="background-image:url('pexels-cottonbro-5082237 (1).jpg')"></span>
-          <span class="m-do-text"><strong>Ceramic Coating</strong><span>A pro-grade coating bonds to your clear coat — a hard, glossy, hydrophobic shield that lasts years, not weeks.</span></span>
-          <span class="m-do-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-        </a>
-        <a class="m-do-row" href="pricing.html#correction">
-          <span class="m-do-thumb" style="background-image:url('pexels-autorecords-10186994.jpg')"></span>
-          <span class="m-do-text"><strong>Paint Correction</strong><span>Single, two or multi-stage machine polishing removes swirls, scratches and oxidation for a true mirror finish.</span></span>
-          <span class="m-do-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-        </a>
-        <a class="m-do-row" href="pricing.html#detailing">
-          <span class="m-do-thumb" style="background-image:url('pexels-bylukemiller-14231686.jpg')"></span>
-          <span class="m-do-text"><strong>Interior Detailing</strong><span>A complete reset: steam cleaning, stain extraction, leather conditioning, odor removal and surface protection.</span></span>
-          <span class="m-do-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-        </a>
-        <a class="m-do-row" href="pricing.html#ceramic">
-          <span class="m-do-thumb" style="background-image:url('pexels-entero-37208720.jpg')"></span>
-          <span class="m-do-text"><strong>Paint Protection Film</strong><span>Self-healing film shields vulnerable panels from rock chips &amp; debris — invisible, removable, ultimate defense.</span></span>
-          <span class="m-do-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-        </a>
-      </div>
-
-      <!-- our process -->
-      <div class="m-sec-head"><h2>Our Process</h2></div>
-      <p class="m-sec-sub">Built on integrity &amp; results — do the job right, every time, with nothing hidden.</p>
-      <div class="m-proc">
-        <div class="m-proc-step">
-          <div class="m-proc-rail"><span class="m-proc-node">1</span><span class="m-proc-line"></span></div>
-          <div class="m-proc-card"><span class="m-proc-kicker">Step 01</span><h4>Inspect &amp; Decontaminate</h4><p>A thorough inspection and a deep, multi-stage decon wash — foam, clay and iron removal.</p></div>
-        </div>
-        <div class="m-proc-step">
-          <div class="m-proc-rail"><span class="m-proc-node">2</span><span class="m-proc-line"></span></div>
-          <div class="m-proc-card"><span class="m-proc-kicker">Step 02</span><h4>Paint Correction</h4><p>Under professional lighting we machine-polish away swirls and oxidation, measuring paint depth as we go.</p></div>
-        </div>
-        <div class="m-proc-step">
-          <div class="m-proc-rail"><span class="m-proc-node">3</span><span class="m-proc-line"></span></div>
-          <div class="m-proc-card"><span class="m-proc-kicker">Step 03</span><h4>Ceramic Coating</h4><p>In a climate-controlled bay we apply your coating panel by panel for a flawless, glass-like finish.</p></div>
-        </div>
-        <div class="m-proc-step">
-          <div class="m-proc-rail"><span class="m-proc-node">4</span><span class="m-proc-line"></span></div>
-          <div class="m-proc-card"><span class="m-proc-kicker">Step 04</span><h4>Cure, Protect &amp; Maintain</h4><p>Your coating cures, you receive a written warranty, and a maintenance plan keeps that shine performing.</p></div>
-        </div>
-      </div>
-
-      <!-- our collections (we coat) -->
+    <!-- WE COAT (collections) -->
+    <section class="m-sec">
       <div class="ed-coll-head">
         <h2 class="ed-coll-title">What<br>We Coat</h2>
         <a class="ed-more" href="portfolio.html"><span class="ed-more-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>More Work</a>
@@ -4785,32 +4718,27 @@ nav {
       </div>
       <div class="ed-coll-cta">
         <h3>Protection for<br>every vehicle.</h3>
-        <p>From daily drivers to garage-kept exotics — detail-shop precision and an obsession with doing things right on every car that rolls in.</p>
+        <p>From daily drivers to garage-kept exotics &mdash; detail-shop precision on every car that rolls in.</p>
         <div class="ed-coll-btns">
           <a class="ed-pill-dark" href="#" onclick="openModal();return false;">Book Now</a>
           <a class="ed-pill-out" href="pricing.html">View Pricing</a>
         </div>
       </div>
+    </section>
 
-      <!-- featured work -->
-      <div class="m-sec-head"><h2>Featured Work</h2><a href="portfolio.html" class="m-seeall">See all</a></div>
+    <!-- FEATURED WORK -->
+    <section class="m-sec">
+      <div class="ed-coll-head"><h2 class="ed-coll-title">Featured<br>Work</h2><a class="m-seeall" href="portfolio.html">See all</a></div>
       <div class="m-feat">
-        <a href="portfolio.html" class="m-feat-card">
-          <img src="pexels-radubradu-395822838-19524777.jpg" alt="Ceramic coated exotic">
-          <div class="m-feat-tag"><span class="m-feat-dot"></span><span>Crown Signature · 9H</span></div>
-        </a>
-        <a href="portfolio.html" class="m-feat-card">
-          <img src="pexels-entero-37208720.jpg" alt="Paint correction result">
-          <div class="m-feat-tag"><span class="m-feat-dot"></span><span>Multi-Stage Correction</span></div>
-        </a>
-        <a href="portfolio.html" class="m-feat-card">
-          <img src="pexels-ivan-kazlouski-234108500-12175729.jpg" alt="Full detail result">
-          <div class="m-feat-tag"><span class="m-feat-dot"></span><span>Full Detail · In &amp; Out</span></div>
-        </a>
+        <a href="portfolio.html" class="m-feat-card"><img src="pexels-radubradu-395822838-19524777.jpg" alt="Ceramic coated exotic"><div class="m-feat-tag"><span class="m-feat-dot"></span><span>Crown Signature &middot; 9H</span></div></a>
+        <a href="portfolio.html" class="m-feat-card"><img src="pexels-entero-37208720.jpg" alt="Paint correction result"><div class="m-feat-tag"><span class="m-feat-dot"></span><span>Multi-Stage Correction</span></div></a>
+        <a href="portfolio.html" class="m-feat-card"><img src="pexels-ivan-kazlouski-234108500-12175729.jpg" alt="Full detail result"><div class="m-feat-tag"><span class="m-feat-dot"></span><span>Full Detail &middot; In &amp; Out</span></div></a>
       </div>
+    </section>
 
-      <!-- testimonials -->
-      <div class="m-sec-head"><h2>Happy Clients</h2></div>
+    <!-- TESTIMONIALS -->
+    <section class="m-sec">
+      <h2 class="ed-h">What Our<br>Clients Say</h2>
       <div class="ed-tmls">
         <article class="ed-tml">
           <div class="ed-tml-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
@@ -4828,312 +4756,382 @@ nav {
           <div class="ed-tml-by"><img src="https://i.pravatar.cc/80?img=32" alt=""><div><strong>Luis M.</strong><span>F-150 &middot; Full Detail</span></div></div>
         </article>
       </div>
-      <div class="ed-rating"><strong>4.9/5</strong><span>from hundreds of happy clients across DFW</span></div>
+    </section>
 
-      <!-- insights / blog -->
-      <div class="m-sec-head"><h2>Insights</h2><a href="blog.html" class="m-seeall">Read the blog</a></div>
+    <!-- INSIGHTS -->
+    <section class="m-sec">
+      <div class="ed-coll-head"><h2 class="ed-coll-title">Insights</h2><a href="blog.html" class="m-seeall">Read the blog</a></div>
       <div class="ed-blogs">
         <article class="ed-blog">
-          <div class="ed-blog-img">
-            <div class="ed-blog-photo" style="background-image:url('pexels-bylukemiller-14231686.jpg')"></div>
-            <a class="ed-blog-pill" href="blog.html">Read More</a>
-          </div>
+          <div class="ed-blog-img"><div class="ed-blog-photo" style="background-image:url('pexels-bylukemiller-14231686.jpg')"></div><a class="ed-blog-pill" href="blog.html">Read More</a></div>
           <h3 class="ed-blog-title">Ceramic vs. Wax vs. Sealant</h3>
           <p class="ed-blog-desc">What actually protects your paint &mdash; and what&rsquo;s just marketing hype.</p>
         </article>
         <article class="ed-blog">
-          <div class="ed-blog-img">
-            <div class="ed-blog-photo" style="background-image:url('pexels-autorecords-10186994.jpg')"></div>
-            <a class="ed-blog-pill" href="blog.html">Read More</a>
-          </div>
+          <div class="ed-blog-img"><div class="ed-blog-photo" style="background-image:url('pexels-autorecords-10186994.jpg')"></div><a class="ed-blog-pill" href="blog.html">Read More</a></div>
           <h3 class="ed-blog-title">Is Paint Correction Worth It?</h3>
           <p class="ed-blog-desc">What those swirl marks are really costing your paint over time.</p>
         </article>
       </div>
+    </section>
 
-      <!-- service area -->
-      <div class="m-sec-head"><h2>Service Area</h2></div>
-      <div class="m-area">
-        <div class="m-area-map">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
-        <div class="m-area-body">
-          <h3>Across Dallas–Fort Worth</h3>
-          <p>Based in Forney and proudly serving the entire DFW metroplex with detail-shop precision.</p>
-          <div class="m-area-tags"><span>Dallas</span><span>Fort Worth</span><span>Rockwall</span><span>Mesquite</span><span>Garland</span><span>Terrell</span></div>
+    <!-- CTA band -->
+    <section class="m-sec">
+      <div class="ed-cta">
+        <h3>Ready for the<br>Crown Treatment?</h3>
+        <p>Tell us about your vehicle and get a free, honest quote within 24 hours.</p>
+        <button class="ed-cta-btn" onclick="openModal()">Get a Free Quote</button>
+      </div>
+    </section>
+
+    <!-- FOOTER (image 2 style) -->
+    <footer class="m-foot">
+      <div class="m-foot-brand">
+        <span class="m-foot-logo"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Crown Ceramic Coating</span></span>
+        <p>Premium ceramic coating, paint correction &amp; detailing across the Dallas&ndash;Fort Worth metroplex.</p>
+      </div>
+      <div class="m-foot-news">
+        <label>Get our latest offers &amp; detailing tips</label>
+        <div class="m-foot-form">
+          <input type="email" placeholder="Your email address..." autocomplete="email">
+          <button onclick="window.location.href='contact.html'">Subscribe</button>
         </div>
       </div>
-
-      <!-- inline CTA -->
-      <div class="m-cta-band">
-        <div>
-          <p class="m-cta-band-title">Ready for the Crown Treatment?</p>
-          <p class="m-cta-band-sub">Free, honest quote within 24 hours.</p>
+      <div class="m-foot-cols">
+        <div class="m-foot-col">
+          <h5>Services</h5>
+          <a href="pricing.html#ceramic">Ceramic Coating</a>
+          <a href="pricing.html#correction">Paint Correction</a>
+          <a href="pricing.html#detailing">Interior Detailing</a>
+          <a href="pricing.html">Maintenance Plans</a>
         </div>
-        <button onclick="openModal()">Get a Quote</button>
+        <div class="m-foot-col">
+          <h5>Company</h5>
+          <a href="about.html">About Us</a>
+          <a href="portfolio.html">Our Work</a>
+          <a href="process.html">Our Process</a>
+          <a href="contact.html">Contact</a>
+        </div>
+        <div class="m-foot-col">
+          <h5>Legal</h5>
+          <a href="contact.html">Warranty</a>
+          <a href="contact.html">Privacy</a>
+          <a href="contact.html">Terms</a>
+        </div>
       </div>
+      <div class="m-foot-social">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        <a href="tel:+19402178680" aria-label="Phone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>
+      </div>
+      <div class="m-foot-bottom">&copy; 2026 Crown Ceramic Coating &middot; Rockwall&ndash;Dallas, TX &middot; All rights reserved</div>
+    </footer>
 
-      <div class="m-foot-note">© 2026 Crown Ceramic Coating · Rockwall–Dallas, TX</div>
-      <div style="height:96px"></div>
+    <div class="m-scroll-pad"></div>
+  </div>
+
+  <!-- ===== bottom tab bar ===== -->
+  <nav class="m-tabbar" id="mTabbar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:99995;background:#fff;border-top:1px solid #ececee;padding:10px 8px calc(env(safe-area-inset-bottom,0px) + 10px);align-items:center;justify-content:space-around;transition:transform .4s cubic-bezier(.7,0,.2,1);">
+    <button class="m-tab active" onclick="mHome(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></button>
+    <a class="m-tab" href="portfolio.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Portfolio</span></a>
+    <button class="m-tab m-tab-fab" onclick="openModal()" aria-label="Book now"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></button>
+    <a class="m-tab" href="pricing.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>Pricing</span></a>
+    <a class="m-tab" href="client_portal.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Account</span></a>
+  </nav>
+<script>document.getElementById("mTabbar").style.display="none";</script>
+
+
+<!-- ===== nav search dropdown ===== -->
+<div class="cs-overlay" id="csOverlay" onclick="if(event.target===this)crownSearchClose()">
+  <div class="cs-panel">
+    <div class="cs-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.7" y2="16.7"/></svg>
+      <input id="csInput" type="text" placeholder="Search services, pricing, work..." oninput="crownSearchRun(this.value)" autocomplete="off">
+      <button class="cs-x" onclick="crownSearchClose()" aria-label="Close">&#10005;</button>
     </div>
+    <div class="cs-results" id="csResults"></div>
+  </div>
+</div>
+<style id="crown-search-css">
+.cs-overlay{ position:absolute; inset:0; z-index:120; background:rgba(20,22,26,.45); backdrop-filter:blur(2px); opacity:0; visibility:hidden; transition:opacity .25s, visibility .25s; }
+.cs-overlay.open{ opacity:1; visibility:visible; }
+.cs-panel{ position:absolute; top:0; left:0; right:0; background:#fff; border-radius:0 0 22px 22px; box-shadow:0 20px 44px rgba(0,0,0,.28); display:flex; flex-direction:column; max-height:86%; padding-top:calc(env(safe-area-inset-top,0px)); transform:translateY(-14px); opacity:0; transition:transform .28s cubic-bezier(.7,0,.2,1), opacity .25s; }
+.cs-overlay.open .cs-panel{ transform:translateY(0); opacity:1; }
+.cs-bar{ display:flex; align-items:center; gap:11px; padding:18px; border-bottom:1px solid #ececee; }
+.cs-bar > svg{ width:21px; height:21px; color:#8a9099; flex:none; }
+.cs-bar input{ flex:1; border:none; outline:none; font-size:16px; color:#14161a; font-family:inherit; background:none; }
+.cs-bar input::placeholder{ color:#8a9099; }
+.cs-x{ flex:none; width:32px; height:32px; border:none; background:#f4f5f6; color:#8a9099; border-radius:50%; font-size:13px; cursor:pointer; }
+.cs-results{ overflow-y:auto; -webkit-overflow-scrolling:touch; padding:6px 0 12px; }
+.cs-head{ padding:15px 18px 7px; font-size:11px; font-weight:800; letter-spacing:1.3px; text-transform:uppercase; color:#aeb3ba; }
+.cs-item{ display:flex; align-items:center; gap:13px; padding:12px 18px; text-decoration:none; }
+.cs-item:active{ background:#f7f7f8; }
+.cs-ic{ flex:none; width:40px; height:40px; border-radius:12px; background:#f6edda; color:#b07d2b; display:flex; align-items:center; justify-content:center; }
+.cs-ic svg{ width:20px; height:20px; }
+.cs-meta{ flex:1; min-width:0; }
+.cs-t{ display:block; font-size:15px; font-weight:700; color:#14161a; }
+.cs-d{ display:block; font-size:12.5px; color:#8a9099; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cs-arrow{ flex:none; color:#caa14a; display:flex; }
+.cs-arrow svg{ width:18px; height:18px; }
+.cs-empty{ padding:34px 18px; text-align:center; color:#8a9099; font-size:14px; line-height:1.6; }
+</style>
+<script>
+(function(){
+  var IP={
+    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+    sofa:'<path d="M4 12V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M2 14a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3H2z"/><path d="M5 17v2M19 17v2"/>',
+    droplet:'<path d="M12 2.7s5.5 5.6 5.5 9.8a5.5 5.5 0 0 1-11 0C6.5 8.3 12 2.7 12 2.7z"/>',
+    tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+    image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+    info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+    doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+    user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    route:'<circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M9 19h6a3 3 0 0 0 3-3V8"/>',
+    crown:'<path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z"/><line x1="3" y1="21" x2="21" y2="21"/>'
+  };
+  function ic(k){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+(IP[k]||IP.tag)+'</svg>'; }
+  var ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+  var DATA=[
+    {t:'Ceramic Coating', d:'Long-lasting gloss & paint protection', u:'pricing.html#ceramic', i:'shield', k:'ceramic coating 9h liquid glass gloss hydrophobic protection sealant nano', pop:1},
+    {t:'Paint Correction', d:'Remove swirls, scratches & oxidation', u:'pricing.html#correction', i:'layers', k:'paint correction polish swirl scratch oxidation buffing compound mirror', pop:1},
+    {t:'Interior Detailing', d:'Deep interior clean & protection', u:'pricing.html#detailing', i:'sofa', k:'interior detailing leather vacuum shampoo seats carpet odor clean steam'},
+    {t:'Paint Protection Film (PPF)', d:'Self-healing rock-chip defense', u:'pricing.html#ceramic', i:'shield', k:'ppf paint protection film clear bra rock chip self healing'},
+    {t:'Maintenance Plans', d:'Keep that coated shine year-round', u:'pricing.html', i:'droplet', k:'maintenance plan wash upkeep top up'},
+    {t:'Pricing & Packages', d:'See every package & price', u:'pricing.html', i:'tag', k:'pricing packages price cost plans quote how much', pop:1},
+    {t:'The Crown Treatment', d:'Why a Crown coating lasts', u:'index.html', i:'crown', k:'crown treatment gloss protection upkeep'},
+    {t:'Our Process', d:'How we do it, step by step', u:'process.html', i:'route', k:'process steps how it works inspect decontaminate correct coat cure'},
+    {t:'Portfolio / Our Work', d:'Browse before & after results', u:'portfolio.html', i:'image', k:'portfolio work gallery before after results photos exotics luxury trucks', pop:1},
+    {t:'About Us', d:'Our story & team', u:'about.html', i:'info', k:'about story team owner who we are mission'},
+    {t:'Blog & Insights', d:'Detailing tips & guides', u:'blog.html', i:'doc', k:'blog insights tips guide articles ceramic vs wax'},
+    {t:'Book / Get a Quote', d:'Request a free quote in 24 hrs', u:'contact.html', i:'cal', k:'book booking appointment quote schedule estimate free', pop:1},
+    {t:'Contact Us', d:'Call, email or message us', u:'contact.html', i:'phone', k:'contact phone email call message address location hours'},
+    {t:'Client Portal', d:'Invoices, agreements & account', u:'client_portal.html', i:'user', k:'portal account login invoices client agreements sign in receipts'}
+  ];
+  function row(e){ return '<a class="cs-item" href="'+e.u+'"><span class="cs-ic">'+ic(e.i)+'</span><span class="cs-meta"><span class="cs-t">'+e.t+'</span><span class="cs-d">'+e.d+'</span></span><span class="cs-arrow">'+ARROW+'</span></a>'; }
+  window.crownSearchOpen=function(){ var o=document.getElementById('csOverlay'); o.classList.add('open'); crownSearchRun(''); setTimeout(function(){ var i=document.getElementById('csInput'); if(i){ i.value=''; i.focus(); } },140); };
+  window.crownSearchClose=function(){ document.getElementById('csOverlay').classList.remove('open'); };
+  window.crownSearchRun=function(q){
+    q=(q||'').trim().toLowerCase();
+    var res=document.getElementById('csResults'), list, head;
+    if(!q){ list=DATA.filter(function(e){return e.pop;}); head='Popular'; }
+    else { var w=q.split(/\s+/); list=DATA.filter(function(e){ var h=(e.t+' '+e.k).toLowerCase(); return w.every(function(x){return h.indexOf(x)>-1;}); }); head=list.length+(list.length===1?' result':' results'); }
+    if(!list.length){ res.innerHTML='<div class="cs-empty">No matches for that. Try &ldquo;ceramic&rdquo;, &ldquo;pricing&rdquo;, &ldquo;portfolio&rdquo; or &ldquo;book&rdquo;.</div>'; return; }
+    res.innerHTML='<div class="cs-head">'+head+'</div>'+list.map(row).join('');
+  };
+})();
+</script>
+<!-- ===== end nav search dropdown ===== -->
 
-    <!-- bottom nav -->
-    <nav class="m-tabbar">
-      <button class="m-tab active" onclick="mTab(this,'home')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>Home</span>
-      </button>
-      <a class="m-tab" href="portfolio.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        <span>Work</span>
-      </a>
-      <button class="m-tab m-tab-fab" onclick="openModal()" aria-label="Book now">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
-      <a class="m-tab" href="pricing.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        <span>Pricing</span>
-      </a>
-      <a class="m-tab" href="client_portal.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span>Account</span>
-      </a>
-    </nav>
-  </section>
-
-  <!-- ===================== SLIDE-IN MENU (white) ===================== -->
+  <!-- ===== slide-in menu ===== -->
   <div class="m-menu-overlay" id="mMenu" onclick="if(event.target===this)mCloseMenu()">
     <div class="m-menu-panel">
-      <div class="m-menu-top">
-        <span class="m-menu-logo">CROWN</span>
-        <button class="m-menu-x" onclick="mCloseMenu()" aria-label="Close">&#10005;</button>
-      </div>
+      <div class="m-menu-top"><span class="m-menu-logo"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="m-logo-wm"><b>CROWN</b><i>CERAMIC COATING</i></span></span><button class="m-menu-x" onclick="mCloseMenu()" aria-label="Close">&#10005;</button></div>
       <a href="index.html" class="m-menu-link">Home</a>
       <a href="portfolio.html" class="m-menu-link">Our Work</a>
       <a href="pricing.html" class="m-menu-link">Services &amp; Pricing</a>
       <a href="about.html" class="m-menu-link">About Us</a>
       <a href="process.html" class="m-menu-link">Our Process</a>
       <a href="blog.html" class="m-menu-link">Blog</a>
+      <a href="client_portal.html" class="m-menu-link">Client Portal</a>
       <a href="contact.html" class="m-menu-link">Contact</a>
       <button class="m-menu-cta" onclick="mCloseMenu();openModal();">Get a Free Quote</button>
-      <a href="tel:+19402178680" class="m-menu-phone">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        (940) 217-8680
-      </a>
+      <a href="tel:+19402178680" class="m-menu-phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>(940) 217-8680</a>
     </div>
   </div>
 </div>
 
 <style>
-/* ===== CROWN MOBILE APP (index) — fonts match pricing.html ===== */
+/* ===== CROWN MOBILE HOMEPAGE (single flow) ===== */
 .m-app{ display:none; }
 
 @media (max-width:768px){
-  body > .back-to-top,
-  body > .announcement-banner,
-  body > nav,
-  body > section,
-  body > footer,
-  body > .logo-carousel,
-  body > .section-divider,
-  body > .chatbot-container{ display:none !important; }
-
-  html,body{ overflow:hidden !important; height:100%; background:#f4f5f6; }
-
+  body > .back-to-top, body > .announcement-banner, body > nav, body > section, body > footer,
+  body > .logo-carousel, body > .section-divider, body > .chatbot-container{ display:none !important; }
+  html,body{
+    overflow:hidden !important;
+    height:100% !important;
+    overscroll-behavior:none;
+    background:#fff;
+  }
   .m-app{
-    display:block; position:fixed; inset:0; z-index:99990;
-    background:#f4f5f6; overflow:hidden;
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-    --g:#caa14a; --g-deep:#b07d2b; --g-soft:#f6edda; --ink:#14161a; --muted:#8a9099; --line:#edeef0;
+    display:block; position:fixed; inset:0; z-index:99990; background:#fff; overflow:hidden;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    --g:#caa14a; --g-deep:#b07d2b; --g-soft:#f6edda; --ink:#14161a; --muted:#8a9099; --line:#ececee;
   }
 }
 
-/* ---------- SCREEN 1 : HERO (kept as photo) ---------- */
-.m-hero{ position:absolute; inset:0; display:flex; flex-direction:column; justify-content:space-between;
-  transition:transform .65s cubic-bezier(.7,0,.2,1), opacity .5s ease; z-index:2; }
-.m-hero-bg{ position:absolute; inset:0; z-index:0; }
-.m-hero-img{ width:100%; height:100%; object-fit:cover; display:block; }
-.m-hero::before{ content:''; position:absolute; left:0; right:0; top:0; height:160px;
-  background:linear-gradient(to bottom, rgba(10,10,10,.55), transparent); z-index:1; pointer-events:none; }
-.m-hero::after{ content:''; position:absolute; left:0; right:0; bottom:0; height:62%;
-  background:linear-gradient(to top, rgba(10,10,10,.92) 4%, rgba(10,10,10,.6) 38%, transparent 100%); z-index:1; pointer-events:none; }
-.m-hero-top{ position:relative; z-index:3; display:flex; align-items:flex-start; justify-content:space-between;
-  padding:calc(env(safe-area-inset-top,0px) + 18px) 20px 0; }
-.m-hero-spacer{ width:44px; }
-.m-hero-brand{ text-align:center; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:2px; padding-top:4px; }
-.m-brand-mark{ font-family:'Playfair Display',Georgia,serif; color:#fff; font-size:22px; font-weight:700; letter-spacing:3px; }
-.m-brand-sub{ color:var(--g); font-size:9px; font-weight:600; letter-spacing:4px; }
-.m-menu-btn{ width:44px; height:44px; border:none; cursor:pointer; background:rgba(255,255,255,.14);
-  backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.25); border-radius:13px;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
-.m-menu-btn span{ display:block; width:18px; height:2px; background:#fff; border-radius:2px; }
-.m-menu-btn span:nth-child(2){ width:13px; align-self:flex-end; margin-right:13px; }
-.m-hero-foot{ position:relative; z-index:3; padding:0 24px calc(env(safe-area-inset-bottom,0px) + 40px); }
-.m-hero-eyebrow{ color:var(--g); font-size:11px; font-weight:700; letter-spacing:2.5px; margin-bottom:14px; }
-.m-hero-title{ font-family:'Playfair Display',Georgia,serif; color:#fff; font-size:40px; line-height:1.08; font-weight:600; letter-spacing:-.5px; margin-bottom:16px; }
-.m-hero-copy{ color:rgba(255,255,255,.85); font-size:15px; line-height:1.6; margin-bottom:28px; max-width:90%; }
-.m-getstarted{ width:100%; border:none; cursor:pointer; background:var(--g); color:#fff; font-size:16px; font-weight:700; letter-spacing:.3px;
-  padding:18px; border-radius:16px; display:flex; align-items:center; justify-content:center; gap:10px;
-  box-shadow:0 14px 34px rgba(202,161,74,.4); transition:transform .15s ease; }
-.m-getstarted:active{ transform:scale(.97); }
+/* top bar */
+/* NOTE: position:absolute not fixed — fixed-inside-fixed breaks on iOS Safari (bottom:0 lands
+   in the wrong place). .m-app is already position:fixed;inset:0 so absolute = same visual result. */
+.m-top2{ position:absolute; top:0; left:0; right:0; z-index:40; display:flex; align-items:center; justify-content:space-between;
+  padding:calc(env(safe-area-inset-top,0px) + 12px) 20px 12px; background:#fff; border-bottom:1px solid var(--line);
+  transform:translateY(-100%); opacity:0; pointer-events:none; transition:transform .4s cubic-bezier(.7,0,.2,1), opacity .3s ease; }
+.m-app.scrolled .m-top2{ transform:translateY(0); opacity:1; pointer-events:auto; }
+.m-top2-logo{ display:flex; align-items:center; gap:9px; text-decoration:none; }
+.m-crown{ width:30px; height:30px; color:var(--g); flex:none; }
+.m-logo-wm{ display:flex; flex-direction:column; line-height:1; }
+.m-logo-wm b{ font-family:'Archivo',sans-serif; font-weight:900; font-size:16px; letter-spacing:1px; color:var(--ink); }
+.m-logo-wm i{ font-style:normal; font-size:8px; font-weight:700; letter-spacing:3px; color:var(--g-deep); margin-top:3px; }
+.m-top2-icons{ display:flex; align-items:center; gap:6px; }
+.m-top2-icons button, .m-top2-icons a{ width:40px; height:40px; border:none; background:none; color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.m-top2-icons svg{ width:21px; height:21px; }
 
-/* ---------- SCREEN 2 : APP HOME (white) ---------- */
-.m-home{ position:absolute; inset:0; z-index:1; background:#f4f5f6; transform:translateY(8%); opacity:0; pointer-events:none;
-  transition:transform .6s cubic-bezier(.7,0,.2,1), opacity .5s ease; display:flex; flex-direction:column; }
-.m-app.started .m-hero{ transform:translateY(-14%); opacity:0; pointer-events:none; }
-.m-app.started .m-home{ transform:translateY(0); opacity:1; pointer-events:auto; z-index:3; }
-.m-home-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:calc(env(safe-area-inset-top,0px) + 18px) 20px 0; }
+/* scroll body */
+.m-scroll{ position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch; scroll-padding-top:74px; overscroll-behavior-y:contain; touch-action:pan-y; }
+.m-sec{ padding:38px 20px 0; }
+.m-scroll-pad{ height:20px; }
 
-.m-greet{ display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
-.m-greet-left{ display:flex; flex-direction:column; gap:3px; }
-.m-greet-hi{ color:var(--muted); font-size:13px; }
-.m-greet-name{ color:var(--ink); font-family:'Playfair Display',Georgia,serif; font-size:21px; font-weight:600; }
-.m-bell{ position:relative; width:46px; height:46px; flex:none; border:none; background:#fff; color:var(--ink);
-  border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 14px rgba(20,22,26,.08); }
-.m-bell-dot{ position:absolute; top:12px; right:13px; width:8px; height:8px; background:var(--g); border-radius:50%; border:2px solid #fff; }
+/* section heading (editorial) */
+.ed-h{ font-family:'Archivo',sans-serif; font-weight:900; font-size:36px; line-height:.92; letter-spacing:-1.2px; text-transform:uppercase; color:var(--ink); margin-bottom:14px; }
+.m-lead{ color:var(--muted); font-size:15px; line-height:1.6; margin-bottom:24px; }
 
-.m-search{ display:flex; align-items:center; gap:12px; background:#fff; border-radius:16px; padding:0 18px; height:58px;
-  margin-bottom:30px; color:var(--muted); box-shadow:0 4px 16px rgba(20,22,26,.06); }
+/* HERO */
+.m-hero2{ position:relative; height:100vh; height:100dvh; min-height:560px; overflow:hidden; }
+.m-hero2-img{ width:100%; height:100%; object-fit:cover; display:block; }
+.m-hero2-shade{ position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,10,.9) 6%, rgba(10,10,10,.4) 42%, rgba(10,10,10,.05) 75%); pointer-events:none; z-index:1; }
+.m-hero2-inner{ position:absolute; left:0; right:0; bottom:0; padding:0 22px calc(env(safe-area-inset-bottom,0px) + 88px); z-index:5; }
+.m-hero2-title{ font-family:'Archivo',sans-serif; font-weight:900; font-size:62px; line-height:.92; letter-spacing:-2px; color:#fff; margin-bottom:18px; }
+.m-hero2-copy{ color:rgba(255,255,255,.85); font-size:14.5px; line-height:1.6; margin-bottom:24px; max-width:94%; }
+.m-hero2-btn{ display:inline-flex; align-items:center; gap:12px; background:#fff; color:var(--ink); border:none; cursor:pointer;
+  font-size:15px; font-weight:700; padding:15px 26px; border-radius:40px; box-shadow:0 12px 30px rgba(0,0,0,.3); }
+.m-hero2-btn svg{ width:18px; height:18px; }
+.m-hero-menu{ position:absolute; top:calc(env(safe-area-inset-top,0px) + 14px); right:14px; z-index:6; width:46px; height:46px; border:none; background:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:opacity .25s; }
+.m-hero-menu svg{ width:27px; height:27px; filter:drop-shadow(0 1px 5px rgba(0,0,0,.45)); }
+.m-app.scrolled .m-hero-menu{ opacity:0; pointer-events:none; }
+.m-scrollcue{ position:absolute; left:50%; transform:translateX(-50%); bottom:calc(env(safe-area-inset-bottom,0px) + 20px); z-index:6; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:5px; color:rgba(255,255,255,.9); transition:opacity .25s; }
+.m-scrollcue span{ font-size:10px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; }
+.m-scrollcue svg{ width:24px; height:24px; animation:mbounce 1.6s ease-in-out infinite; filter:drop-shadow(0 1px 4px rgba(0,0,0,.4)); }
+@keyframes mbounce{ 0%,100%{ transform:translateY(0); opacity:.95; } 50%{ transform:translateY(7px); opacity:.45; } }
+.m-app.scrolled .m-scrollcue{ opacity:0; pointer-events:none; }
+
+/* search + tiles */
+.m-search{ display:flex; align-items:center; gap:12px; background:#f4f5f6; border:1px solid var(--line); border-radius:16px; padding:0 18px; height:56px; margin-bottom:24px; color:var(--muted); }
 .m-search input{ flex:1; background:none; border:none; outline:none; color:var(--ink); font-size:15px; font-family:inherit; }
 .m-search input::placeholder{ color:var(--muted); }
-
-.m-sec-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-.m-sec-head h2{ color:var(--ink); font-family:'Playfair Display',Georgia,serif; font-size:21px; font-weight:600; }
-.m-sec-sub{ color:var(--muted); font-size:14px; line-height:1.5; margin:-8px 0 18px; }
-.m-seeall{ color:var(--g); font-size:13px; font-weight:700; text-decoration:none; }
-
-/* categories */
-.m-cats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px 10px; margin-bottom:30px; }
+.m-cats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px 10px; }
 .m-cat{ display:flex; flex-direction:column; align-items:center; gap:8px; text-decoration:none; }
-.m-cat-img{ width:100%; aspect-ratio:1/1; border-radius:18px; background-size:cover; background-position:center;
-  border:1px solid var(--line); box-shadow:0 6px 16px rgba(20,22,26,.08); }
+.m-cat-img{ width:100%; aspect-ratio:1/1; border-radius:18px; background-size:cover; background-position:center; border:1px solid var(--line); box-shadow:0 6px 16px rgba(20,22,26,.08); }
 .m-cat-more{ display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; font-weight:800; font-size:18px; }
 .m-cat-label{ color:var(--ink); font-size:11px; font-weight:600; text-align:center; line-height:1.25; }
-.m-cats-empty{ display:none; color:var(--muted); font-size:14px; text-align:center; padding:14px 0 30px; }
+.m-cats-empty{ display:none; color:var(--muted); font-size:14px; text-align:center; padding:14px 0 0; }
 
-/* stats */
-.m-stats{ display:flex; background:var(--ink); border-radius:20px; padding:20px 8px; margin-bottom:34px; }
-.m-stat{ flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; position:relative; }
-.m-stat+.m-stat::before{ content:''; position:absolute; left:0; top:6px; bottom:6px; width:1px; background:rgba(255,255,255,.14); }
-.m-stat-n{ font-family:'Playfair Display',Georgia,serif; color:var(--g); font-size:24px; font-weight:700; }
-.m-stat-c{ color:rgba(255,255,255,.6); font-size:10.5px; letter-spacing:.4px; text-transform:uppercase; }
+/* editorial feature blocks */
+.ed-feat{ padding:40px 20px 0; }
+.ed-feat-imgwrap{ position:relative; height:230px; margin-bottom:18px; }
+.ed-feat-img{ position:absolute; inset:0; border-radius:26px; background-size:cover; background-position:center; box-shadow:0 16px 34px rgba(20,22,26,.16);
+  -webkit-mask:radial-gradient(circle 52px at calc(100% - 78px) 100%, transparent 51px, #000 52px);
+          mask:radial-gradient(circle 52px at calc(100% - 78px) 100%, transparent 51px, #000 52px); }
+.ed-feat-pill{ position:absolute; right:16px; bottom:6px; z-index:2; background:var(--ink); color:#fff; font-size:12.5px; font-weight:700; padding:12px 20px; border-radius:30px; text-decoration:none; box-shadow:0 8px 18px rgba(20,22,26,.28); white-space:nowrap; }
+.ed-feat-kicker{ display:block; font-family:'Archivo',sans-serif; font-weight:800; font-size:13px; letter-spacing:1.5px; text-transform:uppercase; color:var(--g-deep); margin-bottom:10px; }
+.ed-feat-body > p{ color:#3f444b; font-size:15px; line-height:1.7; }
+.ed-list{ list-style:none; margin:20px 0 0; padding:0; }
+.ed-list li a{ display:flex; align-items:center; justify-content:space-between; padding:15px 2px; border-top:1px solid var(--line); color:var(--ink); text-decoration:none; font-family:'Archivo',sans-serif; font-weight:700; font-size:16px; text-transform:uppercase; letter-spacing:.2px; }
+.ed-list li:last-child a{ border-bottom:1px solid var(--line); }
+.ed-list svg{ width:18px; height:18px; color:var(--g-deep); }
+.ed-steps{ display:flex; gap:10px; margin-top:22px; }
+.ed-step{ flex:1; text-align:center; }
+.ed-step b{ display:block; font-family:'Archivo',sans-serif; font-weight:900; font-size:26px; color:var(--g); line-height:1; margin-bottom:6px; }
+.ed-step span{ color:var(--muted); font-size:11px; font-weight:600; line-height:1.3; display:block; }
 
-/* the crown treatment — swipe photo cards */
-.m-treat{ display:flex; gap:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -20px 34px; padding:2px 20px 10px; scrollbar-width:none; scroll-snap-type:x mandatory; }
-.m-treat::-webkit-scrollbar{ display:none; }
-.m-treat-card{ position:relative; flex:0 0 82%; scroll-snap-align:start; height:392px; border-radius:26px; overflow:hidden;
-  background-size:cover; background-position:center; box-shadow:0 18px 38px rgba(20,22,26,.24);
-  display:flex; flex-direction:column; justify-content:flex-end; }
-.m-treat-card::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(8,8,8,.95) 8%, rgba(8,8,8,.5) 46%, rgba(8,8,8,.08) 82%); }
-.m-treat-no{ position:absolute; top:18px; left:22px; z-index:2; font-family:'Playfair Display',Georgia,serif; color:rgba(255,255,255,.92); font-size:30px; font-weight:700; }
-.m-treat-foot{ position:relative; z-index:2; padding:22px; }
-.m-treat-title{ font-family:'Playfair Display',Georgia,serif; color:#fff; font-size:25px; font-weight:600; line-height:1.1; margin-bottom:10px; }
-.m-treat-desc{ color:rgba(255,255,255,.82); font-size:13.5px; line-height:1.55; margin-bottom:16px; }
-.m-treat-stat{ display:flex; align-items:center; gap:13px; border-top:1px solid rgba(255,255,255,.2); padding-top:14px; }
-.m-treat-stat strong{ font-family:'Playfair Display',Georgia,serif; color:var(--g); font-size:32px; font-weight:700; line-height:1; }
-.m-treat-stat span{ color:rgba(255,255,255,.72); font-size:11px; line-height:1.4; letter-spacing:.3px; text-transform:uppercase; }
+/* marquee */
+.ed-marquee{ margin:40px 0 0; background:#f0f1f2; overflow:hidden; padding:16px 0; }
+.ed-marquee-track{ display:flex; align-items:center; gap:22px; white-space:nowrap; width:max-content; animation:edmarq 22s linear infinite; }
+.ed-marquee-track span{ font-family:'Archivo',sans-serif; font-weight:800; font-size:19px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink); }
+.ed-marquee-track i{ color:var(--g); font-style:normal; font-size:15px; }
+@keyframes edmarq{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
 
-/* what we do — image rows */
-.m-do{ display:flex; flex-direction:column; gap:12px; margin-bottom:34px; }
-.m-do-row{ display:flex; align-items:center; gap:14px; background:#fff; border-radius:18px; padding:12px; text-decoration:none; box-shadow:0 6px 16px rgba(20,22,26,.06); transition:transform .15s ease; }
-.m-do-row:active{ transform:scale(.99); }
-.m-do-thumb{ flex:none; width:66px; height:66px; border-radius:14px; background-size:cover; background-position:center; box-shadow:0 4px 10px rgba(20,22,26,.12); }
-.m-do-text{ flex:1; display:flex; flex-direction:column; gap:4px; min-width:0; }
-.m-do-text strong{ color:var(--ink); font-size:15.5px; font-weight:700; }
-.m-do-text span{ color:#5b6068; font-size:12.5px; line-height:1.5; }
-.m-do-arrow{ flex:none; width:34px; height:34px; border-radius:50%; background:var(--g-soft); color:var(--g-deep); display:flex; align-items:center; justify-content:center; }
-.m-do-arrow svg{ width:16px; height:16px; }
-
-/* our process — connected stepper */
-.m-proc{ margin-bottom:34px; }
-.m-proc-step{ display:flex; gap:16px; padding-bottom:14px; }
-.m-proc-step:last-child{ padding-bottom:0; }
-.m-proc-rail{ flex:none; width:38px; display:flex; flex-direction:column; align-items:center; }
-.m-proc-node{ flex:none; width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff;
-  font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; border:3px solid #fff; box-shadow:0 6px 15px rgba(202,161,74,.45); z-index:1; }
-.m-proc-line{ flex:1; width:2px; min-height:16px; margin-top:4px; background:linear-gradient(180deg, rgba(202,161,74,.55), var(--line)); }
-.m-proc-step:last-child .m-proc-line{ display:none; }
-.m-proc-card{ flex:1; background:#fff; border-radius:16px; padding:15px 17px; box-shadow:0 5px 14px rgba(20,22,26,.05); }
-.m-proc-kicker{ display:inline-block; color:var(--g-deep); font-size:10px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; margin-bottom:7px; }
-.m-proc-card h4{ color:var(--ink); font-size:15px; font-weight:700; margin-bottom:6px; }
-.m-proc-card p{ color:#5b6068; font-size:13.5px; line-height:1.55; }
-
-/* vehicle types */
-.m-types{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:34px; }
-.m-type{ position:relative; height:130px; border-radius:18px; overflow:hidden; text-decoration:none; background-size:cover; background-position:center;
-  display:flex; align-items:flex-end; box-shadow:0 8px 20px rgba(20,22,26,.12); }
+/* collections head / vehicle types */
+.ed-coll-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.ed-coll-title{ font-family:'Archivo',sans-serif; font-weight:900; font-size:40px; line-height:.9; letter-spacing:-1.4px; text-transform:uppercase; color:var(--ink); }
+.m-seeall{ color:var(--g-deep); font-size:13px; font-weight:700; text-decoration:none; white-space:nowrap; padding-bottom:6px; }
+.ed-more{ flex:none; display:inline-flex; align-items:center; gap:9px; background:#fff; border:1px solid var(--line); border-radius:30px; padding:7px 16px 7px 7px; color:var(--ink); font-size:13px; font-weight:700; text-decoration:none; box-shadow:0 4px 12px rgba(20,22,26,.06); margin-bottom:4px; }
+.ed-more-ic{ width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; }
+.ed-more-ic svg{ width:15px; height:15px; }
+.m-types{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.m-type{ position:relative; height:132px; border-radius:18px; overflow:hidden; text-decoration:none; background-size:cover; background-position:center; display:flex; align-items:flex-end; box-shadow:0 8px 20px rgba(20,22,26,.12); }
 .m-type::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,10,.85), rgba(10,10,10,.05)); }
 .m-type-lbl{ position:relative; z-index:1; padding:12px 13px; color:#fff; font-size:11px; line-height:1.35; }
 .m-type-lbl strong{ display:block; font-size:14px; margin-bottom:2px; }
+.ed-coll-cta{ background:var(--ink); border-radius:22px; padding:24px; margin-top:18px; }
+.ed-coll-cta h3{ font-family:'Archivo',sans-serif; font-weight:800; font-size:24px; text-transform:uppercase; color:#fff; line-height:1; margin-bottom:12px; letter-spacing:-.4px; }
+.ed-coll-cta p{ color:rgba(255,255,255,.66); font-size:13.5px; line-height:1.6; margin-bottom:20px; }
+.ed-coll-btns{ display:flex; gap:12px; }
+.ed-pill-dark{ flex:1; text-align:center; background:var(--g); color:#fff; font-weight:700; font-size:14px; padding:14px; border-radius:30px; text-decoration:none; }
+.ed-pill-out{ flex:1; text-align:center; background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); font-weight:700; font-size:14px; padding:14px; border-radius:30px; text-decoration:none; }
 
 /* featured rail */
-.m-feat{ display:flex; gap:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -20px 34px; padding:0 20px 6px; scrollbar-width:none; }
+.m-feat{ display:flex; gap:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -20px; padding:0 20px 6px; scrollbar-width:none; }
 .m-feat::-webkit-scrollbar{ display:none; }
 .m-feat-card{ position:relative; flex:0 0 78%; border-radius:22px; overflow:hidden; text-decoration:none; box-shadow:0 12px 28px rgba(20,22,26,.14); }
 .m-feat-card img{ width:100%; height:200px; object-fit:cover; display:block; }
-.m-feat-tag{ position:absolute; left:12px; bottom:12px; display:flex; align-items:center; gap:8px;
-  background:rgba(10,10,10,.7); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.14);
-  padding:8px 13px; border-radius:30px; color:#fff; font-size:12px; font-weight:600; }
+.m-feat-tag{ position:absolute; left:12px; bottom:12px; display:flex; align-items:center; gap:8px; background:rgba(10,10,10,.7); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.14); padding:8px 13px; border-radius:30px; color:#fff; font-size:12px; font-weight:600; }
 .m-feat-dot{ width:8px; height:8px; border-radius:50%; background:var(--g); }
 
-/* review */
-.m-review{ background:#fff; border-radius:22px; padding:22px; margin-bottom:34px; box-shadow:0 6px 18px rgba(20,22,26,.06); }
-.m-review-stars{ display:flex; gap:4px; margin-bottom:14px; }
-.m-review-stars svg{ width:18px; height:18px; color:#f1b434; }
-.m-review-text{ color:var(--ink); font-size:15px; line-height:1.65; font-style:italic; margin-bottom:18px; }
-.m-review-meta{ display:flex; align-items:center; gap:12px; }
-.m-review-avatars{ display:flex; }
-.m-review-avatars img{ width:30px; height:30px; border-radius:50%; border:2px solid #fff; margin-left:-8px; object-fit:cover; }
-.m-review-avatars img:first-child{ margin-left:0; }
-.m-review-meta span{ color:var(--muted); font-size:13px; }
-.m-review-meta strong{ color:var(--ink); }
+/* testimonials */
+.ed-tmls{ display:flex; gap:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -20px; padding:0 20px 6px; scrollbar-width:none; }
+.ed-tmls::-webkit-scrollbar{ display:none; }
+.ed-tml{ flex:0 0 82%; background:#fff; border:1px solid var(--line); border-radius:22px; padding:22px; box-shadow:0 8px 22px rgba(20,22,26,.07); display:flex; flex-direction:column; }
+.ed-tml-stars{ color:#f1b434; font-size:15px; letter-spacing:3px; margin-bottom:12px; }
+.ed-tml-quote{ color:var(--ink); font-size:15px; line-height:1.6; margin-bottom:18px; flex:1; }
+.ed-tml-by{ display:flex; align-items:center; gap:11px; }
+.ed-tml-by img{ width:40px; height:40px; border-radius:50%; object-fit:cover; background:var(--g-soft); }
+.ed-tml-by strong{ display:block; color:var(--ink); font-size:14px; }
+.ed-tml-by span{ color:var(--muted); font-size:12px; }
 
-/* blog */
-.m-blog{ display:flex; flex-direction:column; gap:12px; margin-bottom:34px; }
-.m-blog-item{ display:block; background:#fff; border-radius:16px; padding:16px 18px; text-decoration:none; box-shadow:0 5px 14px rgba(20,22,26,.05); }
-.m-blog-soon{ display:inline-block; background:var(--g-soft); color:var(--g-deep); font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; padding:4px 10px; border-radius:20px; margin-bottom:9px; }
-.m-blog-title{ display:block; color:var(--ink); font-size:14.5px; font-weight:600; line-height:1.4; }
+/* blog notch cards */
+.ed-blogs{ display:flex; flex-direction:column; gap:26px; }
+.ed-blog-img{ position:relative; height:212px; }
+.ed-blog-photo{ position:absolute; inset:0; border-radius:24px; background-size:cover; background-position:center; box-shadow:0 12px 28px rgba(20,22,26,.14);
+  -webkit-mask:radial-gradient(circle 48px at calc(100% - 72px) 100%, transparent 47px, #000 48px);
+          mask:radial-gradient(circle 48px at calc(100% - 72px) 100%, transparent 47px, #000 48px); }
+.ed-blog-pill{ position:absolute; right:14px; bottom:8px; z-index:2; background:var(--ink); color:#fff; font-size:12.5px; font-weight:700; padding:11px 19px; border-radius:30px; text-decoration:none; box-shadow:0 8px 18px rgba(20,22,26,.28); white-space:nowrap; }
+.ed-blog-title{ font-family:'Archivo',sans-serif; font-weight:800; font-size:19px; text-transform:uppercase; letter-spacing:-.3px; color:var(--ink); margin:20px 0 6px; line-height:1.05; }
+.ed-blog-desc{ color:#5b6068; font-size:13.5px; line-height:1.55; }
 
-/* service area */
-.m-area{ display:flex; gap:16px; background:var(--ink); border-radius:22px; padding:20px; margin-bottom:24px; }
-.m-area-map{ flex:none; width:60px; height:60px; border-radius:16px; background:rgba(202,161,74,.16); color:var(--g);
-  display:flex; align-items:center; justify-content:center; }
-.m-area-map svg{ width:30px; height:30px; }
-.m-area-body h3{ color:#fff; font-family:'Playfair Display',Georgia,serif; font-size:17px; font-weight:600; margin-bottom:6px; }
-.m-area-body p{ color:rgba(255,255,255,.62); font-size:13px; line-height:1.5; margin-bottom:12px; }
-.m-area-tags{ display:flex; flex-wrap:wrap; gap:7px; }
-.m-area-tags span{ background:rgba(255,255,255,.08); color:rgba(255,255,255,.82); font-size:11px; font-weight:600; padding:5px 11px; border-radius:20px; }
+/* CTA */
+.ed-cta{ background:linear-gradient(135deg,#1b1b1b,#0d0d0d); border-radius:24px; padding:30px 24px; text-align:center; }
+.ed-cta h3{ font-family:'Archivo',sans-serif; font-weight:900; font-size:27px; text-transform:uppercase; color:#fff; line-height:1; letter-spacing:-.6px; margin-bottom:12px; }
+.ed-cta p{ color:rgba(255,255,255,.66); font-size:14px; line-height:1.6; margin-bottom:22px; }
+.ed-cta-btn{ width:100%; border:none; cursor:pointer; background:var(--g); color:#fff; font-size:15px; font-weight:700; padding:16px; border-radius:30px; box-shadow:0 12px 28px rgba(202,161,74,.4); }
 
-/* cta band */
-.m-cta-band{ display:flex; align-items:center; justify-content:space-between; gap:14px;
-  background:linear-gradient(135deg,#fff,#fbf6ea); border:1px solid rgba(202,161,74,.3); border-radius:20px; padding:20px; margin-bottom:22px; box-shadow:0 6px 18px rgba(20,22,26,.06); }
-.m-cta-band-title{ color:var(--ink); font-family:'Playfair Display',Georgia,serif; font-size:16px; font-weight:600; margin-bottom:4px; }
-.m-cta-band-sub{ color:var(--muted); font-size:12px; }
-.m-cta-band button{ flex:none; border:none; cursor:pointer; background:var(--g); color:#fff; font-weight:700; font-size:13px; padding:12px 16px; border-radius:12px; }
-.m-foot-note{ text-align:center; color:var(--muted); font-size:11px; padding:8px 0 4px; }
+/* footer */
+.m-foot{ background:#0e0e0e; margin-top:40px; padding:40px 22px calc(env(safe-area-inset-bottom,0px) + 96px); color:#fff; }
+.m-foot-logo{ display:inline-flex; align-items:center; gap:11px; }
+.m-foot-logo .m-crown{ width:34px; height:34px; color:var(--g); }
+.m-foot-logo > span{ font-family:'Archivo',sans-serif; font-weight:900; font-size:18px; letter-spacing:1px; color:#fff; text-transform:uppercase; }
+.m-foot-brand p{ color:rgba(255,255,255,.5); font-size:13px; line-height:1.6; margin:12px 0 26px; }
+.m-foot-news label{ display:block; color:rgba(255,255,255,.8); font-size:13px; font-weight:600; margin-bottom:10px; }
+.m-foot-form{ display:flex; gap:8px; margin-bottom:32px; }
+.m-foot-form input{ flex:1; background:#1a1a1a; border:1px solid rgba(255,255,255,.12); color:#fff; border-radius:12px; padding:13px 14px; font-size:13px; font-family:inherit; outline:none; }
+.m-foot-form input::placeholder{ color:rgba(255,255,255,.4); }
+.m-foot-form button{ flex:none; border:none; cursor:pointer; background:var(--g); color:#fff; font-weight:700; font-size:13px; padding:0 18px; border-radius:12px; }
+.m-foot-cols{ display:grid; grid-template-columns:1fr 1fr; gap:26px 16px; margin-bottom:30px; }
+.m-foot-col:last-child{ grid-column:1 / -1; }
+.m-foot-col h5{ color:#fff; font-family:'Archivo',sans-serif; font-weight:800; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:14px; }
+.m-foot-col a{ display:block; color:rgba(255,255,255,.55); font-size:13.5px; text-decoration:none; padding:6px 0; }
+.m-foot-col a:active{ color:var(--g); }
+.m-foot-social{ display:flex; gap:12px; padding:24px 0; border-top:1px solid rgba(255,255,255,.1); border-bottom:1px solid rgba(255,255,255,.1); }
+.m-foot-social a{ width:42px; height:42px; border-radius:50%; border:1px solid rgba(255,255,255,.16); color:#fff; display:flex; align-items:center; justify-content:center; }
+.m-foot-social svg{ width:19px; height:19px; }
+.m-foot-bottom{ color:rgba(255,255,255,.4); font-size:11.5px; text-align:center; padding-top:24px; line-height:1.5; }
 
-/* bottom tab bar (white) */
-.m-tabbar{ position:relative; z-index:4; width:auto; top:auto; display:flex; align-items:center; justify-content:space-around;
-  background:#fff; border-top:1px solid var(--line); padding:10px 8px calc(env(safe-area-inset-bottom,0px) + 10px); }
-.m-tab{ background:none; border:none; cursor:pointer; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px;
-  color:#aeb3ba; font-size:10px; font-weight:600; flex:1; padding:4px 0; }
+
+.m-tab{ background:none; border:none; cursor:pointer; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; color:#aeb3ba; font-size:10px; font-weight:600; flex:1; padding:4px 0; }
 .m-tab svg{ width:23px; height:23px; }
-.m-tab.active{ color:var(--g); }
-.m-tab-fab{ flex:none; width:56px; height:56px; margin-top:-26px; background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff;
-  border-radius:50%; justify-content:center; box-shadow:0 10px 26px rgba(202,161,74,.5); border:4px solid #fff; }
+.m-tab.active{ color:var(--g-deep); }
+.m-tab-fab{ flex:none; width:56px; height:56px; margin-top:-26px; background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; border-radius:50%; justify-content:center; box-shadow:0 10px 26px rgba(202,161,74,.5); border:4px solid #fff; }
 .m-tab-fab svg{ width:26px; height:26px; }
 
-/* slide-in menu (white) */
-.m-menu-overlay{ position:absolute; inset:0; z-index:50; background:rgba(20,22,26,.45); backdrop-filter:blur(2px);
-  opacity:0; visibility:hidden; transition:opacity .3s ease, visibility .3s ease; }
+/* slide-in menu */
+.m-menu-overlay{ position:absolute; inset:0; z-index:50; background:rgba(20,22,26,.45); backdrop-filter:blur(2px); opacity:0; visibility:hidden; transition:opacity .3s ease, visibility .3s ease; }
 .m-menu-overlay.open{ opacity:1; visibility:visible; }
-.m-menu-panel{ position:absolute; top:0; right:0; height:100%; width:80%; max-width:330px; background:#fff;
-  padding:calc(env(safe-area-inset-top,0px) + 24px) 28px 28px; display:flex; flex-direction:column;
-  transform:translateX(100%); transition:transform .35s cubic-bezier(.7,0,.2,1); overflow-y:auto; }
+.m-menu-panel{ position:absolute; top:0; right:0; height:100%; width:80%; max-width:330px; background:#fff; padding:calc(env(safe-area-inset-top,0px) + 24px) 28px 28px; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .35s cubic-bezier(.7,0,.2,1); overflow-y:auto; }
 .m-menu-overlay.open .m-menu-panel{ transform:translateX(0); }
 .m-menu-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:30px; }
-.m-menu-logo{ font-family:'Playfair Display',Georgia,serif; color:var(--ink); font-size:22px; font-weight:700; letter-spacing:3px; }
+.m-menu-logo{ display:flex; align-items:center; gap:9px; }
 .m-menu-x{ background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; }
 .m-menu-link{ color:var(--ink); text-decoration:none; font-size:18px; font-weight:500; padding:15px 0; border-bottom:1px solid var(--line); }
 .m-menu-link:active{ color:var(--g); }
@@ -5143,21 +5141,48 @@ nav {
 
 <script>
 (function(){
-  window.mStart = function(){ document.getElementById('mApp').classList.add('started'); };
-  window.mOpenMenu = function(){ document.getElementById('mMenu').classList.add('open'); };
-  window.mCloseMenu = function(){ document.getElementById('mMenu').classList.remove('open'); };
-  window.mTab = function(el,which){
-    document.querySelectorAll('.m-tab').forEach(t=>t.classList.remove('active'));
-    el.classList.add('active');
-    if(which==='home'){ var s=document.querySelector('.m-home-scroll'); if(s) s.scrollTo({top:0,behavior:'smooth'}); }
+  window.mOpenMenu=function(){ document.getElementById('mMenu').classList.add('open'); };
+  window.mCloseMenu=function(){ document.getElementById('mMenu').classList.remove('open'); };
+  window.mScrollTo=function(id){ var app=document.getElementById('mApp'); var sc=document.getElementById('mScroll'); var el=document.getElementById(id); if(app) app.classList.add('scrolled'); var tb=document.getElementById('mTabbar'); if(tb){ tb.style.display='flex'; } if(sc&&el){ var offset=el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop; sc.scrollTo({top:offset,behavior:'smooth'}); } };
+  (function(){ var sc=document.getElementById('mScroll'), app=document.getElementById('mApp');
+    if(!sc||!app) return;
+    var hero = app.querySelector('.m-hero2');
+    var tabbar = document.querySelector('.m-tabbar');
+
+    function setScrolled(on) {
+      app.classList.toggle('scrolled', on);
+      if(tabbar) {
+        tabbar.style.display = on ? 'flex' : 'none';
+      }
+    }
+
+    // Primary: scroll listener — always reliable across all mobile browsers
+    sc.addEventListener('scroll', function(){
+      var threshold = hero ? hero.offsetHeight * 0.8 : 200;
+      setScrolled(sc.scrollTop > threshold);
+    }, {passive:true});
+
+    // Enhancement: IntersectionObserver for instant trigger when hero leaves view
+    if(window.IntersectionObserver && hero){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(!e.isIntersecting) setScrolled(true);
+        });
+      }, { root: sc, threshold: 0, rootMargin: '0px' });
+      io.observe(hero);
+    }
+    } )();
+  window.mHome=function(el){
+    if(el){ document.querySelectorAll('.m-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
+    var sc=document.getElementById('mScroll'); if(sc) sc.scrollTo({top:0,behavior:'smooth'});
+    var tb=document.getElementById('mTabbar'); if(tb) tb.style.display='none';
   };
-  window.mFilterCats = function(q){
+  window.mFilterCats=function(q){
     q=(q||'').trim().toLowerCase(); var any=false;
     document.querySelectorAll('#mCats .m-cat').forEach(function(c){
-      var hit = !q || (c.dataset.name||'').indexOf(q)>-1;
-      c.style.display = hit ? '' : 'none'; if(hit) any=true;
+      var hit=!q||(c.dataset.name||'').indexOf(q)>-1; c.style.display=hit?'':'none'; if(hit)any=true;
     });
-    document.getElementById('mCatsEmpty').style.display = any ? 'none' : 'block';
+    document.getElementById('mCatsEmpty').style.display=any?'none':'block';
   };
 })();
 </script>
@@ -8708,26 +8733,28 @@ document.getElementById('chatbotInput').addEventListener('keypress', function(e)
 const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
 const navLinks = document.querySelector('.nav-links');
 
-mobileMenuBtn.addEventListener('click', function() {
-    navLinks.classList.toggle('active');
-    this.classList.toggle('active');
-});
-
-// Close mobile menu when clicking outside
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('nav')) {
-        navLinks.classList.remove('active');
-        mobileMenuBtn.classList.remove('active');
-    }
-});
-
-// Close mobile menu when clicking a link
-document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', function() {
-        navLinks.classList.remove('active');
-        mobileMenuBtn.classList.remove('active');
+if (mobileMenuBtn && navLinks) {
+    mobileMenuBtn.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+        this.classList.toggle('active');
     });
-});
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('nav')) {
+            navLinks.classList.remove('active');
+            mobileMenuBtn.classList.remove('active');
+        }
+    });
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', function() {
+            navLinks.classList.remove('active');
+            mobileMenuBtn.classList.remove('active');
+        });
+    });
+}
     </script>
 
 <script>
@@ -8736,10 +8763,12 @@ window.addEventListener('scroll', function() {
     const nav = document.querySelector('nav');
     if (window.scrollY > 50) {
         nav.style.background = '#000';
+        nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.5)';
     } else {
-        nav.style.background = 'var(--black)';
+        nav.style.background = '#1a1a1a';
+        nav.style.boxShadow = 'none';
     }
-});
+}, { passive: true });
 // Check URL hash on page load and switch to appropriate tab
 document.addEventListener('DOMContentLoaded', function() {
     // Get the hash from URL (e.g., #crm)
@@ -9263,55 +9292,7 @@ document.addEventListener('keydown', function(e) {
 (function(){if(window.__crownVidOpt)return;window.__crownVidOpt=1;function init(){var v=document.getElementById("heroVideo")||document.querySelector(".hero-video");if(!v)return;try{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var p=v.play();if(p&&p.catch)p.catch(function(){});}else{try{v.pause();}catch(_){}}});},{threshold:0.05});io.observe(v);}catch(_){var p=v.play&&v.play();if(p&&p.catch)p.catch(function(){});}}if(document.readyState!=="loading")init();else document.addEventListener("DOMContentLoaded",init);})();
 </script>
 
-<style id="crown-editorial">
-/* ===== editorial marketing sections (mobile) ===== */
-.m-app .m-sec-head h2{ font-family:'Archivo',sans-serif; font-weight:800; font-size:27px; line-height:1; letter-spacing:-.6px; text-transform:uppercase; color:var(--ink); }
 
-/* marquee */
-.ed-marquee{ margin:0 -20px 34px; background:#ececee; overflow:hidden; padding:14px 0; }
-.ed-marquee-track{ display:flex; align-items:center; gap:22px; white-space:nowrap; width:max-content; animation:edmarq 22s linear infinite; }
-.ed-marquee-track span{ font-family:'Archivo',sans-serif; font-weight:800; font-size:18px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink); }
-.ed-marquee-track i{ color:var(--g); font-style:normal; font-size:15px; }
-@keyframes edmarq{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
-
-/* collections (we coat) */
-.ed-coll-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:18px; }
-.ed-coll-title{ font-family:'Archivo',sans-serif; font-weight:800; font-size:40px; line-height:.9; letter-spacing:-1.2px; text-transform:uppercase; color:var(--ink); }
-.ed-more{ flex:none; display:inline-flex; align-items:center; gap:9px; background:#fff; border:1px solid var(--line); border-radius:30px; padding:7px 16px 7px 7px; color:var(--ink); font-size:13px; font-weight:700; text-decoration:none; box-shadow:0 4px 12px rgba(20,22,26,.06); }
-.ed-more-ic{ width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; }
-.ed-more-ic svg{ width:15px; height:15px; }
-.ed-coll-cta{ background:var(--ink); border-radius:22px; padding:24px; margin:18px 0 34px; }
-.ed-coll-cta h3{ font-family:'Archivo',sans-serif; font-weight:800; font-size:24px; text-transform:uppercase; color:#fff; line-height:1; margin-bottom:12px; letter-spacing:-.4px; }
-.ed-coll-cta p{ color:rgba(255,255,255,.66); font-size:13.5px; line-height:1.6; margin-bottom:20px; }
-.ed-coll-btns{ display:flex; gap:12px; }
-.ed-pill-dark{ flex:1; text-align:center; background:var(--g); color:#fff; font-weight:700; font-size:14px; padding:14px; border-radius:30px; text-decoration:none; }
-.ed-pill-out{ flex:1; text-align:center; background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); font-weight:700; font-size:14px; padding:14px; border-radius:30px; text-decoration:none; }
-
-/* testimonials */
-.ed-tmls{ display:flex; gap:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -20px 16px; padding:0 20px 6px; scrollbar-width:none; }
-.ed-tmls::-webkit-scrollbar{ display:none; }
-.ed-tml{ flex:0 0 82%; background:#fff; border-radius:22px; padding:22px; box-shadow:0 8px 22px rgba(20,22,26,.07); display:flex; flex-direction:column; }
-.ed-tml-stars{ color:#f1b434; font-size:15px; letter-spacing:3px; margin-bottom:12px; }
-.ed-tml-quote{ color:var(--ink); font-size:15px; line-height:1.6; margin-bottom:18px; flex:1; }
-.ed-tml-by{ display:flex; align-items:center; gap:11px; }
-.ed-tml-by img{ width:40px; height:40px; border-radius:50%; object-fit:cover; background:var(--g-soft); }
-.ed-tml-by strong{ display:block; color:var(--ink); font-size:14px; }
-.ed-tml-by span{ color:var(--muted); font-size:12px; }
-.ed-rating{ display:flex; align-items:baseline; gap:10px; margin-bottom:34px; padding-left:2px; }
-.ed-rating strong{ font-family:'Archivo',sans-serif; font-weight:800; font-size:30px; color:var(--ink); }
-.ed-rating span{ color:var(--muted); font-size:13px; }
-
-/* blog notch cards */
-.ed-blogs{ display:flex; flex-direction:column; gap:26px; margin-bottom:34px; }
-.ed-blog{ position:relative; }
-.ed-blog-img{ position:relative; height:212px; }
-.ed-blog-photo{ position:absolute; inset:0; border-radius:24px; background-size:cover; background-position:center; box-shadow:0 12px 28px rgba(20,22,26,.14);
-  -webkit-mask:radial-gradient(circle 48px at calc(100% - 72px) 100%, transparent 47px, #000 48px);
-          mask:radial-gradient(circle 48px at calc(100% - 72px) 100%, transparent 47px, #000 48px); }
-.ed-blog-pill{ position:absolute; right:14px; bottom:8px; z-index:2; background:var(--ink); color:#fff; font-size:12.5px; font-weight:700; padding:11px 19px; border-radius:30px; text-decoration:none; box-shadow:0 8px 18px rgba(20,22,26,.28); white-space:nowrap; }
-.ed-blog-title{ font-family:'Archivo',sans-serif; font-weight:800; font-size:19px; text-transform:uppercase; letter-spacing:-.3px; color:var(--ink); margin:20px 0 6px; line-height:1.05; }
-.ed-blog-desc{ color:#5b6068; font-size:13.5px; line-height:1.55; }
-</style>
 
 </body>
 </html>
