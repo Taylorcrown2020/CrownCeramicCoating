@@ -49,6 +49,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&family=Libre+Baskerville:wght@400;700&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&display=swap">
     
 <!-- Google Analytics - Deferred Loading -->
 <script>
@@ -2117,6 +2118,602 @@ window.addEventListener('load', function() {
 </style>
 </head>
 <body>
+
+<!-- ============================================================
+     CROWN — MOBILE LAYER  [injected, matches index.html]
+     No hero, no bottom tab bar. Shared shell + page content.
+     ============================================================ -->
+<div class="m-app" id="mApp">
+
+    <header class="m-top2">
+    <a class="m-top2-logo" href="index.html"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="m-logo-wm"><b>CROWN</b><i>CERAMIC COATING</i></span></a>
+    <div class="m-top2-icons">
+      <button aria-label="Search" onclick="crownSearchOpen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.7" y2="16.7"/></svg></button>
+      <a aria-label="Account" href="client_portal.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+      <button aria-label="Menu" onclick="mOpenMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg></button>
+    </div>
+  </header>
+
+  <div class="m-scroll" id="mScroll">
+
+    <section class="m-sec m-sec-top" id="mReach">
+      <div class="m-pagehead">
+        <span class="m-eyebrow">Get in Touch</span>
+        <h1 class="m-pagetitle">Let&rsquo;s protect<br>your ride.</h1>
+        <p class="m-pagesub">Call, text or email &mdash; or send the quote form below and we&rsquo;ll get right back to you, usually within 24 hours.</p>
+      </div>
+      <div class="ct-methods">
+        <a class="ct-method" href="tel:+19402178680">
+          <span class="ct-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+          <span class="ct-method-txt"><strong>Call Us</strong><small>(940) 217-8680</small></span>
+        </a>
+        <a class="ct-method" href="sms:+19402178680">
+          <span class="ct-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+          <span class="ct-method-txt"><strong>Text Us</strong><small>Quick questions</small></span>
+        </a>
+        <a class="ct-method" href="mailto:contact@crownceramiccoating.com">
+          <span class="ct-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></svg></span>
+          <span class="ct-method-txt"><strong>Email</strong><small>contact@crownceramiccoating.com</small></span>
+        </a>
+        <div class="ct-method ct-method-static">
+          <span class="ct-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+          <span class="ct-method-txt"><strong>Hours</strong><small>Mon&ndash;Sat &middot; 6a&ndash;7p</small></span>
+        </div>
+      </div>
+      <div class="ct-location">
+        <span class="ct-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <div class="ct-method-txt"><strong>Rockwall&ndash;Dallas, TX</strong><small>Serving all of the Dallas&ndash;Fort Worth metroplex</small></div>
+      </div>
+    </section>
+
+    <section id="mQuote" class="m-sec">
+      <div class="ct-formcard">
+        <span class="ct-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Trusted by drivers across DFW</span>
+        <h2 class="ct-form-title">Request your<br>free quote</h2>
+        <p class="ct-form-sub">Tell us about your vehicle and we&rsquo;ll follow up within 24 hours &mdash; no pressure, no upselling.</p>
+        <div id="mcFields">
+          <div class="ct-field"><label for="mcName">Full Name *</label><input type="text" id="mcName" placeholder="Jane Smith" autocomplete="name"></div>
+          <div class="ct-field"><label for="mcEmail">Email *</label><input type="email" id="mcEmail" placeholder="you@email.com" autocomplete="email"></div>
+          <div class="ct-field"><label for="mcPhone">Phone</label><input type="tel" id="mcPhone" placeholder="(555) 000-0000" autocomplete="tel"></div>
+          <div class="ct-field"><label for="mcService">Service</label>
+            <select id="mcService">
+              <option value="">Select a service&hellip;</option>
+              <option>Ceramic Coating</option>
+              <option>Paint Correction &amp; Polishing</option>
+              <option>Interior &amp; Detailing</option>
+              <option>Maintenance Plan</option>
+              <option>Not Sure / Other</option>
+            </select>
+          </div>
+          <div class="ct-field"><label for="mcVehicle">Year, Make &amp; Model</label><input type="text" id="mcVehicle" placeholder="e.g. 2022 Porsche 911"></div>
+          <div class="ct-field"><label for="mcType">Vehicle Type</label>
+            <select id="mcType">
+              <option value="">Select&hellip;</option>
+              <option>Daily Driver</option>
+              <option>Luxury / Premium</option>
+              <option>Exotic / Supercar</option>
+              <option>Truck / SUV</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="ct-field"><label for="mcDetails">Tell Us About Your Vehicle *</label><textarea id="mcDetails" placeholder="Share the condition of your paint and what you&rsquo;re hoping to achieve &mdash; gloss, protection, swirl removal, etc."></textarea></div>
+
+          <div class="ct-consult">
+            <div class="ct-consult-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span>Book a consultation <em>(optional)</em></span></div>
+            <div class="ct-field"><label for="mcDate">Preferred Date</label><input type="date" id="mcDate" onchange="mcDateCheck()"><small class="ct-hint" id="mcDateHint">Mon&ndash;Sat only &middot; no same-day or Sunday bookings</small></div>
+            <div class="ct-field"><label for="mcTime">Preferred Time</label>
+              <select id="mcTime">
+                <option value="">Select a time&hellip;</option>
+                <option value="09:00">9:00 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="13:00">1:00 PM</option>
+                <option value="14:00">2:00 PM</option>
+                <option value="15:00">3:00 PM</option>
+                <option value="16:00">4:00 PM</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="ct-submit" id="mcSubmit" type="button" onclick="mContactSubmit()">Get My Free Quote <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+          <p class="ct-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Your information is 100% secure and never shared.</p>
+        </div>
+        <div class="ct-success" id="mcSuccess">
+          <div class="ct-success-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <h3>Request received!</h3>
+          <p id="mcSuccessMsg">Thank you &mdash; we&rsquo;ll be in touch within 24 hours with an honest quote. Need us sooner? Call <a href="tel:+19402178680">(940)&nbsp;217-8680</a>.</p>
+        </div>
+      </div>
+
+      <div class="ct-trust">
+        <div class="ct-trust-item"><span class="ct-trust-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><div><strong>Secure &amp; Confidential</strong><small>Your info is never shared or sold</small></div></div>
+        <div class="ct-trust-item"><span class="ct-trust-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><strong>Response Within 24 Hours</strong><small>Usually much faster on business days</small></div></div>
+        <div class="ct-trust-item"><span class="ct-trust-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg></span><div><strong>Free, Honest Quote</strong><small>No obligation &mdash; just straight talk</small></div></div>
+        <div class="ct-trust-item"><span class="ct-trust-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><div><strong>You Work Directly With Us</strong><small>The owner is hands-on with every vehicle</small></div></div>
+      </div>
+    </section>
+
+        <footer class="m-foot">
+      <div class="m-foot-brand">
+        <span class="m-foot-logo"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Crown Ceramic Coating</span></span>
+        <p>Premium ceramic coating, paint correction &amp; detailing across the Dallas&ndash;Fort Worth metroplex.</p>
+      </div>
+      <div class="m-foot-news">
+        <label>Get our latest offers &amp; detailing tips</label>
+        <div class="m-foot-form">
+          <input type="email" placeholder="Your email address..." autocomplete="email">
+          <button onclick="window.location.href='contact.html'">Subscribe</button>
+        </div>
+      </div>
+      <div class="m-foot-cols">
+        <div class="m-foot-col">
+          <h5>Services</h5>
+          <a href="pricing.html#ceramic">Ceramic Coating</a>
+          <a href="pricing.html#correction">Paint Correction</a>
+          <a href="pricing.html#detailing">Interior Detailing</a>
+          <a href="pricing.html">Maintenance Plans</a>
+        </div>
+        <div class="m-foot-col">
+          <h5>Company</h5>
+          <a href="about.html">About Us</a>
+          <a href="portfolio.html">Our Work</a>
+          <a href="process.html">Our Process</a>
+          <a href="contact.html">Contact</a>
+        </div>
+        <div class="m-foot-col">
+          <h5>Legal</h5>
+          <a href="contact.html">Warranty</a>
+          <a href="contact.html">Privacy</a>
+          <a href="contact.html">Terms</a>
+        </div>
+      </div>
+      <div class="m-foot-social">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        <a href="tel:+19402178680" aria-label="Phone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>
+      </div>
+      <div class="m-foot-bottom">&copy; 2026 Crown Ceramic Coating &middot; Rockwall&ndash;Dallas, TX &middot; All rights reserved</div>
+    </footer>
+    <div class="m-scroll-pad" style="height:30px;"></div>
+  </div>
+
+
+
+<!-- ===== nav search dropdown ===== -->
+<div class="cs-overlay" id="csOverlay" onclick="if(event.target===this)crownSearchClose()">
+  <div class="cs-panel">
+    <div class="cs-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.7" y2="16.7"/></svg>
+      <input id="csInput" type="text" placeholder="Search services, pricing, work..." oninput="crownSearchRun(this.value)" autocomplete="off">
+      <button class="cs-x" onclick="crownSearchClose()" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="cs-results" id="csResults"></div>
+  </div>
+</div>
+<style id="crown-search-css">
+.cs-overlay{ position:absolute; inset:0; z-index:120; background:rgba(20,22,26,.45); backdrop-filter:blur(2px); opacity:0; visibility:hidden; transition:opacity .25s, visibility .25s; }
+.cs-overlay.open{ opacity:1; visibility:visible; }
+.cs-panel{ position:absolute; top:0; left:0; right:0; background:#fff; border-radius:0 0 22px 22px; box-shadow:0 20px 44px rgba(0,0,0,.28); display:flex; flex-direction:column; max-height:86%; padding-top:calc(env(safe-area-inset-top,0px)); transform:translateY(-14px); opacity:0; transition:transform .28s cubic-bezier(.7,0,.2,1), opacity .25s; }
+.cs-overlay.open .cs-panel{ transform:translateY(0); opacity:1; }
+.cs-bar{ display:flex; align-items:center; gap:11px; padding:18px; border-bottom:1px solid #ececee; }
+.cs-bar > svg{ width:21px; height:21px; color:#8a9099; flex:none; }
+.cs-bar input{ flex:1; border:none; outline:none; font-size:16px; color:#14161a; font-family:inherit; background:none; }
+.cs-bar input::placeholder{ color:#8a9099; }
+.cs-x{ flex:none; width:32px; height:32px; border:none; background:#f4f5f6; color:#8a9099; border-radius:50%; font-size:13px; cursor:pointer; }
+.cs-results{ overflow-y:auto; -webkit-overflow-scrolling:touch; padding:6px 0 12px; }
+.cs-head{ padding:15px 18px 7px; font-size:11px; font-weight:800; letter-spacing:1.3px; text-transform:uppercase; color:#aeb3ba; }
+.cs-item{ display:flex; align-items:center; gap:13px; padding:12px 18px; text-decoration:none; }
+.cs-item:active{ background:#f7f7f8; }
+.cs-ic{ flex:none; width:40px; height:40px; border-radius:12px; background:#f6edda; color:#b07d2b; display:flex; align-items:center; justify-content:center; }
+.cs-ic svg{ width:20px; height:20px; }
+.cs-meta{ flex:1; min-width:0; }
+.cs-t{ display:block; font-size:15px; font-weight:700; color:#14161a; }
+.cs-d{ display:block; font-size:12.5px; color:#8a9099; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cs-arrow{ flex:none; color:#caa14a; display:flex; }
+.cs-arrow svg{ width:18px; height:18px; }
+.cs-empty{ padding:34px 18px; text-align:center; color:#8a9099; font-size:14px; line-height:1.6; }
+</style>
+<script>
+(function(){
+  var IP={
+    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+    sofa:'<path d="M4 12V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M2 14a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3H2z"/><path d="M5 17v2M19 17v2"/>',
+    droplet:'<path d="M12 2.7s5.5 5.6 5.5 9.8a5.5 5.5 0 0 1-11 0C6.5 8.3 12 2.7 12 2.7z"/>',
+    tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+    image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+    info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+    doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+    user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    route:'<circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M9 19h6a3 3 0 0 0 3-3V8"/>',
+    crown:'<path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z"/><line x1="3" y1="21" x2="21" y2="21"/>'
+  };
+  function ic(k){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+(IP[k]||IP.tag)+'</svg>'; }
+  var ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+  var DATA=[
+    {t:'Ceramic Coating', d:'Long-lasting gloss & paint protection', u:'pricing.html#ceramic', i:'shield', k:'ceramic coating 9h liquid glass gloss hydrophobic protection sealant nano', pop:1},
+    {t:'Paint Correction', d:'Remove swirls, scratches & oxidation', u:'pricing.html#correction', i:'layers', k:'paint correction polish swirl scratch oxidation buffing compound mirror', pop:1},
+    {t:'Interior Detailing', d:'Deep interior clean & protection', u:'pricing.html#detailing', i:'sofa', k:'interior detailing leather vacuum shampoo seats carpet odor clean steam'},
+    {t:'Paint Protection Film (PPF)', d:'Self-healing rock-chip defense', u:'pricing.html#ceramic', i:'shield', k:'ppf paint protection film clear bra rock chip self healing'},
+    {t:'Maintenance Plans', d:'Keep that coated shine year-round', u:'pricing.html', i:'droplet', k:'maintenance plan wash upkeep top up'},
+    {t:'Pricing & Packages', d:'See every package & price', u:'pricing.html', i:'tag', k:'pricing packages price cost plans quote how much', pop:1},
+    {t:'The Crown Treatment', d:'Why a Crown coating lasts', u:'index.html', i:'crown', k:'crown treatment gloss protection upkeep'},
+    {t:'Our Process', d:'How we do it, step by step', u:'process.html', i:'route', k:'process steps how it works inspect decontaminate correct coat cure'},
+    {t:'Portfolio / Our Work', d:'Browse before & after results', u:'portfolio.html', i:'image', k:'portfolio work gallery before after results photos exotics luxury trucks', pop:1},
+    {t:'About Us', d:'Our story & team', u:'about.html', i:'info', k:'about story team owner who we are mission'},
+    {t:'Blog & Insights', d:'Detailing tips & guides', u:'blog.html', i:'doc', k:'blog insights tips guide articles ceramic vs wax'},
+    {t:'Book / Get a Quote', d:'Request a free quote in 24 hrs', u:'contact.html', i:'cal', k:'book booking appointment quote schedule estimate free', pop:1},
+    {t:'Contact Us', d:'Call, email or message us', u:'contact.html', i:'phone', k:'contact phone email call message address location hours'},
+    {t:'Client Portal', d:'Invoices, agreements & account', u:'client_portal.html', i:'user', k:'portal account login invoices client agreements sign in receipts'}
+  ];
+  function row(e){ return '<a class="cs-item" href="'+e.u+'"><span class="cs-ic">'+ic(e.i)+'</span><span class="cs-meta"><span class="cs-t">'+e.t+'</span><span class="cs-d">'+e.d+'</span></span><span class="cs-arrow">'+ARROW+'</span></a>'; }
+  window.crownSearchOpen=function(){ var o=document.getElementById('csOverlay'); o.classList.add('open'); crownSearchRun(''); setTimeout(function(){ var i=document.getElementById('csInput'); if(i){ i.value=''; i.focus(); } },140); };
+  window.crownSearchClose=function(){ document.getElementById('csOverlay').classList.remove('open'); };
+  window.crownSearchRun=function(q){
+    q=(q||'').trim().toLowerCase();
+    var res=document.getElementById('csResults'), list, head;
+    if(!q){ list=DATA.filter(function(e){return e.pop;}); head='Popular'; }
+    else { var w=q.split(/\s+/); list=DATA.filter(function(e){ var h=(e.t+' '+e.k).toLowerCase(); return w.every(function(x){return h.indexOf(x)>-1;}); }); head=list.length+(list.length===1?' result':' results'); }
+    if(!list.length){ res.innerHTML='<div class="cs-empty">No matches for that. Try &ldquo;ceramic&rdquo;, &ldquo;pricing&rdquo;, &ldquo;portfolio&rdquo; or &ldquo;book&rdquo;.</div>'; return; }
+    res.innerHTML='<div class="cs-head">'+head+'</div>'+list.map(row).join('');
+  };
+})();
+</script>
+<!-- ===== end nav search dropdown ===== -->
+
+  <div class="m-menu-overlay" id="mMenu" onclick="if(event.target===this)mCloseMenu()">
+    <div class="m-menu-panel">
+      <div class="m-menu-top"><span class="m-menu-logo"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="m-logo-wm"><b>CROWN</b><i>CERAMIC COATING</i></span></span><button class="m-menu-x" onclick="mCloseMenu()" aria-label="Close">&#10005;</button></div>
+      <a href="index.html" class="m-menu-link">Home</a>
+      <a href="portfolio.html" class="m-menu-link">Our Work</a>
+      <a href="pricing.html" class="m-menu-link">Services &amp; Pricing</a>
+      <a href="about.html" class="m-menu-link">About Us</a>
+      <a href="process.html" class="m-menu-link">Our Process</a>
+      <a href="blog.html" class="m-menu-link">Blog</a>
+      <a href="client_portal.html" class="m-menu-link">Client Portal</a>
+      <a href="contact.html" class="m-menu-link">Contact</a>
+      <button class="m-menu-cta" onclick="mCloseMenu();mQuote();">Get a Free Quote</button>
+      <a href="tel:+19402178680" class="m-menu-phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>(940) 217-8680</a>
+    </div>
+  </div>
+</div>
+
+<style>
+
+/* ===== CROWN MOBILE LAYER (shared shell, matches index.html) ===== */
+.m-app{ display:none; }
+@media (max-width:768px){
+  body > .announcement-banner,
+  body > nav,
+  body > section,
+  body > footer,
+  body > .cc-page,
+  body > .footer-cta-section,
+  body > .testimonials-section,
+  body > .chatbot-container,
+  body > .chatbot-bubble,
+  body > .chatbot-toggle,
+  body > .chatbot-window,
+  body > .back-to-top,
+  body > .back-to-top-btn{ display:none !important; }
+  html,body{ overflow:hidden !important; height:100% !important; overscroll-behavior:none; background:#fff; }
+  .m-app{
+    display:block; position:fixed; inset:0; z-index:99990; background:#fff; overflow:hidden;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    --g:#caa14a; --g-deep:#b07d2b; --g-soft:#f6edda; --ink:#14161a; --muted:#8a9099; --line:#ececee;
+  }
+}
+
+/* top bar */
+/* NOTE: position:absolute not fixed — fixed-inside-fixed breaks on iOS Safari (bottom:0 lands
+   in the wrong place). .m-app is already position:fixed;inset:0 so absolute = same visual result. */
+.m-top2{ position:absolute; top:0; left:0; right:0; z-index:40; display:flex; align-items:center; justify-content:space-between;
+  padding:calc(env(safe-area-inset-top,0px) + 12px) 20px 12px; background:transparent; border-bottom:1px solid transparent; pointer-events:auto; transition:background .3s ease, border-color .3s ease; }
+.m-app.scrolled .m-top2{ background:#fff; border-bottom-color:var(--line); }
+.m-top2-logo{ display:flex; align-items:center; gap:9px; text-decoration:none; }
+.m-crown{ width:30px; height:30px; color:#fff; flex:none; transition:color .3s ease; }
+.m-app.scrolled .m-top2 .m-crown{ color:var(--g); }
+.m-logo-wm{ display:flex; flex-direction:column; line-height:1; }
+.m-logo-wm b{ font-family:'Archivo',sans-serif; font-weight:900; font-size:16px; letter-spacing:1px; color:#fff; transition:color .3s ease; }
+.m-app.scrolled .m-logo-wm b{ color:var(--ink); }
+.m-logo-wm i{ font-style:normal; font-size:8px; font-weight:700; letter-spacing:3px; color:var(--g-deep); margin-top:3px; }
+.m-top2-icons{ display:flex; align-items:center; gap:6px; }
+.m-top2-icons button, .m-top2-icons a{ width:40px; height:40px; border:none; background:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:color .3s ease; }
+.m-app.scrolled .m-top2-icons button, .m-app.scrolled .m-top2-icons a{ color:var(--ink); }
+.m-top2-icons svg{ width:21px; height:21px; }
+
+/* scroll body */
+.m-scroll{ position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; touch-action:pan-y; }
+.m-sec{ padding:38px 20px 0; }
+.m-scroll-pad{ height:20px; }
+
+/* section heading (editorial) */
+.ed-h{ font-family:'Archivo',sans-serif; font-weight:900; font-size:36px; line-height:.92; letter-spacing:-1.2px; text-transform:uppercase; color:var(--ink); margin-bottom:14px; }
+.m-lead{ color:var(--muted); font-size:15px; line-height:1.6; margin-bottom:24px; }
+
+/* HERO */
+.m-hero2{ position:relative; height:100vh; height:100dvh; min-height:560px; overflow:hidden; }
+.m-hero2-img{ width:100%; height:100%; object-fit:cover; display:block; }
+.m-hero2-shade{ position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,10,.9) 6%, rgba(10,10,10,.4) 42%, rgba(10,10,10,.05) 75%); pointer-events:none; z-index:1; }
+.m-hero2-inner{ position:absolute; left:0; right:0; bottom:0; padding:0 22px calc(env(safe-area-inset-bottom,0px) + 88px); z-index:5; }
+.m-hero2-title{ font-family:'Archivo',sans-serif; font-weight:900; font-size:62px; line-height:.92; letter-spacing:-2px; color:#fff; margin-bottom:18px; }
+.m-hero2-copy{ color:rgba(255,255,255,.85); font-size:14.5px; line-height:1.6; margin-bottom:24px; max-width:94%; }
+.m-hero2-btn{ display:inline-flex; align-items:center; gap:12px; background:#fff; color:var(--ink); border:none; cursor:pointer;
+  font-size:15px; font-weight:700; padding:15px 26px; border-radius:40px; box-shadow:0 12px 30px rgba(0,0,0,.3); }
+.m-hero2-btn svg{ width:18px; height:18px; }
+.m-hero-menu{ position:absolute; top:calc(env(safe-area-inset-top,0px) + 14px); right:14px; z-index:6; width:46px; height:46px; border:none; background:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:opacity .25s; }
+.m-hero-menu svg{ width:27px; height:27px; filter:drop-shadow(0 1px 5px rgba(0,0,0,.45)); }
+.m-app.scrolled .m-hero-menu{ opacity:0; pointer-events:none; }
+.m-scrollcue{ position:absolute; left:50%; transform:translateX(-50%); bottom:calc(env(safe-area-inset-bottom,0px) + 20px); z-index:6; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:5px; color:rgba(255,255,255,.9); transition:opacity .25s; }
+.m-scrollcue span{ font-size:10px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; }
+.m-scrollcue svg{ width:24px; height:24px; animation:mbounce 1.6s ease-in-out infinite; filter:drop-shadow(0 1px 4px rgba(0,0,0,.4)); }
+@keyframes mbounce{ 0%,100%{ transform:translateY(0); opacity:.95; } 50%{ transform:translateY(7px); opacity:.45; } }
+.m-app.scrolled .m-scrollcue{ opacity:0; pointer-events:none; }
+
+/* search + tiles */
+.m-search{ display:flex; align-items:center; gap:12px; background:#f4f5f6; border:1px solid var(--line); border-radius:16px; padding:0 18px; height:56px; margin-bottom:24px; color:var(--muted); }
+.m-search input{ flex:1; background:none; border:none; outline:none; color:var(--ink); font-size:15px; font-family:inherit; }
+.m-search input::placeholder{ color:var(--muted); }
+.m-cats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px 10px; }
+.m-cat{ display:flex; flex-direction:column; align-items:center; gap:8px; text-decoration:none; }
+.m-cat-img{ width:100%; aspect-ratio:1/1; border-radius:18px; background-size:cover; background-position:center; border:1px solid var(--line); box-shadow:0 6px 16px rgba(20,22,26,.08); }
+.m-cat-more{ display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; font-weight:800; font-size:18px; }
+.m-cat-label{ color:var(--ink); font-size:11px; font-weight:600; text-align:center; line-height:1.25; }
+.m-cats-empty{ display:none; color:var(--muted); font-size:14px; text-align:center; padding:14px 0 0; }
+
+/* editorial feature blocks */
+.ed-feat{ padding:40px 20px 0; }
+.ed-feat-imgwrap{ position:relative; height:230px; margin-bottom:18px; }
+.ed-feat-img{ position:absolute; inset:0; border-radius:26px; background-size:cover; background-position:center; box-shadow:0 16px 34px rgba(20,22,26,.16);
+  -webkit-mask:radial-gradient(circle 52px at calc(100% - 78px) 100%, transparent 51px, #000 52px);
+          mask:radial-gradient(circle 52px at calc(100% - 78px) 100%, transparent 51px, #000 52px); }
+.ed-feat-pill{ position:absolute; right:16px; bottom:6px; z-index:2; background:var(--ink); color:#fff; font-size:12.5px; font-weight:700; padding:12px 20px; border-radius:30px; text-decoration:none; box-shadow:0 8px 18px rgba(20,22,26,.28); white-space:nowrap; }
+.ed-feat-kicker{ display:block; font-family:'Archivo',sans-serif; font-weight:800; font-size:13px; letter-spacing:1.5px; text-transform:uppercase; color:var(--g-deep); margin-bottom:10px; }
+.ed-feat-body > p{ color:#3f444b; font-size:15px; line-height:1.7; }
+.ed-list{ list-style:none; margin:20px 0 0; padding:0; }
+.ed-list li a{ display:flex; align-items:center; justify-content:space-between; padding:15px 2px; border-top:1px solid var(--line); color:var(--ink); text-decoration:none; font-family:'Archivo',sans-serif; font-weight:700; font-size:16px; text-transform:uppercase; letter-spacing:.2px; }
+.ed-list li:last-child a{ border-bottom:1px solid var(--line); }
+.ed-list svg{ width:18px; height:18px; color:var(--g-deep); }
+.ed-steps{ display:flex; gap:10px; margin-top:22px; }
+.ed-step{ flex:1; text-align:center; }
+.ed-step b{ display:block; font-family:'Archivo',sans-serif; font-weight:900; font-size:26px; color:var(--g); line-height:1; margin-bottom:6px; }
+.ed-step span{ color:var(--muted); font-size:11px; font-weight:600; line-height:1.3; display:block; }
+
+/* marquee */
+.ed-marquee{ margin:40px 0 0; background:#f0f1f2; overflow:hidden; padding:16px 0; }
+.ed-marquee-track{ display:flex; align-items:center; gap:22px; white-space:nowrap; width:max-content; animation:edmarq 22s linear infinite; }
+.ed-marquee-track span{ font-family:'Archivo',sans-serif; font-weight:800; font-size:19px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink); }
+.ed-marquee-track i{ color:var(--g); font-style:normal; font-size:15px; }
+@keyframes edmarq{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
+
+/* collections head / vehicle types */
+.ed-coll-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.ed-coll-title{ font-family:'Archivo',sans-serif; font-weight:900; font-size:40px; line-height:.9; letter-spacing:-1.4px; text-transform:uppercase; color:var(--ink); }
+.m-seeall{ color:var(--g-deep); font-size:13px; font-weight:700; text-decoration:none; white-space:nowrap; padding-bottom:6px; }
+.ed-more{ flex:none; display:inline-flex; align-items:center; gap:9px; background:#fff; border:1px solid var(--line); border-radius:30px; padding:7px 16px 7px 7px; color:var(--ink); font-size:13px; font-weight:700; text-decoration:none; box-shadow:0 4px 12px rgba(20,22,26,.06); margin-bottom:4px; }
+.ed-more-ic{ width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; }
+.ed-more-ic svg{ width:15px; height:15px; }
+.m-types{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.m-type{ position:relative; height:132px; border-radius:18px; overflow:hidden; text-decoration:none; background-size:cover; background-position:center; display:flex; align-items:flex-end; box-shadow:0 8px 20px rgba(20,22,26,.12); }
+.m-type::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,10,.85), rgba(10,10,10,.05)); }
+.m-type-lbl{ position:relative; z-index:1; padding:12px 13px; color:#fff; font-size:11px; line-height:1.35; }
+.m-type-lbl strong{ display:block; font-size:14px; margin-bottom:2px; }
+.ed-coll-cta{ background:var(--ink); border-radius:22px; padding:24px; margin-top:18px; }
+.ed-coll-cta h3{ font-family:'Archivo',sans-serif; font-weight:800; font-size:24px; text-transform:uppercase; color:#fff; line-height:1; margin-bottom:12px; letter-spacing:-.4px; }
+.ed-coll-cta p{ color:rgba(255,255,255,.66); font-size:13.5px; line-height:1.6; margin-bottom:20px; }
+.ed-coll-btns{ display:flex; gap:12px; }
+.ed-pill-dark{ flex:1; text-align:center; background:var(--g); color:#fff; font-weight:700; font-size:14px; padding:14px; border-radius:30px; text-decoration:none; }
+.ed-pill-out{ flex:1; text-align:center; background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); font-weight:700; font-size:14px; padding:14px; border-radius:30px; text-decoration:none; }
+
+/* featured rail */
+.m-feat{ display:flex; gap:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -20px; padding:0 20px 6px; scrollbar-width:none; }
+.m-feat::-webkit-scrollbar{ display:none; }
+.m-feat-card{ position:relative; flex:0 0 78%; border-radius:22px; overflow:hidden; text-decoration:none; box-shadow:0 12px 28px rgba(20,22,26,.14); }
+.m-feat-card img{ width:100%; height:200px; object-fit:cover; display:block; }
+.m-feat-tag{ position:absolute; left:12px; bottom:12px; display:flex; align-items:center; gap:8px; background:rgba(10,10,10,.7); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.14); padding:8px 13px; border-radius:30px; color:#fff; font-size:12px; font-weight:600; }
+.m-feat-dot{ width:8px; height:8px; border-radius:50%; background:var(--g); }
+
+/* testimonials */
+.ed-tmls{ display:flex; gap:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -20px; padding:0 20px 6px; scrollbar-width:none; }
+.ed-tmls::-webkit-scrollbar{ display:none; }
+.ed-tml{ flex:0 0 82%; background:#fff; border:1px solid var(--line); border-radius:22px; padding:22px; box-shadow:0 8px 22px rgba(20,22,26,.07); display:flex; flex-direction:column; }
+.ed-tml-stars{ color:#f1b434; font-size:15px; letter-spacing:3px; margin-bottom:12px; }
+.ed-tml-quote{ color:var(--ink); font-size:15px; line-height:1.6; margin-bottom:18px; flex:1; }
+.ed-tml-by{ display:flex; align-items:center; gap:11px; }
+.ed-tml-by img{ width:40px; height:40px; border-radius:50%; object-fit:cover; background:var(--g-soft); }
+.ed-tml-by strong{ display:block; color:var(--ink); font-size:14px; }
+.ed-tml-by span{ color:var(--muted); font-size:12px; }
+
+/* blog notch cards */
+.ed-blogs{ display:flex; flex-direction:column; gap:26px; }
+.ed-blog-img{ position:relative; height:212px; }
+.ed-blog-photo{ position:absolute; inset:0; border-radius:24px; background-size:cover; background-position:center; box-shadow:0 12px 28px rgba(20,22,26,.14);
+  -webkit-mask:radial-gradient(circle 48px at calc(100% - 72px) 100%, transparent 47px, #000 48px);
+          mask:radial-gradient(circle 48px at calc(100% - 72px) 100%, transparent 47px, #000 48px); }
+.ed-blog-pill{ position:absolute; right:14px; bottom:8px; z-index:2; background:var(--ink); color:#fff; font-size:12.5px; font-weight:700; padding:11px 19px; border-radius:30px; text-decoration:none; box-shadow:0 8px 18px rgba(20,22,26,.28); white-space:nowrap; }
+.ed-blog-title{ font-family:'Archivo',sans-serif; font-weight:800; font-size:19px; text-transform:uppercase; letter-spacing:-.3px; color:var(--ink); margin:20px 0 6px; line-height:1.05; }
+.ed-blog-desc{ color:#5b6068; font-size:13.5px; line-height:1.55; }
+
+/* CTA */
+.ed-cta{ background:linear-gradient(135deg,#1b1b1b,#0d0d0d); border-radius:24px; padding:30px 24px; text-align:center; }
+.ed-cta h3{ font-family:'Archivo',sans-serif; font-weight:900; font-size:27px; text-transform:uppercase; color:#fff; line-height:1; letter-spacing:-.6px; margin-bottom:12px; }
+.ed-cta p{ color:rgba(255,255,255,.66); font-size:14px; line-height:1.6; margin-bottom:22px; }
+.ed-cta-btn{ width:100%; border:none; cursor:pointer; background:var(--g); color:#fff; font-size:15px; font-weight:700; padding:16px; border-radius:30px; box-shadow:0 12px 28px rgba(202,161,74,.4); }
+
+/* footer */
+.m-foot{ background:#0e0e0e; margin-top:40px; padding:40px 22px calc(env(safe-area-inset-bottom,0px) + 96px); color:#fff; }
+.m-foot-logo{ display:inline-flex; align-items:center; gap:11px; }
+.m-foot-logo .m-crown{ width:34px; height:34px; color:var(--g); }
+.m-foot-logo > span{ font-family:'Archivo',sans-serif; font-weight:900; font-size:18px; letter-spacing:1px; color:#fff; text-transform:uppercase; }
+.m-foot-brand p{ color:rgba(255,255,255,.5); font-size:13px; line-height:1.6; margin:12px 0 26px; }
+.m-foot-news label{ display:block; color:rgba(255,255,255,.8); font-size:13px; font-weight:600; margin-bottom:10px; }
+.m-foot-form{ display:flex; gap:8px; margin-bottom:32px; }
+.m-foot-form input{ flex:1; background:#1a1a1a; border:1px solid rgba(255,255,255,.12); color:#fff; border-radius:12px; padding:13px 14px; font-size:13px; font-family:inherit; outline:none; }
+.m-foot-form input::placeholder{ color:rgba(255,255,255,.4); }
+.m-foot-form button{ flex:none; border:none; cursor:pointer; background:var(--g); color:#fff; font-weight:700; font-size:13px; padding:0 18px; border-radius:12px; }
+.m-foot-cols{ display:grid; grid-template-columns:1fr 1fr; gap:26px 16px; margin-bottom:30px; }
+.m-foot-col:last-child{ grid-column:1 / -1; }
+.m-foot-col h5{ color:#fff; font-family:'Archivo',sans-serif; font-weight:800; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:14px; }
+.m-foot-col a{ display:block; color:rgba(255,255,255,.55); font-size:13.5px; text-decoration:none; padding:6px 0; }
+.m-foot-col a:active{ color:var(--g); }
+.m-foot-social{ display:flex; gap:12px; padding:24px 0; border-top:1px solid rgba(255,255,255,.1); border-bottom:1px solid rgba(255,255,255,.1); }
+.m-foot-social a{ width:42px; height:42px; border-radius:50%; border:1px solid rgba(255,255,255,.16); color:#fff; display:flex; align-items:center; justify-content:center; }
+.m-foot-social svg{ width:19px; height:19px; }
+.m-foot-bottom{ color:rgba(255,255,255,.4); font-size:11.5px; text-align:center; padding-top:24px; line-height:1.5; }
+/* slide-in menu */
+.m-menu-overlay{ position:absolute; inset:0; z-index:50; background:rgba(20,22,26,.45); backdrop-filter:blur(2px); opacity:0; visibility:hidden; transition:opacity .3s ease, visibility .3s ease; }
+.m-menu-overlay.open{ opacity:1; visibility:visible; }
+.m-menu-panel{ position:absolute; top:0; right:0; height:100%; width:80%; max-width:330px; background:#fff; padding:calc(env(safe-area-inset-top,0px) + 24px) 28px 28px; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .35s cubic-bezier(.7,0,.2,1); overflow-y:auto; }
+.m-menu-overlay.open .m-menu-panel{ transform:translateX(0); }
+.m-menu-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:30px; }
+.m-menu-logo{ display:flex; align-items:center; gap:9px; }
+.m-menu-x{ background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; }
+.m-menu-link{ color:var(--ink); text-decoration:none; font-size:18px; font-weight:500; padding:15px 0; border-bottom:1px solid var(--line); }
+.m-menu-link:active{ color:var(--g); }
+.m-menu-cta{ margin-top:26px; border:none; cursor:pointer; background:var(--g); color:#fff; font-size:15px; font-weight:700; padding:16px; border-radius:14px; }
+.m-menu-phone{ margin-top:18px; color:var(--g-deep); text-decoration:none; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px; justify-content:center; }
+
+/* no bottom tab bar -> normal footer */
+.m-foot{ padding-bottom:calc(env(safe-area-inset-bottom,0px) + 40px); }
+/* no hero: top bar solid from the very top */
+.m-top2{ background:#fff; border-bottom-color:var(--line); }
+.m-top2 .m-crown{ color:var(--g); }
+.m-logo-wm b{ color:var(--ink); }
+.m-top2-icons button, .m-top2-icons a{ color:var(--ink); }
+/* clear the fixed top bar for the first section */
+.m-sec-top{ padding-top:calc(env(safe-area-inset-top,0px) + 84px); }
+/* editorial page header (replaces hero) */
+.m-pagehead{ margin-bottom:22px; }
+.m-eyebrow{ display:inline-block; font-family:'Archivo',sans-serif; font-weight:800; font-size:11.5px; letter-spacing:2.5px; text-transform:uppercase; color:var(--g-deep); margin-bottom:12px; }
+.m-pagetitle{ font-family:'Archivo',sans-serif; font-weight:900; font-size:44px; line-height:.9; letter-spacing:-1.6px; text-transform:uppercase; color:var(--ink); margin-bottom:14px; }
+.m-pagesub{ color:var(--muted); font-size:15px; line-height:1.6; }
+
+
+.ct-methods{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.ct-method{ display:flex; align-items:center; gap:12px; min-width:0; padding:16px 14px; background:#fff; border:1px solid var(--line); border-radius:18px; text-decoration:none; box-shadow:0 6px 16px rgba(20,22,26,.06); }
+.ct-method:active{ background:#faf8f2; }
+.ct-ic{ flex:none; width:42px; height:42px; border-radius:13px; background:var(--g-soft); color:var(--g-deep); display:flex; align-items:center; justify-content:center; }
+.ct-ic svg{ width:20px; height:20px; }
+.ct-method-txt{ min-width:0; }
+.ct-method-txt strong{ display:block; font-size:14px; font-weight:700; color:var(--ink); }
+.ct-method-txt small{ display:block; font-size:12px; color:var(--muted); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ct-location{ display:flex; align-items:center; gap:13px; margin-top:12px; padding:18px 16px; border-radius:18px; background:var(--ink); color:#fff; }
+.ct-location .ct-ic{ background:rgba(255,255,255,.1); color:var(--g); }
+.ct-location strong{ display:block; font-size:15px; font-weight:700; color:#fff; }
+.ct-location small{ display:block; font-size:12.5px; color:rgba(255,255,255,.6); margin-top:3px; }
+.ct-formcard{ background:#fff; border:1px solid var(--line); border-radius:24px; padding:26px 20px; box-shadow:0 14px 34px rgba(20,22,26,.1); }
+.ct-badge{ display:inline-flex; align-items:center; gap:7px; background:var(--g-soft); border:1px solid rgba(202,161,74,.4); color:var(--g-deep); font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:7px 13px; border-radius:30px; margin-bottom:16px; }
+.ct-badge svg{ width:11px; height:11px; }
+.ct-form-title{ font-family:'Archivo',sans-serif; font-weight:900; font-size:32px; line-height:.95; letter-spacing:-1px; text-transform:uppercase; color:var(--ink); margin-bottom:10px; }
+.ct-form-sub{ color:var(--muted); font-size:14px; line-height:1.6; margin-bottom:22px; }
+.ct-field{ display:flex; flex-direction:column; margin-bottom:15px; }
+.ct-field label{ font-size:11px; font-weight:700; letter-spacing:.7px; text-transform:uppercase; color:#5b6068; margin-bottom:7px; }
+.ct-field input, .ct-field select, .ct-field textarea{ width:100%; padding:14px 15px; font-size:15px; font-family:'Inter',sans-serif; color:var(--ink); background:#fafafa; border:1.5px solid var(--line); border-radius:13px; -webkit-appearance:none; appearance:none; transition:border-color .2s, background .2s, box-shadow .2s; }
+.ct-field textarea{ min-height:120px; resize:vertical; }
+.ct-field input[type=date]{ min-height:50px; }
+.ct-field input:focus, .ct-field select:focus, .ct-field textarea:focus{ outline:none; border-color:var(--g); background:#fff; box-shadow:0 0 0 3px rgba(202,161,74,.15); }
+.ct-field input::placeholder, .ct-field textarea::placeholder{ color:#b3b8bf; }
+.ct-hint{ display:block; margin-top:7px; font-size:12px; color:var(--muted); line-height:1.4; }
+.ct-consult{ margin:4px 0 6px; padding:18px 16px; border:1px dashed var(--line); border-radius:16px; background:#fbfaf7; }
+.ct-consult-head{ display:flex; align-items:center; gap:9px; margin-bottom:14px; color:var(--ink); }
+.ct-consult-head svg{ width:19px; height:19px; color:var(--g-deep); flex:none; }
+.ct-consult-head span{ font-family:'Archivo',sans-serif; font-weight:800; font-size:14px; letter-spacing:.3px; text-transform:uppercase; }
+.ct-consult-head em{ font-style:normal; font-weight:600; text-transform:none; letter-spacing:0; color:var(--muted); font-size:12px; }
+.ct-consult .ct-field:last-child{ margin-bottom:0; }
+.ct-submit{ display:flex; align-items:center; justify-content:center; gap:10px; width:100%; border:none; cursor:pointer; background:var(--ink); color:#fff; font-size:15px; font-weight:700; padding:17px; border-radius:30px; margin-top:14px; box-shadow:0 12px 28px rgba(20,22,26,.22); }
+.ct-submit svg{ width:18px; height:18px; }
+.ct-submit:disabled{ opacity:.6; }
+.ct-note{ display:flex; align-items:center; justify-content:center; gap:6px; text-align:center; font-size:12px; color:var(--muted); margin-top:14px; }
+.ct-note svg{ width:13px; height:13px; flex:none; }
+.ct-success{ display:none; text-align:center; padding:18px 6px 8px; }
+.ct-success-ic{ width:60px; height:60px; margin:0 auto 16px; border-radius:50%; background:var(--g-soft); color:var(--g-deep); display:flex; align-items:center; justify-content:center; }
+.ct-success-ic svg{ width:30px; height:30px; }
+.ct-success h3{ font-family:'Archivo',sans-serif; font-weight:900; font-size:24px; text-transform:uppercase; color:var(--ink); margin-bottom:10px; }
+.ct-success p{ color:var(--muted); font-size:14px; line-height:1.6; }
+.ct-success a{ color:var(--g-deep); font-weight:700; text-decoration:none; }
+.ct-trust{ display:grid; grid-template-columns:1fr; gap:14px; margin-top:26px; }
+.ct-trust-item{ display:flex; align-items:flex-start; gap:13px; }
+.ct-trust-ic{ flex:none; width:38px; height:38px; border-radius:11px; background:var(--g-soft); border:1px solid rgba(202,161,74,.3); color:var(--g-deep); display:flex; align-items:center; justify-content:center; }
+.ct-trust-ic svg{ width:17px; height:17px; }
+.ct-trust-item strong{ display:block; font-size:14px; font-weight:700; color:var(--ink); }
+.ct-trust-item small{ display:block; font-size:12.5px; color:var(--muted); margin-top:2px; }
+
+</style>
+
+
+<script>
+(function(){
+  window.mOpenMenu=function(){ var m=document.getElementById('mMenu'); if(m) m.classList.add('open'); };
+  window.mCloseMenu=function(){ var m=document.getElementById('mMenu'); if(m) m.classList.remove('open'); };
+  window.mScrollTo=function(id){
+    var sc=document.getElementById('mScroll'), el=document.getElementById(id);
+    if(sc&&el){ var offset=el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop; sc.scrollTo({top:offset-74,behavior:'smooth'}); }
+  };
+})();
+</script>
+
+
+<script>
+window.mQuote=function(){ mScrollTo('mQuote'); };
+(function(){ var d=document.getElementById('mcDate'); if(d){ var t=new Date(); t.setDate(t.getDate()+1); d.min=t.toISOString().split('T')[0]; } })();
+window.mcDateCheck=function(){
+  var d=document.getElementById('mcDate'), h=document.getElementById('mcDateHint');
+  if(!d||!d.value){ if(h) h.textContent='Mon\u2013Sat only \u00b7 no same-day or Sunday bookings'; return; }
+  var dt=new Date(d.value+'T12:00:00'); var today=new Date(); today.setHours(0,0,0,0);
+  if(dt.getDay()===0){ if(h) h.textContent="We\u2019re closed Sundays \u2014 please choose Mon\u2013Sat."; d.value=''; return; }
+  if(dt<=today){ if(h) h.textContent='No same-day booking \u2014 please choose a future date.'; d.value=''; return; }
+  if(h){ var s=dt.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'}); h.textContent='Great \u2014 we\u2019ll confirm '+s+'.'; }
+};
+window.mContactSubmit=async function(){
+  var v=function(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; };
+  var name=v('mcName'), email=v('mcEmail'), phone=v('mcPhone'), service=v('mcService'),
+      vehicle=v('mcVehicle'), vType=v('mcType'), details=v('mcDetails');
+  if(!name||!email){ alert('Please enter your name and email so we can get back to you.'); return; }
+  var lines=[]; if(vehicle) lines.push('Vehicle: '+vehicle); if(vType) lines.push('Vehicle Type: '+vType);
+  if(lines.length) details = lines.join('\n') + (details ? '\n\n'+details : '');
+  var parts=name.split(' ');
+  var payload={ name:name, firstName:parts[0]||'Unknown', lastName:parts.slice(1).join(' ')||'',
+    email:email, phone:phone, service:service, project_type:service,
+    details:details, message:details, source:'Contact Page (Mobile)' };
+  var btn=document.getElementById('mcSubmit'); var orig=btn?btn.innerHTML:'';
+  if(btn){ btn.disabled=true; btn.textContent='Sending\u2026'; }
+  try{
+    var res=await fetch(window.location.origin+'/api/leads',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    var data={}; try{ data=await res.json(); }catch(_){ data={}; }
+    if(!res.ok || !data.success){
+      alert('Sorry \u2014 we couldn\u2019t submit your request'+((data&&data.message)?': '+data.message:'.')+' Please try again or call us at (940) 217-8680.');
+      return;
+    }
+    var cDate=v('mcDate'), cTime=v('mcTime'), booked=false;
+    if(cDate){
+      try{
+        var scheduledTime=new Date(cDate+'T'+(cTime||'09:00')).toISOString();
+        await fetch(window.location.origin+'/api/public/consultations',{ method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ name:name, email:email, phone:phone, scheduledTime:scheduledTime, service:service, message:details }) });
+        booked=true;
+      }catch(consultErr){ console.warn('Consultation booking skipped:',consultErr); }
+    }
+    var f=document.getElementById('mcFields'), s=document.getElementById('mcSuccess'), sm=document.getElementById('mcSuccessMsg');
+    if(booked && sm){
+      var dd=new Date(cDate+'T12:00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+      sm.innerHTML='Thank you \u2014 your request is in and we\u2019ve noted your consultation request for <strong>'+dd+'</strong>. We\u2019ll confirm the time within 24 hours. Need us sooner? Call <a href="tel:+19402178680">(940)&nbsp;217-8680</a>.';
+    }
+    if(f) f.style.display='none'; if(s) s.style.display='block';
+    if(s) s.scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(err){
+    console.error('Mobile contact submit error:',err);
+    alert('Network error. Please check your connection and try again, or call us at (940) 217-8680.');
+  }finally{
+    if(btn){ btn.disabled=false; btn.innerHTML=orig; }
+  }
+};
+</script>
+
+<!-- ============================================================ END CROWN MOBILE LAYER ============================================================ -->
+
+
 
 <!-- Announcement Banner -->
     <div class="announcement-banner">
