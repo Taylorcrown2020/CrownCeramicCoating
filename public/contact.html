@@ -2241,10 +2241,11 @@ window.addEventListener('load', function() {
       <div class="m-foot-news">
         <label>Get our latest offers &amp; detailing tips</label>
         <div class="m-foot-form">
-          <input type="email" placeholder="Your email address..." autocomplete="email">
-          <button onclick="window.location.href='contact.html'">Subscribe</button>
+          <input type="email" id="mNewsEmail" placeholder="Your email address..." autocomplete="email" onkeydown="if(event.key==='Enter'){event.preventDefault();mNewsletter();}">
+          <button type="button" onclick="mNewsletter()">Subscribe</button>
         </div>
       </div>
+      <p class="m-foot-news-status" id="mNewsStatus" role="status"></p>
       <div class="m-foot-cols">
         <div class="m-foot-col">
           <h5>Services</h5>
@@ -2589,6 +2590,12 @@ window.addEventListener('load', function() {
 .m-eyebrow{ display:inline-block; font-family:'Archivo',sans-serif; font-weight:800; font-size:11.5px; letter-spacing:2.5px; text-transform:uppercase; color:var(--g-deep); margin-bottom:12px; }
 .m-pagetitle{ font-family:'Archivo',sans-serif; font-weight:900; font-size:44px; line-height:.9; letter-spacing:-1.6px; text-transform:uppercase; color:var(--ink); margin-bottom:14px; }
 .m-pagesub{ color:var(--muted); font-size:15px; line-height:1.6; }
+/* footer newsletter status */
+.m-foot-news-status{ font-size:12.5px; line-height:1.4; margin:-22px 0 32px; min-height:1em; }
+.m-foot-news-status.ok{ color:var(--g); }
+.m-foot-news-status.err{ color:#e8938b; }
+/* iOS auto-zooms on focus when an input is < 16px; force 16px everywhere to prevent it */
+.m-app input, .m-app select, .m-app textarea{ font-size:16px !important; }
 
 
 .ct-methods{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -2650,6 +2657,36 @@ window.addEventListener('load', function() {
   window.mScrollTo=function(id){
     var sc=document.getElementById('mScroll'), el=document.getElementById(id);
     if(sc&&el){ var offset=el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop; sc.scrollTo({top:offset-74,behavior:'smooth'}); }
+  };
+  window.mNewsletter=async function(){
+    var i=document.getElementById('mNewsEmail'), st=document.getElementById('mNewsStatus');
+    var email=((i&&i.value)||'').trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      if(st){ st.textContent='Please enter a valid email address.'; st.className='m-foot-news-status err'; }
+      if(i) i.focus(); return;
+    }
+    var btn = i && i.parentNode ? i.parentNode.querySelector('button') : null;
+    if(btn){ btn.disabled=true; btn.textContent='\u2026'; }
+    if(st){ st.textContent=''; st.className='m-foot-news-status'; }
+    try{
+      var local=email.split('@')[0];
+      var payload={ name:local||'Subscriber', firstName:local||'Subscriber', lastName:'',
+        email:email, phone:'', service:'Newsletter', project_type:'Newsletter',
+        details:'Newsletter signup from website footer', message:'Newsletter signup from website footer',
+        source:'Newsletter (Footer)' };
+      var res=await fetch(window.location.origin+'/api/leads',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+      var data={}; try{ data=await res.json(); }catch(_){ data={}; }
+      if(res.ok && data.success){
+        if(i) i.value='';
+        if(st){ st.textContent='\u2713 You\u2019re subscribed \u2014 thanks!'; st.className='m-foot-news-status ok'; }
+      } else {
+        if(st){ st.textContent='Sorry, that didn\u2019t go through \u2014 please try again.'; st.className='m-foot-news-status err'; }
+      }
+    }catch(e){
+      if(st){ st.textContent='Network error \u2014 please try again.'; st.className='m-foot-news-status err'; }
+    }finally{
+      if(btn){ btn.disabled=false; btn.textContent='Subscribe'; }
+    }
   };
 })();
 </script>
