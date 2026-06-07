@@ -1699,11 +1699,9 @@ window.addEventListener('load', function() {
 <body>
 
 <!-- ============================================================
-     CROWN — MOBILE LAYER  [injected, matches index.html]
-     No hero, no bottom tab bar. Shared shell + page content.
+     CROWN — MOBILE v3  [injected]  (booking-editorial, no tab bar)
      ============================================================ -->
 <div class="m-app" id="mApp">
-
     <header class="m-top2">
     <a class="m-top2-logo" href="index.html"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="m-logo-wm"><b>CROWN</b><i>CERAMIC COATING</i></span></a>
     <div class="m-top2-icons">
@@ -1712,153 +1710,65 @@ window.addEventListener('load', function() {
       <button aria-label="Menu" onclick="mOpenMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg></button>
     </div>
   </header>
-
   <div class="m-scroll" id="mScroll">
+    <div class="x-top"></div>
 
-    <section class="m-sec m-sec-top">
-      <div class="m-pagehead">
-        <span class="m-eyebrow">Our Work</span>
-        <h1 class="m-pagetitle">The<br>Gallery</h1>
-        <p class="m-pagesub">Real daily drivers, luxury cars and exotics we&rsquo;ve corrected, coated and detailed across the Dallas&ndash;Fort Worth metroplex.</p>
-      </div>
-
-      <div class="pf-featured">
-        <a class="pf-fcard" href="contact.html">
-          <img src="pexels-holyson-h-2154634702-34257675.jpg" alt="Luxury Sedan — Concours" loading="lazy">
-          <span class="pf-fcard-cap">
-            <span class="pf-fcard-tag"><span class="dot"></span>Crown Signature &middot; 9H</span>
-            <h3>Luxury Sedan — Concours</h3>
-            <span class="pf-fcard-view">View the work <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-          </span>
-        </a>
-        <a class="pf-fcard" href="contact.html">
-          <img src="pexels-anna-danilina-241843489-33556666.jpg" alt="Swirls & scratches, erased" loading="lazy">
-          <span class="pf-fcard-cap">
-            <span class="pf-fcard-tag"><span class="dot"></span>Multi-Stage Correction</span>
-            <h3>Swirls & scratches, erased</h3>
-            <span class="pf-fcard-view">View the work <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-          </span>
-        </a>
-        <a class="pf-fcard" href="contact.html">
-          <img src="pexels-introspectivedsgn-20695250.jpg" alt="Cabins reset, surfaces protected" loading="lazy">
-          <span class="pf-fcard-cap">
-            <span class="pf-fcard-tag"><span class="dot"></span>Interior &amp; Detailing</span>
-            <h3>Cabins reset, surfaces protected</h3>
-            <span class="pf-fcard-view">View the work <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-          </span>
-        </a>
-      </div>
-
-      <div class="pf-filters" id="pfFilters">
-        <button class="pf-chip active" data-cat="all" onclick="mFilterWork('all',this)">All Work</button>
-        <button class="pf-chip" data-cat="ceramic" onclick="mFilterWork('ceramic',this)">Ceramic</button>
-        <button class="pf-chip" data-cat="correction" onclick="mFilterWork('correction',this)">Correction</button>
-        <button class="pf-chip" data-cat="interior" onclick="mFilterWork('interior',this)">Interior</button>
-      </div>
-
-      <div class="pf-grid" id="pfGrid">
-        <div class="pf-card" data-cat="ceramic">
-          <div class="pf-card-imgwrap" onclick="location.href='contact.html'">
-            <img src="pexels-bulat843-1243575272-26281541.jpg" alt="Daily Driver — 5-Year Ceramic" loading="lazy" onerror="this.closest('.pf-card').style.display='none'">
-            <button class="pf-save" type="button" aria-label="Save" onclick="pfSave(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-            <button class="pf-add" type="button" aria-label="Get a quote for this" onclick="event.stopPropagation();location.href='contact.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          </div>
-          <div class="pf-card-meta" onclick="location.href='contact.html'"><span class="pf-tag">Ceramic Coating</span><strong>Daily Driver — 5-Year Ceramic</strong><em>Signature 9H coating with a one-step polish for everyday protection.</em></div>
-        </div>
-        <div class="pf-card" data-cat="ceramic">
-          <div class="pf-card-imgwrap" onclick="location.href='contact.html'">
-            <img src="pexels-holyson-h-2154634702-34257675.jpg" alt="Luxury Sedan — Concours" loading="lazy" onerror="this.closest('.pf-card').style.display='none'">
-            <button class="pf-save" type="button" aria-label="Save" onclick="pfSave(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-            <button class="pf-add" type="button" aria-label="Get a quote for this" onclick="event.stopPropagation();location.href='contact.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          </div>
-          <div class="pf-card-meta" onclick="location.href='contact.html'"><span class="pf-tag">Ceramic Coating</span><strong>Luxury Sedan — Concours</strong><em>Multi-stage correction finished with our premium long-life coating.</em></div>
-        </div>
-        <div class="pf-card" data-cat="ceramic">
-          <div class="pf-card-imgwrap" onclick="location.href='contact.html'">
-            <img src="pexels-padrechaks-34614254 (1).jpg" alt="Exotic — Full Coating" loading="lazy" onerror="this.closest('.pf-card').style.display='none'">
-            <button class="pf-save" type="button" aria-label="Save" onclick="pfSave(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-            <button class="pf-add" type="button" aria-label="Get a quote for this" onclick="event.stopPropagation();location.href='contact.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          </div>
-          <div class="pf-card-meta" onclick="location.href='contact.html'"><span class="pf-tag">Ceramic Coating</span><strong>Exotic — Full Coating</strong><em>Wheels-off, fully coated finish for a high-value collector car.</em></div>
-        </div>
-        <div class="pf-card" data-cat="correction">
-          <div class="pf-card-imgwrap" onclick="location.href='contact.html'">
-            <img src="pexels-anna-danilina-241843489-33556666.jpg" alt="Multi-Stage Correction" loading="lazy" onerror="this.closest('.pf-card').style.display='none'">
-            <button class="pf-save" type="button" aria-label="Save" onclick="pfSave(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-            <button class="pf-add" type="button" aria-label="Get a quote for this" onclick="event.stopPropagation();location.href='contact.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          </div>
-          <div class="pf-card-meta" onclick="location.href='contact.html'"><span class="pf-tag">Paint Correction</span><strong>Multi-Stage Correction</strong><em>Heavy swirling and oxidation removed for show-quality clarity.</em></div>
-        </div>
-        <div class="pf-card" data-cat="correction">
-          <div class="pf-card-imgwrap" onclick="location.href='contact.html'">
-            <img src="pexels-yusuf-miah-70201554-11761278.jpg" alt="Two-Stage Polish" loading="lazy" onerror="this.closest('.pf-card').style.display='none'">
-            <button class="pf-save" type="button" aria-label="Save" onclick="pfSave(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-            <button class="pf-add" type="button" aria-label="Get a quote for this" onclick="event.stopPropagation();location.href='contact.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          </div>
-          <div class="pf-card-meta" onclick="location.href='contact.html'"><span class="pf-tag">Paint Correction</span><strong>Two-Stage Polish</strong><em>Restored depth and gloss on a faded daily driver.</em></div>
-        </div>
-        <div class="pf-card" data-cat="correction">
-          <div class="pf-card-imgwrap" onclick="location.href='contact.html'">
-            <img src="pexels-loic-manegarium-25859083.jpg" alt="Gloss Enhancement" loading="lazy" onerror="this.closest('.pf-card').style.display='none'">
-            <button class="pf-save" type="button" aria-label="Save" onclick="pfSave(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-            <button class="pf-add" type="button" aria-label="Get a quote for this" onclick="event.stopPropagation();location.href='contact.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          </div>
-          <div class="pf-card-meta" onclick="location.href='contact.html'"><span class="pf-tag">Paint Correction</span><strong>Gloss Enhancement</strong><em>A single-stage polish that brought back the wet-look shine.</em></div>
-        </div>
-        <div class="pf-card" data-cat="interior">
-          <div class="pf-card-imgwrap" onclick="location.href='contact.html'">
-            <img src="pexels-introspectivedsgn-20695250.jpg" alt="Full Interior Detail" loading="lazy" onerror="this.closest('.pf-card').style.display='none'">
-            <button class="pf-save" type="button" aria-label="Save" onclick="pfSave(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-            <button class="pf-add" type="button" aria-label="Get a quote for this" onclick="event.stopPropagation();location.href='contact.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          </div>
-          <div class="pf-card-meta" onclick="location.href='contact.html'"><span class="pf-tag">Interior &amp; Detailing</span><strong>Full Interior Detail</strong><em>Leather cleaned and conditioned, carpets extracted and refreshed.</em></div>
-        </div>
-        <div class="pf-card" data-cat="interior">
-          <div class="pf-card-imgwrap" onclick="location.href='contact.html'">
-            <img src="pexels-bulat843-1243575272-28995187.jpg" alt="Full Detail — In &amp; Out" loading="lazy" onerror="this.closest('.pf-card').style.display='none'">
-            <button class="pf-save" type="button" aria-label="Save" onclick="pfSave(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-            <button class="pf-add" type="button" aria-label="Get a quote for this" onclick="event.stopPropagation();location.href='contact.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          </div>
-          <div class="pf-card-meta" onclick="location.href='contact.html'"><span class="pf-tag">Interior &amp; Detailing</span><strong>Full Detail — In &amp; Out</strong><em>Complete reset inside and out for a trade-in-ready finish.</em></div>
-        </div>
-        <div class="pf-card" data-cat="interior">
-          <div class="pf-card-imgwrap" onclick="location.href='contact.html'">
-            <img src="pexels-ivan-kazlouski-234108500-12175729.jpg" alt="Maintenance Detail" loading="lazy" onerror="this.closest('.pf-card').style.display='none'">
-            <button class="pf-save" type="button" aria-label="Save" onclick="pfSave(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-            <button class="pf-add" type="button" aria-label="Get a quote for this" onclick="event.stopPropagation();location.href='contact.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          </div>
-          <div class="pf-card-meta" onclick="location.href='contact.html'"><span class="pf-tag">Interior &amp; Detailing</span><strong>Maintenance Detail</strong><em>Keeping a coated vehicle spotless between visits.</em></div>
-        </div>
-      </div>
-      <p class="pf-empty" id="pfEmpty">No work in that category yet &mdash; check back soon.</p>
-    </section>
-
-    <section class="m-sec">
-      <h2 class="ed-h">Trusted<br>across DFW</h2>
-      <div class="ed-tmls">
-        <article class="ed-tml">
-          <div class="ed-tml-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="ed-tml-quote">&ldquo;The gloss on my car is unreal &mdash; water just sheets right off. Honest pricing and zero pressure.&rdquo;</p>
-          <div class="ed-tml-by"><img src="https://i.pravatar.cc/80?img=12" alt=""><div><strong>Verified Customer</strong><span>Ceramic Coating</span></div></div>
-        </article>
-        <article class="ed-tml">
-          <div class="ed-tml-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="ed-tml-quote">&ldquo;They removed swirls I thought were permanent. The paint looks deeper than the day I bought it.&rdquo;</p>
-          <div class="ed-tml-by"><img src="https://i.pravatar.cc/80?img=47" alt=""><div><strong>Verified Customer</strong><span>Paint Correction</span></div></div>
-        </article>
-        <article class="ed-tml">
-          <div class="ed-tml-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="ed-tml-quote">&ldquo;Owner walked me through everything. My interior looks brand new. Highly recommend.&rdquo;</p>
-          <div class="ed-tml-by"><img src="https://i.pravatar.cc/80?img=32" alt=""><div><strong>Verified Customer</strong><span>Interior &amp; Detailing</span></div></div>
-        </article>
+    <section class="x-hero">
+      <div class="x-hero-media"><img src="pexels-entero-37208720.jpg" alt="Crown portfolio" fetchpriority="high" decoding="async"></div>
+      <div class="x-hero-body">
+        <span class="x-eyebrow x-hero-eyebrow">Our Work</span>
+        <h1 class="x-hero-title">Real work.<br>Real shine.</h1>
+        <p class="x-hero-copy">Daily drivers, luxury cars and exotics corrected, coated and detailed across DFW.</p>
+        <a class="x-cta" href="#mGrid" onclick="event.preventDefault();mScrollTo('mGrid')">Browse the Gallery <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
     </section>
 
-    <section class="m-sec">
-      <div class="ed-cta">
-        <h3>Ready for the<br>Crown Treatment?</h3>
-        <p>Tell us about your vehicle and get a free, honest quote within 24 hours.</p>
-        <button class="ed-cta-btn" onclick="window.location.href='contact.html'">Get a Free Quote</button>
+    <div class="x-chips" id="pfChips">
+      <button class="x-chip on" data-cat="all" onclick="xFilter('all',this)">All Work</button>
+      <button class="x-chip" data-cat="ceramic" onclick="xFilter('ceramic',this)">Ceramic</button>
+      <button class="x-chip" data-cat="correction" onclick="xFilter('correction',this)">Correction</button>
+      <button class="x-chip" data-cat="interior" onclick="xFilter('interior',this)">Interior</button>
+    </div>
+
+    <section class="x-sec" id="mGrid">
+      <div class="x-grid" id="pfGrid">
+        <div class="x-gcard" data-cat="ceramic" onclick="location.href='contact.html'">
+      <img src="pexels-bulat843-1243575272-26281541.jpg" alt="5-Year Ceramic" loading="lazy" decoding="async">
+      <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <span class="x-gcap"><span class="t">Ceramic Coating</span><span class="n">5-Year Ceramic</span></span></div><div class="x-gcard" data-cat="ceramic" onclick="location.href='contact.html'">
+      <img src="pexels-holyson-h-2154634702-34257675.jpg" alt="Luxury Concours" loading="lazy" decoding="async">
+      <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <span class="x-gcap"><span class="t">Ceramic Coating</span><span class="n">Luxury Concours</span></span></div><div class="x-gcard" data-cat="ceramic" onclick="location.href='contact.html'">
+      <img src="pexels-padrechaks-34614254 (1).jpg" alt="Exotic Full Coat" loading="lazy" decoding="async">
+      <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <span class="x-gcap"><span class="t">Ceramic Coating</span><span class="n">Exotic Full Coat</span></span></div><div class="x-gcard" data-cat="correction" onclick="location.href='contact.html'">
+      <img src="pexels-anna-danilina-241843489-33556666.jpg" alt="Multi-Stage" loading="lazy" decoding="async">
+      <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <span class="x-gcap"><span class="t">Paint Correction</span><span class="n">Multi-Stage</span></span></div><div class="x-gcard" data-cat="correction" onclick="location.href='contact.html'">
+      <img src="pexels-yusuf-miah-70201554-11761278.jpg" alt="Two-Stage Polish" loading="lazy" decoding="async">
+      <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <span class="x-gcap"><span class="t">Paint Correction</span><span class="n">Two-Stage Polish</span></span></div><div class="x-gcard" data-cat="correction" onclick="location.href='contact.html'">
+      <img src="pexels-loic-manegarium-25859083.jpg" alt="Gloss Enhance" loading="lazy" decoding="async">
+      <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <span class="x-gcap"><span class="t">Paint Correction</span><span class="n">Gloss Enhance</span></span></div><div class="x-gcard" data-cat="interior" onclick="location.href='contact.html'">
+      <img src="pexels-introspectivedsgn-20695250.jpg" alt="Full Interior" loading="lazy" decoding="async">
+      <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <span class="x-gcap"><span class="t">Interior</span><span class="n">Full Interior</span></span></div><div class="x-gcard" data-cat="interior" onclick="location.href='contact.html'">
+      <img src="pexels-bulat843-1243575272-28995187.jpg" alt="In &amp; Out Detail" loading="lazy" decoding="async">
+      <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <span class="x-gcap"><span class="t">Interior</span><span class="n">In &amp; Out Detail</span></span></div><div class="x-gcard" data-cat="interior" onclick="location.href='contact.html'">
+      <img src="pexels-ivan-kazlouski-234108500-12175729.jpg" alt="Maintenance" loading="lazy" decoding="async">
+      <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <span class="x-gcap"><span class="t">Interior</span><span class="n">Maintenance</span></span></div>
+      </div>
+      <p class="x-empty" id="pfEmpty">No work in that category yet &mdash; check back soon.</p>
+    </section>
+
+    <section class="x-sec">
+      <div class="x-sec-head"><h2>What clients say</h2></div>
+      <div class="x-rev">
+        <div class="x-rev-card"><div class="x-rev-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>&ldquo;Best detailer in the metroplex. My car looks better than the day I bought it.&rdquo;</p><div class="x-rev-by"><b>Verified Customer</b><span>Ceramic Coating</span></div></div>
+        <div class="x-rev-card"><div class="x-rev-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>&ldquo;Incredible attention to detail. Worth every penny.&rdquo;</p><div class="x-rev-by"><b>Verified Customer</b><span>Paint Correction</span></div></div>
       </div>
     </section>
 
@@ -1904,14 +1814,8 @@ window.addEventListener('load', function() {
       </div>
       <div class="m-foot-bottom">&copy; 2026 Crown Ceramic Coating &middot; Rockwall&ndash;Dallas, TX &middot; All rights reserved</div>
     </footer>
-    <div class="m-scroll-pad" style="height:30px;"></div>
+    <div class="m-scroll-pad" style="height:40px;"></div>
   </div>
-
-
-  <button class="pf-savedpill" id="pfSavedPill" onclick="window.location.href='contact.html'">
-    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span><span id="pfSavedTxt">0 saved</span><span class="go">Get a quote <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-  </button>
-
 
 <!-- ===== nav search dropdown ===== -->
 <div class="cs-overlay" id="csOverlay" onclick="if(event.target===this)crownSearchClose()">
@@ -1996,7 +1900,6 @@ window.addEventListener('load', function() {
 })();
 </script>
 <!-- ===== end nav search dropdown ===== -->
-
   <div class="m-menu-overlay" id="mMenu" onclick="if(event.target===this)mCloseMenu()">
     <div class="m-menu-panel">
       <div class="m-menu-top"><span class="m-menu-logo"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="m-logo-wm"><b>CROWN</b><i>CERAMIC COATING</i></span></span><button class="m-menu-x" onclick="mCloseMenu()" aria-label="Close">&#10005;</button></div>
@@ -2013,31 +1916,18 @@ window.addEventListener('load', function() {
     </div>
   </div>
 </div>
-
 <style>
 
-/* ===== CROWN MOBILE LAYER (shared shell, matches index.html) ===== */
 .m-app{ display:none; }
 @media (max-width:768px){
-  body > .announcement-banner,
-  body > nav,
-  body > section,
-  body > footer,
-  body > .cc-page,
-  body > .footer-cta-section,
-  body > .testimonials-section,
-  body > .chatbot-container,
-  body > .chatbot-bubble,
-  body > .chatbot-toggle,
-  body > .chatbot-window,
-  body > .back-to-top,
-  body > .back-to-top-btn{ display:none !important; }
+  body > .announcement-banner, body > nav, body > section, body > footer,
+  body > .cc-page, body > .footer-cta-section, body > .testimonials-section,
+  body > .chatbot-container, body > .chatbot-bubble, body > .chatbot-toggle, body > .chatbot-window,
+  body > .back-to-top, body > .back-to-top-btn, body > .logo-carousel, body > .section-divider{ display:none !important; }
   html,body{ overflow:hidden !important; height:100% !important; overscroll-behavior:none; background:#fff; }
-  .m-app{
-    display:block; position:fixed; inset:0; z-index:99990; background:#fff; overflow:hidden;
+  .m-app{ display:block; position:fixed; inset:0; z-index:99990; background:#fff; overflow:hidden;
     font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-    --g:#caa14a; --g-deep:#b07d2b; --g-soft:#f6edda; --ink:#14161a; --muted:#8a9099; --line:#ececee;
-  }
+    --g:#caa14a; --g-deep:#b07d2b; --g-soft:#f6edda; --ink:#14161a; --muted:#8a9099; --line:#ececee; }
 }
 
 /* top bar */
@@ -2209,138 +2099,166 @@ window.addEventListener('load', function() {
 .m-menu-cta{ margin-top:26px; border:none; cursor:pointer; background:var(--g); color:#fff; font-size:15px; font-weight:700; padding:16px; border-radius:14px; }
 .m-menu-phone{ margin-top:18px; color:var(--g-deep); text-decoration:none; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px; justify-content:center; }
 
-/* no bottom tab bar -> normal footer */
 .m-foot{ padding-bottom:calc(env(safe-area-inset-bottom,0px) + 40px); }
-/* no hero: top bar solid from the very top */
 .m-top2{ background:#fff; border-bottom-color:var(--line); }
 .m-top2 .m-crown{ color:var(--g); }
 .m-logo-wm b{ color:var(--ink); }
 .m-top2-icons button, .m-top2-icons a{ color:var(--ink); }
-/* clear the fixed top bar for the first section */
-.m-sec-top{ padding-top:calc(env(safe-area-inset-top,0px) + 84px); }
-/* editorial page header (replaces hero) */
-.m-pagehead{ margin-bottom:22px; }
-.m-eyebrow{ display:inline-block; font-family:'Archivo',sans-serif; font-weight:800; font-size:11.5px; letter-spacing:2.5px; text-transform:uppercase; color:var(--g-deep); margin-bottom:12px; }
-.m-pagetitle{ font-family:'Archivo',sans-serif; font-weight:900; font-size:44px; line-height:.9; letter-spacing:-1.6px; text-transform:uppercase; color:var(--ink); margin-bottom:14px; }
-.m-pagesub{ color:var(--muted); font-size:15px; line-height:1.6; }
-/* footer newsletter status */
-.m-foot-news-status{ font-size:12.5px; line-height:1.4; margin:-22px 0 32px; min-height:1em; }
-.m-foot-news-status.ok{ color:var(--g); }
-.m-foot-news-status.err{ color:#e8938b; }
-/* iOS auto-zooms on focus when an input is < 16px; force 16px everywhere to prevent it */
+.m-foot-news-status{ font-size:12.5px; line-height:1.4; margin:-22px 0 32px; min-height:1em; color:var(--muted); }
+.m-foot-news-status.ok{ color:var(--g); } .m-foot-news-status.err{ color:#e8938b; }
 .m-app input, .m-app select, .m-app textarea{ font-size:16px !important; }
 
 
-/* featured carousel (Magaz / shopping inspired) */
-.pf-featured{ display:flex; gap:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory; margin:0 -20px 26px; padding:2px 20px 8px; scrollbar-width:none; }
-.pf-featured::-webkit-scrollbar{ display:none; }
-.pf-fcard{ position:relative; flex:0 0 85%; scroll-snap-align:start; border-radius:24px; overflow:hidden; text-decoration:none; box-shadow:0 16px 34px rgba(20,22,26,.2); background:linear-gradient(135deg,#1a1410,#2a241e); }
-.pf-fcard img{ width:100%; height:340px; object-fit:cover; display:block; }
-.pf-fcard::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(8,8,8,.85), rgba(8,8,8,.06) 60%); }
-.pf-fcard-cap{ position:absolute; left:18px; right:18px; bottom:18px; z-index:2; color:#fff; display:block; }
-.pf-fcard-tag{ display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:#fff; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.26); padding:6px 12px; border-radius:30px; backdrop-filter:blur(6px); margin-bottom:11px; }
-.pf-fcard-tag .dot{ width:7px; height:7px; border-radius:50%; background:var(--g); }
-.pf-fcard-cap h3{ font-family:'Archivo',sans-serif; font-weight:800; font-size:23px; line-height:1.05; text-transform:uppercase; letter-spacing:-.4px; }
-.pf-fcard-view{ display:inline-flex; align-items:center; gap:8px; margin-top:12px; font-size:13px; font-weight:700; color:#fff; }
-.pf-fcard-view svg{ width:16px; height:16px; }
-/* filter chips */
-.pf-filters{ display:flex; gap:9px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -20px 20px; padding:2px 20px 4px; scrollbar-width:none; }
-.pf-filters::-webkit-scrollbar{ display:none; }
-.pf-chip{ flex:none; border:1px solid var(--line); background:#fff; color:var(--ink); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; padding:10px 18px; border-radius:30px; cursor:pointer; white-space:nowrap; transition:background .2s, color .2s, border-color .2s; }
-.pf-chip.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
-/* masonry tiles (Add inspo) */
-.pf-grid{ column-count:2; column-gap:12px; }
-.pf-card{ position:relative; display:block; break-inside:avoid; margin-bottom:12px; }
-.pf-card-imgwrap{ position:relative; display:block; border-radius:18px; overflow:hidden; box-shadow:0 8px 20px rgba(20,22,26,.12); border:1px solid var(--line); cursor:pointer; }
-.pf-card-imgwrap img{ width:100%; height:auto; display:block; background:linear-gradient(135deg,#1a1410,#2a241e); }
-.pf-save{ position:absolute; top:9px; right:9px; width:34px; height:34px; border:none; border-radius:50%; background:rgba(20,22,26,.5); backdrop-filter:blur(6px); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background .2s, transform .15s; }
-.pf-save svg{ width:17px; height:17px; }
-.pf-save:active{ transform:scale(.88); }
-.pf-card.saved .pf-save{ background:var(--g); }
-.pf-card.saved .pf-save svg{ fill:#fff; }
-.pf-add{ position:absolute; bottom:9px; right:9px; width:34px; height:34px; border:none; border-radius:50%; background:#fff; color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 5px 14px rgba(0,0,0,.22); transition:transform .15s; }
-.pf-add svg{ width:18px; height:18px; }
-.pf-add:active{ transform:scale(.88); }
-.pf-card-meta{ display:block; padding:11px 4px 2px; cursor:pointer; }
-.pf-tag{ display:inline-block; font-size:10px; font-weight:800; letter-spacing:1.1px; text-transform:uppercase; color:var(--g-deep); margin-bottom:5px; }
-.pf-card-meta strong{ display:block; font-size:14px; font-weight:700; color:var(--ink); line-height:1.25; }
-.pf-card-meta em{ display:block; font-style:normal; font-size:12px; color:var(--muted); line-height:1.45; margin-top:4px; }
-.pf-empty{ display:none; color:var(--muted); font-size:14px; text-align:center; padding:24px 0 4px; }
-/* floating saved pill (Add inspo "Added 13 Pics") */
-.pf-savedpill{ position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom,0px) + 18px); transform:translate(-50%,160%); z-index:99996; display:flex; align-items:center; gap:11px; background:var(--ink); color:#fff; border:none; cursor:pointer; padding:11px 18px 11px 11px; border-radius:40px; box-shadow:0 16px 36px rgba(0,0,0,.42); font-size:14px; font-weight:700; opacity:0; transition:transform .4s cubic-bezier(.7,0,.2,1), opacity .3s; }
-.pf-savedpill.show{ transform:translate(-50%,0); opacity:1; }
-.pf-savedpill .ic{ width:30px; height:30px; border-radius:50%; background:var(--g); display:flex; align-items:center; justify-content:center; }
-.pf-savedpill .ic svg{ width:16px; height:16px; fill:#fff; }
-.pf-savedpill .go{ display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:rgba(255,255,255,.6); padding-left:11px; border-left:1px solid rgba(255,255,255,.18); }
-.pf-savedpill .go svg{ width:14px; height:14px; }
+/* ===================== CROWN MOBILE v3 ===================== */
+.m-scroll{ background:#fff; }
+.x-eyebrow{ font-family:'Archivo',sans-serif; font-weight:800; font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--g-deep); }
+.x-top{ height:calc(env(safe-area-inset-top,0px) + 64px); }
+
+/* hero */
+.x-hero{ position:relative; margin-bottom:24px; }
+.x-hero-media{ position:relative; height:78vh; min-height:540px; border-radius:0 0 32px 32px; overflow:hidden; }
+.x-hero-media img{ width:100%; height:100%; object-fit:cover; display:block; background:linear-gradient(135deg,#1a1410,#2a241e); }
+.x-hero-media::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(8,8,10,.88) 3%, rgba(8,8,10,.10) 50%, rgba(8,8,10,.34) 100%); }
+.x-hero-body{ position:absolute; left:22px; right:22px; bottom:32px; z-index:2; color:#fff; }
+.x-hero-eyebrow{ color:rgba(255,255,255,.9); display:block; margin-bottom:14px; }
+.x-hero-title{ font-family:'Archivo',sans-serif; font-weight:900; font-size:48px; line-height:.9; letter-spacing:-2px; text-transform:uppercase; }
+.x-hero-copy{ margin-top:15px; font-size:14.5px; line-height:1.55; color:rgba(255,255,255,.82); max-width:92%; }
+.x-cta{ display:inline-flex; align-items:center; justify-content:center; gap:9px; margin-top:22px; background:#fff; color:var(--ink); font-weight:700; font-size:15px; padding:15px 26px; border-radius:40px; border:none; cursor:pointer; text-decoration:none; box-shadow:0 12px 30px rgba(0,0,0,.3); }
+.x-cta svg{ width:17px; height:17px; }
+.x-cta.gold{ background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; }
+
+/* search pill */
+.x-search{ display:flex; align-items:center; gap:11px; margin:0 18px 26px; padding:15px 18px; background:#f4f5f6; border:1px solid var(--line); border-radius:40px; color:var(--muted); font-size:14.5px; cursor:pointer; }
+.x-search svg{ width:19px; height:19px; color:var(--ink); flex:none; }
+
+/* category chips */
+.x-cats{ display:flex; gap:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 0 32px; padding:0 18px 6px; scrollbar-width:none; }
+.x-cats::-webkit-scrollbar{ display:none; }
+.x-cat{ flex:none; display:flex; flex-direction:column; align-items:center; gap:9px; text-decoration:none; width:62px; }
+.x-cat-ic{ width:60px; height:60px; border-radius:20px; background:var(--g-soft); color:var(--g-deep); display:flex; align-items:center; justify-content:center; border:1px solid rgba(202,161,74,.25); }
+.x-cat-ic svg{ width:25px; height:25px; }
+.x-cat:first-child .x-cat-ic{ background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; border-color:transparent; }
+.x-cat span{ font-size:11px; font-weight:600; color:var(--ink); text-align:center; line-height:1.2; }
+
+/* section */
+.x-sec{ margin-bottom:36px; content-visibility:auto; contain-intrinsic-size:auto 560px; }
+.x-sec-head{ display:flex; align-items:flex-end; justify-content:space-between; padding:0 18px; margin-bottom:16px; }
+.x-sec-head h2{ font-family:'Archivo',sans-serif; font-weight:900; font-size:26px; letter-spacing:-.7px; text-transform:uppercase; color:var(--ink); line-height:1; }
+.x-sec-head a{ font-size:13px; font-weight:700; color:var(--g-deep); text-decoration:none; display:inline-flex; align-items:center; gap:4px; }
+.x-sec-head a svg{ width:14px; height:14px; }
+
+/* rail + card */
+.x-rail{ display:flex; gap:15px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory; padding:2px 18px 8px; scrollbar-width:none; }
+.x-rail::-webkit-scrollbar{ display:none; }
+.x-rail .x-card{ flex:0 0 78%; scroll-snap-align:start; }
+.x-card{ position:relative; display:block; text-decoration:none; border-radius:22px; overflow:hidden; background:#fff; border:1px solid var(--line); box-shadow:0 10px 26px rgba(20,22,26,.10); }
+.x-card-media{ position:relative; height:210px; }
+.x-card-media img{ width:100%; height:100%; object-fit:cover; display:block; background:linear-gradient(135deg,#1a1410,#2a241e); }
+.x-card-heart{ position:absolute; top:11px; right:11px; width:36px; height:36px; border:none; border-radius:50%; background:rgba(255,255,255,.92); color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.18); }
+.x-card-heart svg{ width:18px; height:18px; }
+.x-card.saved .x-card-heart{ background:var(--g); color:#fff; }
+.x-card.saved .x-card-heart svg{ fill:#fff; }
+.x-card-tag{ position:absolute; left:11px; top:11px; background:rgba(20,22,26,.55); color:#fff; font-size:10.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; padding:6px 11px; border-radius:30px; }
+.x-card-body{ padding:14px 15px 16px; }
+.x-card-body h3{ font-size:16px; font-weight:700; color:var(--ink); line-height:1.2; }
+.x-card-sub{ display:flex; align-items:center; gap:5px; margin-top:5px; font-size:12.5px; color:var(--muted); }
+.x-card-sub svg{ width:13px; height:13px; }
+.x-card-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:13px; }
+.x-price{ font-size:15px; font-weight:800; color:var(--ink); }
+.x-price small{ font-weight:600; color:var(--muted); font-size:11px; }
+.x-rate{ display:inline-flex; align-items:center; gap:4px; font-size:12.5px; font-weight:700; color:var(--ink); }
+.x-rate svg{ width:14px; height:14px; color:var(--g); fill:var(--g); }
+
+/* vertical list */
+.x-list{ display:flex; flex-direction:column; gap:14px; padding:0 18px; }
+.x-list .x-card{ display:flex; align-items:stretch; }
+.x-list .x-card .x-card-media{ width:116px; height:auto; flex:none; }
+.x-list .x-card .x-lbody{ flex:1; padding:14px 16px; display:flex; flex-direction:column; justify-content:center; }
+.x-list .x-card .x-lbody .t{ font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--g-deep); margin-bottom:5px; }
+.x-list .x-card .x-lbody h3{ font-size:16px; font-weight:700; color:var(--ink); line-height:1.2; }
+.x-list .x-card .x-lbody p{ font-size:12.5px; color:var(--muted); margin-top:5px; line-height:1.4; }
+.x-list .x-card .x-lgo{ align-self:flex-start; margin-top:10px; display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--ink); }
+.x-list .x-card .x-lgo svg{ width:14px; height:14px; }
+
+/* dark band */
+.x-dark{ margin:0 0 36px; padding:42px 24px; background:var(--ink); color:#fff; content-visibility:auto; contain-intrinsic-size:auto 380px; }
+.x-dark .x-eyebrow{ color:var(--g); }
+.x-dark h2{ font-family:'Archivo',sans-serif; font-weight:900; font-size:36px; line-height:.95; letter-spacing:-1.2px; text-transform:uppercase; margin:12px 0 14px; }
+.x-dark p{ font-size:14.5px; line-height:1.6; color:rgba(255,255,255,.7); margin-bottom:22px; }
+.x-dark .x-stats{ display:flex; gap:10px; margin-bottom:24px; }
+.x-dark .x-stat{ flex:1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:14px 12px; text-align:center; }
+.x-dark .x-stat b{ display:block; font-family:'Archivo',sans-serif; font-weight:900; font-size:22px; color:var(--g); }
+.x-dark .x-stat span{ font-size:10.5px; color:rgba(255,255,255,.6); text-transform:uppercase; letter-spacing:.6px; }
+
+/* chips + grid (portfolio) */
+.x-chips{ display:flex; gap:9px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 0 20px; padding:0 18px 4px; scrollbar-width:none; }
+.x-chips::-webkit-scrollbar{ display:none; }
+.x-chip{ flex:none; border:1px solid var(--line); background:#fff; color:var(--ink); font-size:13px; font-weight:600; padding:10px 18px; border-radius:30px; cursor:pointer; white-space:nowrap; }
+.x-chip.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+.x-grid{ column-count:2; column-gap:13px; padding:0 18px; }
+.x-gcard{ break-inside:avoid; margin-bottom:13px; position:relative; border-radius:18px; overflow:hidden; display:block; box-shadow:0 8px 20px rgba(20,22,26,.12); border:1px solid var(--line); cursor:pointer; }
+.x-gcard img{ width:100%; height:auto; display:block; background:linear-gradient(135deg,#1a1410,#2a241e); }
+.x-gcard .x-card-heart{ width:32px; height:32px; }
+.x-gcap{ position:absolute; left:0; right:0; bottom:0; padding:32px 12px 12px; background:linear-gradient(to top,rgba(8,8,8,.82),transparent); color:#fff; }
+.x-gcap .t{ display:block; font-size:10px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--g); }
+.x-gcap .n{ display:block; font-size:13.5px; font-weight:700; line-height:1.2; margin-top:3px; }
+.x-empty{ display:none; color:var(--muted); font-size:14px; text-align:center; padding:24px 0; }
+
+/* reviews */
+.x-rev{ padding:2px 18px 8px; display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.x-rev::-webkit-scrollbar{ display:none; }
+.x-rev-card{ flex:0 0 84%; scroll-snap-align:start; background:#faf8f2; border:1px solid var(--line); border-radius:20px; padding:22px; }
+.x-rev-stars{ color:var(--g); letter-spacing:2px; font-size:14px; }
+.x-rev-card p{ font-size:14.5px; line-height:1.55; color:var(--ink); margin:12px 0 16px; }
+.x-rev-by b{ color:var(--ink); display:block; font-size:13.5px; }
+.x-rev-by span{ font-size:12px; color:var(--muted); }
+
+/* sticky CTA */
+.x-fab{ position:fixed; left:50%; transform:translateX(-50%); bottom:calc(env(safe-area-inset-bottom,0px) + 18px); z-index:80; display:inline-flex; align-items:center; gap:9px; background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; font-weight:700; font-size:15px; padding:15px 28px; border-radius:40px; box-shadow:0 16px 36px rgba(176,125,43,.5); border:none; cursor:pointer; text-decoration:none; }
+.x-fab svg{ width:17px; height:17px; }
+.m-foot{ content-visibility:auto; contain-intrinsic-size:auto 700px; }
+
 
 </style>
 
-
 <script>
 (function(){
-  window.mOpenMenu=function(){ var m=document.getElementById('mMenu'); if(m) m.classList.add('open'); };
-  window.mCloseMenu=function(){ var m=document.getElementById('mMenu'); if(m) m.classList.remove('open'); };
-  window.mScrollTo=function(id){
-    var sc=document.getElementById('mScroll'), el=document.getElementById(id);
-    if(sc&&el){ var offset=el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop; sc.scrollTo({top:offset-74,behavior:'smooth'}); }
-  };
+  window.mOpenMenu=function(){var m=document.getElementById('mMenu');if(m)m.classList.add('open');};
+  window.mCloseMenu=function(){var m=document.getElementById('mMenu');if(m)m.classList.remove('open');};
+  window.mScrollTo=function(id){var sc=document.getElementById('mScroll'),el=document.getElementById(id);
+    if(sc&&el){var o=el.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop;sc.scrollTo({top:o-74,behavior:'smooth'});}};
+  window.xHeart=function(e,b){e.preventDefault();e.stopPropagation();var c=b.closest('.x-card,.x-gcard');if(c)c.classList.toggle('saved');};
   window.mNewsletter=async function(){
-    var i=document.getElementById('mNewsEmail'), st=document.getElementById('mNewsStatus');
+    var i=document.getElementById('mNewsEmail'),st=document.getElementById('mNewsStatus');
     var email=((i&&i.value)||'').trim();
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-      if(st){ st.textContent='Please enter a valid email address.'; st.className='m-foot-news-status err'; }
-      if(i) i.focus(); return;
-    }
-    var btn = i && i.parentNode ? i.parentNode.querySelector('button') : null;
-    if(btn){ btn.disabled=true; btn.textContent='\u2026'; }
-    if(st){ st.textContent=''; st.className='m-foot-news-status'; }
-    try{
-      var local=email.split('@')[0];
-      var payload={ name:local||'Subscriber', firstName:local||'Subscriber', lastName:'',
-        email:email, phone:'', service:'Newsletter', project_type:'Newsletter',
-        details:'Newsletter signup from website footer', message:'Newsletter signup from website footer',
-        source:'Newsletter (Footer)' };
-      var res=await fetch(window.location.origin+'/api/leads',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
-      var data={}; try{ data=await res.json(); }catch(_){ data={}; }
-      if(res.ok && data.success){
-        if(i) i.value='';
-        if(st){ st.textContent='\u2713 You\u2019re subscribed \u2014 thanks!'; st.className='m-foot-news-status ok'; }
-      } else {
-        if(st){ st.textContent='Sorry, that didn\u2019t go through \u2014 please try again.'; st.className='m-foot-news-status err'; }
-      }
-    }catch(e){
-      if(st){ st.textContent='Network error \u2014 please try again.'; st.className='m-foot-news-status err'; }
-    }finally{
-      if(btn){ btn.disabled=false; btn.textContent='Subscribe'; }
-    }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ if(st){st.textContent='Please enter a valid email address.';st.className='m-foot-news-status err';} if(i)i.focus(); return; }
+    var btn=i&&i.parentNode?i.parentNode.querySelector('button'):null; if(btn){btn.disabled=true;btn.textContent='\u2026';}
+    if(st){st.textContent='';st.className='m-foot-news-status';}
+    try{ var local=email.split('@')[0];
+      var res=await fetch(window.location.origin+'/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name:local||'Subscriber',firstName:local||'Subscriber',lastName:'',email:email,phone:'',service:'Newsletter',project_type:'Newsletter',details:'Newsletter signup from website footer',message:'Newsletter signup from website footer',source:'Newsletter (Footer)'})});
+      var d={};try{d=await res.json();}catch(_){}
+      if(res.ok&&d.success){ if(i)i.value=''; if(st){st.textContent='\u2713 You\u2019re subscribed \u2014 thanks!';st.className='m-foot-news-status ok';} }
+      else { if(st){st.textContent='Sorry, that didn\u2019t go through \u2014 please try again.';st.className='m-foot-news-status err';} }
+    }catch(e){ if(st){st.textContent='Network error \u2014 please try again.';st.className='m-foot-news-status err';} }
+    finally{ if(btn){btn.disabled=false;btn.textContent='Subscribe';} }
   };
 })();
 </script>
 
 
 <script>
-window.mQuote=function(){ window.location.href='contact.html'; };
-window.mFilterWork=function(cat,btn){
-  document.querySelectorAll('#pfFilters .pf-chip').forEach(function(c){ c.classList.remove('active'); });
-  if(btn) btn.classList.add('active');
+window.mQuote=function(){window.location.href='contact.html';};
+window.xFilter=function(cat,btn){
+  document.querySelectorAll('#pfChips .x-chip').forEach(function(c){c.classList.remove('on');});
+  if(btn)btn.classList.add('on');
   var any=false;
-  document.querySelectorAll('#pfGrid .pf-card').forEach(function(c){
-    var hit=(cat==='all')||(c.dataset.cat===cat);
-    c.style.display=hit?'':'none'; if(hit) any=true;
-  });
-  var e=document.getElementById('pfEmpty'); if(e) e.style.display=any?'none':'block';
+  document.querySelectorAll('#pfGrid .x-gcard').forEach(function(c){var hit=(cat==='all')||c.dataset.cat===cat;c.style.display=hit?'':'none';if(hit)any=true;});
+  var e=document.getElementById('pfEmpty');if(e)e.style.display=any?'none':'block';
 };
-function pfUpdatePill(){
-  var n=document.querySelectorAll('#pfGrid .pf-card.saved').length;
-  var p=document.getElementById('pfSavedPill'), t=document.getElementById('pfSavedTxt');
-  if(t) t.textContent=n+' saved';
-  if(p) p.classList.toggle('show', n>0);
-}
-window.pfSave=function(ev,btn){ ev.preventDefault(); ev.stopPropagation(); var c=btn.closest('.pf-card'); if(c) c.classList.toggle('saved'); pfUpdatePill(); };
 </script>
 
-<!-- ============================================================ END CROWN MOBILE LAYER ============================================================ -->
+<!-- ============================================================ END CROWN MOBILE v3 ============================================================ -->
 
 
 
@@ -2512,7 +2430,7 @@ window.pfSave=function(ev,btn){ ev.preventDefault(); ev.stopPropagation(); var c
         <video poster="pexels-gdtography-277628-911738.jpg" preload="none" id="heroVideo" class="hero-video" autoplay muted loop playsinline webkit-playsinline>
             <source src="6159374-hd_1920_1080_30fps (1).mp4" type="video/mp4">
         </video>
-        <img decoding="async" src="pexels-gdtography-277628-911738.jpg" alt="Crown Ceramic Coating portfolio" class="hero-mobile-image" loading="eager">
+        <img decoding="async" src="pexels-entero-37208720.jpg" alt="Crown Ceramic Coating portfolio" class="hero-mobile-image" loading="eager">
     </div>
     <div class="hero-content">
         <div class="hero-text">

@@ -4593,14 +4593,12 @@ nav:not(.m-tabbar) {
 </style>
 </head>
 <body>
+
 <!-- ============================================================
-     CROWN — MOBILE HOMEPAGE (single flow)  [injected]
-     ARCHITECH-style hero · editorial sections · footer
+     CROWN — MOBILE v3  [injected]  (booking-editorial, no tab bar)
      ============================================================ -->
 <div class="m-app" id="mApp">
-
-  <!-- ===== sticky top bar ===== -->
-  <header class="m-top2">
+    <header class="m-top2">
     <a class="m-top2-logo" href="index.html"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="m-logo-wm"><b>CROWN</b><i>CERAMIC COATING</i></span></a>
     <div class="m-top2-icons">
       <button aria-label="Search" onclick="crownSearchOpen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.7" y2="16.7"/></svg></button>
@@ -4608,184 +4606,99 @@ nav:not(.m-tabbar) {
       <button aria-label="Menu" onclick="mOpenMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg></button>
     </div>
   </header>
-
-  <!-- ===== scroll body ===== -->
   <div class="m-scroll" id="mScroll">
+    <div class="x-top"></div>
 
-    <!-- HERO (image 1 style) -->
-    <section class="m-hero2">
-      <img class="m-hero2-img" src="pexels-mert-celik-1876960105-29755710.jpg" alt="Freshly ceramic-coated vehicle">
-      <div class="m-hero2-shade"></div>
-      <button class="m-hero-menu" aria-label="Menu" onclick="mOpenMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg></button>
-      <div class="m-hero2-inner">
-        <h1 class="m-hero2-title">Protect<br>what you<br>drive.</h1>
-        <p class="m-hero2-copy">Premium ceramic coatings, paint correction and luxury detailing across Dallas&ndash;Fort Worth &mdash; protection and shine you can see in every reflection.</p>
-        <button class="m-hero2-btn" onclick="mScrollTo('mFind')">Get Started <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-      </div>
-      <button class="m-scrollcue" onclick="mScrollTo('mFind')" aria-label="Scroll down">
-        <span>Scroll</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-    </section>
-
-    <!-- EXPLORE SERVICES (search + tiles) -->
-    <section id="mFind" class="m-sec">
-      <h2 class="ed-h">Explore<br>Services</h2>
-      <p class="m-lead">Find exactly what your vehicle needs &mdash; from a full ceramic package to a quick maintenance detail.</p>
-      <div class="m-search">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="mSearchInput" placeholder="Find the service you need today..." oninput="mFilterCats(this.value)" autocomplete="off">
-      </div>
-      <div class="m-cats" id="mCats">
-        <a class="m-cat" href="pricing.html#ceramic" data-name="ceramic coating liquid glass 9h"><span class="m-cat-img" style="background-image:url('pexels-cottonbro-5082237 (1).jpg')"></span><span class="m-cat-label">Ceramic<br>Coating</span></a>
-        <a class="m-cat" href="pricing.html#correction" data-name="paint correction polishing swirl"><span class="m-cat-img" style="background-image:url('pexels-autorecords-10186994.jpg')"></span><span class="m-cat-label">Paint<br>Correction</span></a>
-        <a class="m-cat" href="pricing.html#detailing" data-name="interior detailing deep clean leather"><span class="m-cat-img" style="background-image:url('pexels-bylukemiller-14231686.jpg')"></span><span class="m-cat-label">Interior<br>Detail</span></a>
-        <a class="m-cat" href="pricing.html#ceramic" data-name="paint protection film ppf clear bra"><span class="m-cat-img" style="background-image:url('pexels-entero-37208720.jpg')"></span><span class="m-cat-label">Protection<br>Film</span></a>
-        <a class="m-cat" href="pricing.html#ceramic" data-name="wheel coating brake dust rims"><span class="m-cat-img" style="background-image:url('pexels-holyson-h-2154634702-35403673.jpg')"></span><span class="m-cat-label">Wheel<br>Coating</span></a>
-        <a class="m-cat" href="pricing.html#detailing" data-name="full detail wash exterior interior"><span class="m-cat-img" style="background-image:url('pexels-ivan-kazlouski-234108500-12175729.jpg')"></span><span class="m-cat-label">Full<br>Detail</span></a>
-        <a class="m-cat" href="pricing.html#detailing" data-name="maintenance plan wash upkeep"><span class="m-cat-img" style="background-image:url('pexels-mert-celik-1876960105-29755710.jpg')"></span><span class="m-cat-label">Maintenance<br>Plan</span></a>
-        <a class="m-cat" href="pricing.html" data-name="more all services packages pricing"><span class="m-cat-img m-cat-more">20+</span><span class="m-cat-label">View<br>All</span></a>
-      </div>
-      <p class="m-cats-empty" id="mCatsEmpty">No services match that search.</p>
-    </section>
-
-    <!-- EDITORIAL FEATURE: Crown Treatment -->
-    <section class="ed-feat">
-      <div class="ed-feat-imgwrap">
-        <div class="ed-feat-img" style="background-image:url('pexels-cottonbro-5082237 (1).jpg')"></div>
-        <a class="ed-feat-pill" href="process.html">Read More</a>
-      </div>
-      <div class="ed-feat-body">
-        <span class="ed-feat-kicker">The Crown Treatment</span>
-        <p>A Crown ceramic coating turns your paint into liquid glass &mdash; a deep, wet, reflective shine wrapped in a hardened, hydrophobic shell. It shrugs off UV, chemicals and Texas road grime, sheds water on contact, and keeps your finish looking showroom-fresh for years, not weeks. Protection worthy of a crown.</p>
+    <section class="x-hero">
+      <div class="x-hero-media"><img src="pexels-egeardaphotos-2148533277-34054735.jpg" alt="Crown Ceramic Coating" fetchpriority="high" decoding="async"></div>
+      <div class="x-hero-body">
+        <span class="x-eyebrow x-hero-eyebrow">Dallas&ndash;Fort Worth</span>
+        <h1 class="x-hero-title">Protect the<br>cars you<br>love.</h1>
+        <p class="x-hero-copy">Premium ceramic coating, paint correction &amp; detailing &mdash; mirror-deep gloss and years of protection.</p>
+        <a class="x-cta" href="contact.html">Get a Free Quote <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
     </section>
 
-    <!-- EDITORIAL FEATURE: What We Do -->
-    <section class="ed-feat">
-      <div class="ed-feat-imgwrap">
-        <div class="ed-feat-img" style="background-image:url('pexels-bylukemiller-14231686.jpg')"></div>
-        <a class="ed-feat-pill" href="pricing.html">Read More</a>
-      </div>
-      <div class="ed-feat-body">
-        <span class="ed-feat-kicker">What We Do</span>
-        <p>Four core services, one obsession with doing things right. We layer professional-grade ceramic coatings, refine paint through single to multi-stage correction, reset interiors top to bottom, and shield vulnerable panels with self-healing film.</p>
-        <ul class="ed-list">
-          <li><a href="pricing.html#ceramic"><span>Ceramic Coating</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></li>
-          <li><a href="pricing.html#correction"><span>Paint Correction</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></li>
-          <li><a href="pricing.html#detailing"><span>Interior Detailing</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></li>
-          <li><a href="pricing.html#ceramic"><span>Paint Protection Film</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></li>
-        </ul>
-      </div>
-    </section>
+    <div class="x-search" onclick="crownSearchOpen&&crownSearchOpen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Search coatings, services&hellip;</span></div>
 
-    <!-- MARQUEE -->
-    <div class="ed-marquee">
-      <div class="ed-marquee-track">
-        <span>Fast Response</span><i>&#10033;</i><span>Free Quotes</span><i>&#10033;</i><span>5-Star Rated</span><i>&#10033;</i><span>Owner-Operated</span><i>&#10033;</i><span>Fast Response</span><i>&#10033;</i><span>Free Quotes</span><i>&#10033;</i><span>5-Star Rated</span><i>&#10033;</i><span>Owner-Operated</span><i>&#10033;</i>
-      </div>
+    <div class="x-cats">
+      <a class="x-cat" href="pricing.html#ceramic"><span class="x-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span>Ceramic</span></a>
+      <a class="x-cat" href="pricing.html#correction"><span class="x-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg></span><span>Correction</span></a>
+      <a class="x-cat" href="pricing.html#detailing"><span class="x-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/><path d="M3 13a2 2 0 0 1 2-2 2 2 0 0 1 2 2v3h10v-3a2 2 0 0 1 4 0v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="6" y1="20" x2="6" y2="22"/><line x1="18" y1="20" x2="18" y2="22"/></svg></span><span>Interior</span></a>
+      <a class="x-cat" href="pricing.html"><span class="x-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7s6 6.1 6 10.3a6 6 0 0 1-12 0c0-4.2 6-10.3 6-10.3z"/></svg></span><span>Maintenance</span></a>
+      <a class="x-cat" href="pricing.html"><span class="x-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span><span>Pricing</span></a>
     </div>
 
-    <!-- EDITORIAL FEATURE: Our Process -->
-    <section class="ed-feat">
-      <div class="ed-feat-imgwrap">
-        <div class="ed-feat-img" style="background-image:url('pexels-entero-37208720.jpg')"></div>
-        <a class="ed-feat-pill" href="process.html">Read More</a>
-      </div>
-      <div class="ed-feat-body">
-        <span class="ed-feat-kicker">Our Process</span>
-        <p>Every vehicle follows the same meticulous path. We inspect and decontaminate, correct the paint under professional lighting, apply your coating panel by panel in a controlled bay, then cure, warranty and hand you a maintenance plan &mdash; nothing rushed, nothing hidden.</p>
-        <div class="ed-steps">
-          <div class="ed-step"><b>01</b><span>Inspect &amp; Decon</span></div>
-          <div class="ed-step"><b>02</b><span>Correct</span></div>
-          <div class="ed-step"><b>03</b><span>Coat</span></div>
-          <div class="ed-step"><b>04</b><span>Cure &amp; Protect</span></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- WE COAT (collections) -->
-    <section class="m-sec">
-      <div class="ed-coll-head">
-        <h2 class="ed-coll-title">What<br>We Coat</h2>
-        <a class="ed-more" href="portfolio.html"><span class="ed-more-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>More Work</a>
-      </div>
-      <div class="m-types">
-        <a href="portfolio.html" class="m-type" style="background-image:url('pexels-radubradu-395822838-19524777.jpg')"><span class="m-type-lbl"><strong>Exotics &amp; Supercars</strong>Ultimate protection for serious machines</span></a>
-        <a href="portfolio.html" class="m-type" style="background-image:url('pexels-autorecords-10186994.jpg')"><span class="m-type-lbl"><strong>Luxury &amp; Premium</strong>Concours-level finishes</span></a>
-        <a href="portfolio.html" class="m-type" style="background-image:url('pexels-cottonbro-5082237 (1).jpg')"><span class="m-type-lbl"><strong>Daily Drivers</strong>Shine &amp; protection, every day</span></a>
-        <a href="portfolio.html" class="m-type" style="background-image:url('pexels-entero-37208720.jpg')"><span class="m-type-lbl"><strong>Trucks &amp; SUVs</strong>Tough, lasting protection</span></a>
-      </div>
-      <div class="ed-coll-cta">
-        <h3>Protection for<br>every vehicle.</h3>
-        <p>From daily drivers to garage-kept exotics &mdash; detail-shop precision on every car that rolls in.</p>
-        <div class="ed-coll-btns">
-          <a class="ed-pill-dark" href="#" onclick="openModal();return false;">Book Now</a>
-          <a class="ed-pill-out" href="pricing.html">View Pricing</a>
-        </div>
+    <section class="x-sec">
+      <div class="x-sec-head"><h2>Most Popular</h2><a href="pricing.html">See all <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
+      <div class="x-rail">
+        <a class="x-card" href="pricing.html#ceramic">
+      <span class="x-card-media"><img src="pexels-radubradu-395822838-19524777.jpg" alt="Signature Ceramic Coating" loading="lazy" decoding="async">
+        <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+        <span class="x-card-tag">Ceramic</span></span>
+      <span class="x-card-body"><h3>Signature Ceramic Coating</h3>
+        <span class="x-card-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Dallas–Fort Worth</span>
+        <span class="x-card-foot"><span class="x-price">from $799</span><span class="x-rate"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>5.0</span></span>
+      </span></a>
+        <a class="x-card" href="pricing.html#ceramic">
+      <span class="x-card-media"><img src="pexels-holyson-h-2154634702-35403673.jpg" alt="Crown Concours 9H" loading="lazy" decoding="async">
+        <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+        <span class="x-card-tag">Coating</span></span>
+      <span class="x-card-body"><h3>Crown Concours 9H</h3>
+        <span class="x-card-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>By appointment</span>
+        <span class="x-card-foot"><span class="x-price">from $1,299</span><span class="x-rate"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>5.0</span></span>
+      </span></a>
+        <a class="x-card" href="pricing.html#correction">
+      <span class="x-card-media"><img src="pexels-entero-37208720.jpg" alt="Multi-Stage Paint Correction" loading="lazy" decoding="async">
+        <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+        <span class="x-card-tag">Correction</span></span>
+      <span class="x-card-body"><h3>Multi-Stage Paint Correction</h3>
+        <span class="x-card-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Free quote</span>
+        <span class="x-card-foot"><span class="x-price">Free quote</span><span class="x-rate"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>5.0</span></span>
+      </span></a>
+        <a class="x-card" href="pricing.html#detailing">
+      <span class="x-card-media"><img src="pexels-ivan-kazlouski-234108500-12175729.jpg" alt="Full Interior Detail" loading="lazy" decoding="async">
+        <button class="x-card-heart" type="button" aria-label="Save" onclick="xHeart(event,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+        <span class="x-card-tag">Interior</span></span>
+      <span class="x-card-body"><h3>Full Interior Detail</h3>
+        <span class="x-card-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Mobile available</span>
+        <span class="x-card-foot"><span class="x-price">Free quote</span><span class="x-rate"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>4.9</span></span>
+      </span></a>
       </div>
     </section>
 
-    <!-- FEATURED WORK -->
-    <section class="m-sec">
-      <div class="ed-coll-head"><h2 class="ed-coll-title">Featured<br>Work</h2><a class="m-seeall" href="portfolio.html">See all</a></div>
-      <div class="m-feat">
-        <a href="portfolio.html" class="m-feat-card"><img src="pexels-radubradu-395822838-19524777.jpg" alt="Ceramic coated exotic"><div class="m-feat-tag"><span class="m-feat-dot"></span><span>Crown Signature &middot; 9H</span></div></a>
-        <a href="portfolio.html" class="m-feat-card"><img src="pexels-entero-37208720.jpg" alt="Paint correction result"><div class="m-feat-tag"><span class="m-feat-dot"></span><span>Multi-Stage Correction</span></div></a>
-        <a href="portfolio.html" class="m-feat-card"><img src="pexels-ivan-kazlouski-234108500-12175729.jpg" alt="Full detail result"><div class="m-feat-tag"><span class="m-feat-dot"></span><span>Full Detail &middot; In &amp; Out</span></div></a>
+    <section class="x-sec">
+      <div class="x-sec-head"><h2>Our Services</h2></div>
+      <div class="x-list">
+        <a class="x-card" href="pricing.html#ceramic"><span class="x-card-media"><img src="pexels-radubradu-395822838-19524777.jpg" alt="Ceramic Coating" loading="lazy" decoding="async"></span><span class="x-lbody"><span class="t">Ceramic Coating</span><h3>Ceramic Coating</h3><p>Long-lasting gloss &amp; paint protection</p><span class="x-lgo">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></span></a>
+        <a class="x-card" href="pricing.html#correction"><span class="x-card-media"><img src="pexels-entero-37208720.jpg" alt="Paint Correction" loading="lazy" decoding="async"></span><span class="x-lbody"><span class="t">Paint Correction</span><h3>Paint Correction</h3><p>Remove swirls, scratches &amp; oxidation</p><span class="x-lgo">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></span></a>
+        <a class="x-card" href="pricing.html#detailing"><span class="x-card-media"><img src="pexels-ivan-kazlouski-234108500-12175729.jpg" alt="Interior Detailing" loading="lazy" decoding="async"></span><span class="x-lbody"><span class="t">Interior &amp; Detailing</span><h3>Interior Detailing</h3><p>Deep interior clean &amp; protection</p><span class="x-lgo">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></span></a>
+        <a class="x-card" href="pricing.html"><span class="x-card-media"><img src="pexels-mert-celik-1876960105-29755710.jpg" alt="Maintenance Plans" loading="lazy" decoding="async"></span><span class="x-lbody"><span class="t">Maintenance</span><h3>Maintenance Plans</h3><p>Keep that coated shine year-round</p><span class="x-lgo">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></span></a>
       </div>
     </section>
 
-    <!-- TESTIMONIALS -->
-    <section class="m-sec">
-      <h2 class="ed-h">What Our<br>Clients Say</h2>
-      <div class="ed-tmls">
-        <article class="ed-tml">
-          <div class="ed-tml-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="ed-tml-quote">&ldquo;The gloss is unreal and water just rolls right off. The owner walked me through every step &mdash; my daily looks better than the day I bought it.&rdquo;</p>
-          <div class="ed-tml-by"><img src="https://i.pravatar.cc/80?img=12" alt=""><div><strong>Marcus R.</strong><span>Audi S5 &middot; Crown Signature</span></div></div>
-        </article>
-        <article class="ed-tml">
-          <div class="ed-tml-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="ed-tml-quote">&ldquo;Booked a two-stage correction and ceramic. Zero swirls left, honest pricing, no upselling. Worth every dollar.&rdquo;</p>
-          <div class="ed-tml-by"><img src="https://i.pravatar.cc/80?img=47" alt=""><div><strong>Dana K.</strong><span>Tesla Model 3 &middot; Concours</span></div></div>
-        </article>
-        <article class="ed-tml">
-          <div class="ed-tml-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="ed-tml-quote">&ldquo;Truck looks brand new and the maintenance plan keeps it that way. Professional from start to finish.&rdquo;</p>
-          <div class="ed-tml-by"><img src="https://i.pravatar.cc/80?img=32" alt=""><div><strong>Luis M.</strong><span>F-150 &middot; Full Detail</span></div></div>
-        </article>
+    <div class="x-dark">
+      <span class="x-eyebrow">The Crown Treatment</span>
+      <h2>Gloss that<br>turns heads.</h2>
+      <p>Every vehicle is prepped, corrected and coated by hand &mdash; no shortcuts, no rushed jobs, just a finish that lasts.</p>
+      <div class="x-stats">
+        <div class="x-stat"><b>9H</b><span>Hardness</span></div>
+        <div class="x-stat"><b>5yr+</b><span>Protection</span></div>
+        <div class="x-stat"><b>100%</b><span>Hand-applied</span></div>
+      </div>
+      <a class="x-cta gold" href="pricing.html">See Pricing &amp; Packages <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+    </div>
+
+    <section class="x-sec">
+      <div class="x-sec-head"><h2>Trusted in DFW</h2></div>
+      <div class="x-rev">
+        <div class="x-rev-card"><div class="x-rev-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>&ldquo;The gloss is unreal and water just sheets off. Honest pricing, zero pressure.&rdquo;</p><div class="x-rev-by"><b>Verified Customer</b><span>Ceramic Coating</span></div></div>
+        <div class="x-rev-card"><div class="x-rev-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>&ldquo;Swirls I thought were permanent &mdash; gone. Paint looks better than new.&rdquo;</p><div class="x-rev-by"><b>Verified Customer</b><span>Paint Correction</span></div></div>
+        <div class="x-rev-card"><div class="x-rev-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>&ldquo;Owner is hands-on and the interior looks showroom fresh. Highly recommend.&rdquo;</p><div class="x-rev-by"><b>Verified Customer</b><span>Interior Detail</span></div></div>
       </div>
     </section>
 
-    <!-- INSIGHTS -->
-    <section class="m-sec">
-      <div class="ed-coll-head"><h2 class="ed-coll-title">Insights</h2><a href="blog.html" class="m-seeall">Read the blog</a></div>
-      <div class="ed-blogs">
-        <article class="ed-blog">
-          <div class="ed-blog-img"><div class="ed-blog-photo" style="background-image:url('pexels-bylukemiller-14231686.jpg')"></div><a class="ed-blog-pill" href="blog.html">Read More</a></div>
-          <h3 class="ed-blog-title">Ceramic vs. Wax vs. Sealant</h3>
-          <p class="ed-blog-desc">What actually protects your paint &mdash; and what&rsquo;s just marketing hype.</p>
-        </article>
-        <article class="ed-blog">
-          <div class="ed-blog-img"><div class="ed-blog-photo" style="background-image:url('pexels-autorecords-10186994.jpg')"></div><a class="ed-blog-pill" href="blog.html">Read More</a></div>
-          <h3 class="ed-blog-title">Is Paint Correction Worth It?</h3>
-          <p class="ed-blog-desc">What those swirl marks are really costing your paint over time.</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- CTA band -->
-    <section class="m-sec">
-      <div class="ed-cta">
-        <h3>Ready for the<br>Crown Treatment?</h3>
-        <p>Tell us about your vehicle and get a free, honest quote within 24 hours.</p>
-        <button class="ed-cta-btn" onclick="openModal()">Get a Free Quote</button>
-      </div>
-    </section>
-
-    <!-- FOOTER (image 2 style) -->
-    <footer class="m-foot">
+        <footer class="m-foot">
       <div class="m-foot-brand">
         <span class="m-foot-logo"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Crown Ceramic Coating</span></span>
         <p>Premium ceramic coating, paint correction &amp; detailing across the Dallas&ndash;Fort Worth metroplex.</p>
@@ -4827,12 +4740,8 @@ nav:not(.m-tabbar) {
       </div>
       <div class="m-foot-bottom">&copy; 2026 Crown Ceramic Coating &middot; Rockwall&ndash;Dallas, TX &middot; All rights reserved</div>
     </footer>
-
-    <div class="m-scroll-pad"></div>
+    <div class="m-scroll-pad" style="height:40px;"></div>
   </div>
-  
-
-
 
 <!-- ===== nav search dropdown ===== -->
 <div class="cs-overlay" id="csOverlay" onclick="if(event.target===this)crownSearchClose()">
@@ -4917,8 +4826,6 @@ nav:not(.m-tabbar) {
 })();
 </script>
 <!-- ===== end nav search dropdown ===== -->
-
-  <!-- ===== slide-in menu ===== -->
   <div class="m-menu-overlay" id="mMenu" onclick="if(event.target===this)mCloseMenu()">
     <div class="m-menu-panel">
       <div class="m-menu-top"><span class="m-menu-logo"><svg class="m-crown" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="12" cy="4.3" r="1.3" fill="currentColor"/><circle cx="19" cy="7" r="1.3" fill="currentColor"/><line x1="3" y1="21" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="m-logo-wm"><b>CROWN</b><i>CERAMIC COATING</i></span></span><button class="m-menu-x" onclick="mCloseMenu()" aria-label="Close">&#10005;</button></div>
@@ -4930,30 +4837,23 @@ nav:not(.m-tabbar) {
       <a href="blog.html" class="m-menu-link">Blog</a>
       <a href="client_portal.html" class="m-menu-link">Client Portal</a>
       <a href="contact.html" class="m-menu-link">Contact</a>
-      <button class="m-menu-cta" onclick="mCloseMenu();openModal();">Get a Free Quote</button>
+      <button class="m-menu-cta" onclick="mCloseMenu();mQuote();">Get a Free Quote</button>
       <a href="tel:+19402178680" class="m-menu-phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>(940) 217-8680</a>
     </div>
   </div>
 </div>
-
 <style>
-/* ===== CROWN MOBILE HOMEPAGE (single flow) ===== */
-.m-app{ display:none; }
 
+.m-app{ display:none; }
 @media (max-width:768px){
-  body > .back-to-top, body > .announcement-banner, body > nav, body > section, body > footer,
-  body > .logo-carousel, body > .section-divider, body > .chatbot-container{ display:none !important; }
-  html,body{
-    overflow:hidden !important;
-    height:100% !important;
-    overscroll-behavior:none;
-    background:#fff;
-  }
-  .m-app{
-    display:block; position:fixed; inset:0; z-index:99990; background:#fff; overflow:hidden;
+  body > .announcement-banner, body > nav, body > section, body > footer,
+  body > .cc-page, body > .footer-cta-section, body > .testimonials-section,
+  body > .chatbot-container, body > .chatbot-bubble, body > .chatbot-toggle, body > .chatbot-window,
+  body > .back-to-top, body > .back-to-top-btn, body > .logo-carousel, body > .section-divider{ display:none !important; }
+  html,body{ overflow:hidden !important; height:100% !important; overscroll-behavior:none; background:#fff; }
+  .m-app{ display:block; position:fixed; inset:0; z-index:99990; background:#fff; overflow:hidden;
     font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-    --g:#caa14a; --g-deep:#b07d2b; --g-soft:#f6edda; --ink:#14161a; --muted:#8a9099; --line:#ececee;
-  }
+    --g:#caa14a; --g-deep:#b07d2b; --g-soft:#f6edda; --ink:#14161a; --muted:#8a9099; --line:#ececee; }
 }
 
 /* top bar */
@@ -5093,7 +4993,7 @@ nav:not(.m-tabbar) {
 .ed-cta-btn{ width:100%; border:none; cursor:pointer; background:var(--g); color:#fff; font-size:15px; font-weight:700; padding:16px; border-radius:30px; box-shadow:0 12px 28px rgba(202,161,74,.4); }
 
 /* footer */
-.m-foot{ background:#0e0e0e; margin-top:40px; padding:40px 22px calc(env(safe-area-inset-bottom,0px) + 40px); color:#fff; }
+.m-foot{ background:#0e0e0e; margin-top:40px; padding:40px 22px calc(env(safe-area-inset-bottom,0px) + 96px); color:#fff; }
 .m-foot-logo{ display:inline-flex; align-items:center; gap:11px; }
 .m-foot-logo .m-crown{ width:34px; height:34px; color:var(--g); }
 .m-foot-logo > span{ font-family:'Archivo',sans-serif; font-weight:900; font-size:18px; letter-spacing:1px; color:#fff; text-transform:uppercase; }
@@ -5112,14 +5012,6 @@ nav:not(.m-tabbar) {
 .m-foot-social a{ width:42px; height:42px; border-radius:50%; border:1px solid rgba(255,255,255,.16); color:#fff; display:flex; align-items:center; justify-content:center; }
 .m-foot-social svg{ width:19px; height:19px; }
 .m-foot-bottom{ color:rgba(255,255,255,.4); font-size:11.5px; text-align:center; padding-top:24px; line-height:1.5; }
-
-
-.m-tab{ background:none; border:none; cursor:pointer; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; color:#aeb3ba; font-size:10px; font-weight:600; flex:1; padding:4px 0; }
-.m-tab svg{ width:23px; height:23px; }
-.m-tab.active{ color:var(--g-deep); }
-.m-tab-fab{ flex:none; width:56px; height:56px; margin-top:-26px; background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; border-radius:50%; justify-content:center; box-shadow:0 10px 26px rgba(202,161,74,.5); border:4px solid #fff; }
-.m-tab-fab svg{ width:26px; height:26px; }
-
 /* slide-in menu */
 .m-menu-overlay{ position:absolute; inset:0; z-index:50; background:rgba(20,22,26,.45); backdrop-filter:blur(2px); opacity:0; visibility:hidden; transition:opacity .3s ease, visibility .3s ease; }
 .m-menu-overlay.open{ opacity:1; visibility:visible; }
@@ -5132,92 +5024,157 @@ nav:not(.m-tabbar) {
 .m-menu-link:active{ color:var(--g); }
 .m-menu-cta{ margin-top:26px; border:none; cursor:pointer; background:var(--g); color:#fff; font-size:15px; font-weight:700; padding:16px; border-radius:14px; }
 .m-menu-phone{ margin-top:18px; color:var(--g-deep); text-decoration:none; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px; justify-content:center; }
+
+.m-foot{ padding-bottom:calc(env(safe-area-inset-bottom,0px) + 40px); }
+.m-top2{ background:#fff; border-bottom-color:var(--line); }
+.m-top2 .m-crown{ color:var(--g); }
+.m-logo-wm b{ color:var(--ink); }
+.m-top2-icons button, .m-top2-icons a{ color:var(--ink); }
+.m-foot-news-status{ font-size:12.5px; line-height:1.4; margin:-22px 0 32px; min-height:1em; color:var(--muted); }
+.m-foot-news-status.ok{ color:var(--g); } .m-foot-news-status.err{ color:#e8938b; }
+.m-app input, .m-app select, .m-app textarea{ font-size:16px !important; }
+
+
+/* ===================== CROWN MOBILE v3 ===================== */
+.m-scroll{ background:#fff; }
+.x-eyebrow{ font-family:'Archivo',sans-serif; font-weight:800; font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--g-deep); }
+.x-top{ height:calc(env(safe-area-inset-top,0px) + 64px); }
+
+/* hero */
+.x-hero{ position:relative; margin-bottom:24px; }
+.x-hero-media{ position:relative; height:78vh; min-height:540px; border-radius:0 0 32px 32px; overflow:hidden; }
+.x-hero-media img{ width:100%; height:100%; object-fit:cover; display:block; background:linear-gradient(135deg,#1a1410,#2a241e); }
+.x-hero-media::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(8,8,10,.88) 3%, rgba(8,8,10,.10) 50%, rgba(8,8,10,.34) 100%); }
+.x-hero-body{ position:absolute; left:22px; right:22px; bottom:32px; z-index:2; color:#fff; }
+.x-hero-eyebrow{ color:rgba(255,255,255,.9); display:block; margin-bottom:14px; }
+.x-hero-title{ font-family:'Archivo',sans-serif; font-weight:900; font-size:48px; line-height:.9; letter-spacing:-2px; text-transform:uppercase; }
+.x-hero-copy{ margin-top:15px; font-size:14.5px; line-height:1.55; color:rgba(255,255,255,.82); max-width:92%; }
+.x-cta{ display:inline-flex; align-items:center; justify-content:center; gap:9px; margin-top:22px; background:#fff; color:var(--ink); font-weight:700; font-size:15px; padding:15px 26px; border-radius:40px; border:none; cursor:pointer; text-decoration:none; box-shadow:0 12px 30px rgba(0,0,0,.3); }
+.x-cta svg{ width:17px; height:17px; }
+.x-cta.gold{ background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; }
+
+/* search pill */
+.x-search{ display:flex; align-items:center; gap:11px; margin:0 18px 26px; padding:15px 18px; background:#f4f5f6; border:1px solid var(--line); border-radius:40px; color:var(--muted); font-size:14.5px; cursor:pointer; }
+.x-search svg{ width:19px; height:19px; color:var(--ink); flex:none; }
+
+/* category chips */
+.x-cats{ display:flex; gap:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 0 32px; padding:0 18px 6px; scrollbar-width:none; }
+.x-cats::-webkit-scrollbar{ display:none; }
+.x-cat{ flex:none; display:flex; flex-direction:column; align-items:center; gap:9px; text-decoration:none; width:62px; }
+.x-cat-ic{ width:60px; height:60px; border-radius:20px; background:var(--g-soft); color:var(--g-deep); display:flex; align-items:center; justify-content:center; border:1px solid rgba(202,161,74,.25); }
+.x-cat-ic svg{ width:25px; height:25px; }
+.x-cat:first-child .x-cat-ic{ background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; border-color:transparent; }
+.x-cat span{ font-size:11px; font-weight:600; color:var(--ink); text-align:center; line-height:1.2; }
+
+/* section */
+.x-sec{ margin-bottom:36px; content-visibility:auto; contain-intrinsic-size:auto 560px; }
+.x-sec-head{ display:flex; align-items:flex-end; justify-content:space-between; padding:0 18px; margin-bottom:16px; }
+.x-sec-head h2{ font-family:'Archivo',sans-serif; font-weight:900; font-size:26px; letter-spacing:-.7px; text-transform:uppercase; color:var(--ink); line-height:1; }
+.x-sec-head a{ font-size:13px; font-weight:700; color:var(--g-deep); text-decoration:none; display:inline-flex; align-items:center; gap:4px; }
+.x-sec-head a svg{ width:14px; height:14px; }
+
+/* rail + card */
+.x-rail{ display:flex; gap:15px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory; padding:2px 18px 8px; scrollbar-width:none; }
+.x-rail::-webkit-scrollbar{ display:none; }
+.x-rail .x-card{ flex:0 0 78%; scroll-snap-align:start; }
+.x-card{ position:relative; display:block; text-decoration:none; border-radius:22px; overflow:hidden; background:#fff; border:1px solid var(--line); box-shadow:0 10px 26px rgba(20,22,26,.10); }
+.x-card-media{ position:relative; height:210px; }
+.x-card-media img{ width:100%; height:100%; object-fit:cover; display:block; background:linear-gradient(135deg,#1a1410,#2a241e); }
+.x-card-heart{ position:absolute; top:11px; right:11px; width:36px; height:36px; border:none; border-radius:50%; background:rgba(255,255,255,.92); color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.18); }
+.x-card-heart svg{ width:18px; height:18px; }
+.x-card.saved .x-card-heart{ background:var(--g); color:#fff; }
+.x-card.saved .x-card-heart svg{ fill:#fff; }
+.x-card-tag{ position:absolute; left:11px; top:11px; background:rgba(20,22,26,.55); color:#fff; font-size:10.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; padding:6px 11px; border-radius:30px; }
+.x-card-body{ padding:14px 15px 16px; }
+.x-card-body h3{ font-size:16px; font-weight:700; color:var(--ink); line-height:1.2; }
+.x-card-sub{ display:flex; align-items:center; gap:5px; margin-top:5px; font-size:12.5px; color:var(--muted); }
+.x-card-sub svg{ width:13px; height:13px; }
+.x-card-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:13px; }
+.x-price{ font-size:15px; font-weight:800; color:var(--ink); }
+.x-price small{ font-weight:600; color:var(--muted); font-size:11px; }
+.x-rate{ display:inline-flex; align-items:center; gap:4px; font-size:12.5px; font-weight:700; color:var(--ink); }
+.x-rate svg{ width:14px; height:14px; color:var(--g); fill:var(--g); }
+
+/* vertical list */
+.x-list{ display:flex; flex-direction:column; gap:14px; padding:0 18px; }
+.x-list .x-card{ display:flex; align-items:stretch; }
+.x-list .x-card .x-card-media{ width:116px; height:auto; flex:none; }
+.x-list .x-card .x-lbody{ flex:1; padding:14px 16px; display:flex; flex-direction:column; justify-content:center; }
+.x-list .x-card .x-lbody .t{ font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--g-deep); margin-bottom:5px; }
+.x-list .x-card .x-lbody h3{ font-size:16px; font-weight:700; color:var(--ink); line-height:1.2; }
+.x-list .x-card .x-lbody p{ font-size:12.5px; color:var(--muted); margin-top:5px; line-height:1.4; }
+.x-list .x-card .x-lgo{ align-self:flex-start; margin-top:10px; display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--ink); }
+.x-list .x-card .x-lgo svg{ width:14px; height:14px; }
+
+/* dark band */
+.x-dark{ margin:0 0 36px; padding:42px 24px; background:var(--ink); color:#fff; content-visibility:auto; contain-intrinsic-size:auto 380px; }
+.x-dark .x-eyebrow{ color:var(--g); }
+.x-dark h2{ font-family:'Archivo',sans-serif; font-weight:900; font-size:36px; line-height:.95; letter-spacing:-1.2px; text-transform:uppercase; margin:12px 0 14px; }
+.x-dark p{ font-size:14.5px; line-height:1.6; color:rgba(255,255,255,.7); margin-bottom:22px; }
+.x-dark .x-stats{ display:flex; gap:10px; margin-bottom:24px; }
+.x-dark .x-stat{ flex:1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:14px 12px; text-align:center; }
+.x-dark .x-stat b{ display:block; font-family:'Archivo',sans-serif; font-weight:900; font-size:22px; color:var(--g); }
+.x-dark .x-stat span{ font-size:10.5px; color:rgba(255,255,255,.6); text-transform:uppercase; letter-spacing:.6px; }
+
+/* chips + grid (portfolio) */
+.x-chips{ display:flex; gap:9px; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 0 20px; padding:0 18px 4px; scrollbar-width:none; }
+.x-chips::-webkit-scrollbar{ display:none; }
+.x-chip{ flex:none; border:1px solid var(--line); background:#fff; color:var(--ink); font-size:13px; font-weight:600; padding:10px 18px; border-radius:30px; cursor:pointer; white-space:nowrap; }
+.x-chip.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+.x-grid{ column-count:2; column-gap:13px; padding:0 18px; }
+.x-gcard{ break-inside:avoid; margin-bottom:13px; position:relative; border-radius:18px; overflow:hidden; display:block; box-shadow:0 8px 20px rgba(20,22,26,.12); border:1px solid var(--line); cursor:pointer; }
+.x-gcard img{ width:100%; height:auto; display:block; background:linear-gradient(135deg,#1a1410,#2a241e); }
+.x-gcard .x-card-heart{ width:32px; height:32px; }
+.x-gcap{ position:absolute; left:0; right:0; bottom:0; padding:32px 12px 12px; background:linear-gradient(to top,rgba(8,8,8,.82),transparent); color:#fff; }
+.x-gcap .t{ display:block; font-size:10px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--g); }
+.x-gcap .n{ display:block; font-size:13.5px; font-weight:700; line-height:1.2; margin-top:3px; }
+.x-empty{ display:none; color:var(--muted); font-size:14px; text-align:center; padding:24px 0; }
+
+/* reviews */
+.x-rev{ padding:2px 18px 8px; display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.x-rev::-webkit-scrollbar{ display:none; }
+.x-rev-card{ flex:0 0 84%; scroll-snap-align:start; background:#faf8f2; border:1px solid var(--line); border-radius:20px; padding:22px; }
+.x-rev-stars{ color:var(--g); letter-spacing:2px; font-size:14px; }
+.x-rev-card p{ font-size:14.5px; line-height:1.55; color:var(--ink); margin:12px 0 16px; }
+.x-rev-by b{ color:var(--ink); display:block; font-size:13.5px; }
+.x-rev-by span{ font-size:12px; color:var(--muted); }
+
+/* sticky CTA */
+.x-fab{ position:fixed; left:50%; transform:translateX(-50%); bottom:calc(env(safe-area-inset-bottom,0px) + 18px); z-index:80; display:inline-flex; align-items:center; gap:9px; background:linear-gradient(135deg,#e0bd6e,#caa14a); color:#fff; font-weight:700; font-size:15px; padding:15px 28px; border-radius:40px; box-shadow:0 16px 36px rgba(176,125,43,.5); border:none; cursor:pointer; text-decoration:none; }
+.x-fab svg{ width:17px; height:17px; }
+.m-foot{ content-visibility:auto; contain-intrinsic-size:auto 700px; }
+
+
 </style>
 
 <script>
 (function(){
-  window.mOpenMenu=function(){ document.getElementById('mMenu').classList.add('open'); };
-  window.mCloseMenu=function(){ document.getElementById('mMenu').classList.remove('open'); };
-  window.mScrollTo=function(id){ var app=document.getElementById('mApp'); var sc=document.getElementById('mScroll'); var el=document.getElementById(id); if(app) app.classList.add('scrolled'); var tb=document.getElementById('mTabbar'); if(tb){ tb.style.display='flex'; } if(sc&&el){ var offset=el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop; sc.scrollTo({top:offset,behavior:'smooth'}); } };
-  (function(){ var sc=document.getElementById('mScroll'), app=document.getElementById('mApp');
-    if(!sc||!app) return;
-    var hero = app.querySelector('.m-hero2');
-    var tabbar = document.querySelector('.m-tabbar');
-
-    function setScrolled(on) {
-      app.classList.toggle('scrolled', on);
-      if(tabbar) {
-        tabbar.style.display = on ? 'flex' : 'none';
-      }
-    }
-
-    // Primary: scroll listener — always reliable across all mobile browsers
-    sc.addEventListener('scroll', function(){
-      var threshold = hero ? hero.offsetHeight * 0.8 : 200;
-      setScrolled(sc.scrollTop > threshold);
-    }, {passive:true});
-
-    // Scroll listener above handles all cases reliably
-    } )();
-  window.mHome=function(el){
-    if(el){ document.querySelectorAll('.m-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
-    var sc=document.getElementById('mScroll'); if(sc) sc.scrollTo({top:0,behavior:'smooth'});
-    var tb=document.getElementById('mTabbar'); if(tb) tb.style.display='none';
-  };
-  window.mFilterCats=function(q){
-    q=(q||'').trim().toLowerCase(); var any=false;
-    document.querySelectorAll('#mCats .m-cat').forEach(function(c){
-      var hit=!q||(c.dataset.name||'').indexOf(q)>-1; c.style.display=hit?'':'none'; if(hit)any=true;
-    });
-    document.getElementById('mCatsEmpty').style.display=any?'none':'block';
+  window.mOpenMenu=function(){var m=document.getElementById('mMenu');if(m)m.classList.add('open');};
+  window.mCloseMenu=function(){var m=document.getElementById('mMenu');if(m)m.classList.remove('open');};
+  window.mScrollTo=function(id){var sc=document.getElementById('mScroll'),el=document.getElementById(id);
+    if(sc&&el){var o=el.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop;sc.scrollTo({top:o-74,behavior:'smooth'});}};
+  window.xHeart=function(e,b){e.preventDefault();e.stopPropagation();var c=b.closest('.x-card,.x-gcard');if(c)c.classList.toggle('saved');};
+  window.mNewsletter=async function(){
+    var i=document.getElementById('mNewsEmail'),st=document.getElementById('mNewsStatus');
+    var email=((i&&i.value)||'').trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ if(st){st.textContent='Please enter a valid email address.';st.className='m-foot-news-status err';} if(i)i.focus(); return; }
+    var btn=i&&i.parentNode?i.parentNode.querySelector('button'):null; if(btn){btn.disabled=true;btn.textContent='\u2026';}
+    if(st){st.textContent='';st.className='m-foot-news-status';}
+    try{ var local=email.split('@')[0];
+      var res=await fetch(window.location.origin+'/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name:local||'Subscriber',firstName:local||'Subscriber',lastName:'',email:email,phone:'',service:'Newsletter',project_type:'Newsletter',details:'Newsletter signup from website footer',message:'Newsletter signup from website footer',source:'Newsletter (Footer)'})});
+      var d={};try{d=await res.json();}catch(_){}
+      if(res.ok&&d.success){ if(i)i.value=''; if(st){st.textContent='\u2713 You\u2019re subscribed \u2014 thanks!';st.className='m-foot-news-status ok';} }
+      else { if(st){st.textContent='Sorry, that didn\u2019t go through \u2014 please try again.';st.className='m-foot-news-status err';} }
+    }catch(e){ if(st){st.textContent='Network error \u2014 please try again.';st.className='m-foot-news-status err';} }
+    finally{ if(btn){btn.disabled=false;btn.textContent='Subscribe';} }
   };
 })();
 </script>
 
-<style id="crown-mobile-fixes">
-/* iOS auto-zooms on focus when an input is < 16px; force 16px to prevent it */
-.m-app input, .m-app select, .m-app textarea{ font-size:16px !important; }
-/* footer newsletter status */
-.m-foot-news-status{ font-size:12.5px; line-height:1.4; margin:-22px 0 32px; min-height:1em; color:var(--muted); }
-.m-foot-news-status.ok{ color:var(--g); }
-.m-foot-news-status.err{ color:#e8938b; }
-</style>
-<script>
-window.mNewsletter=async function(){
-  var i=document.getElementById('mNewsEmail'), st=document.getElementById('mNewsStatus');
-  var email=((i&&i.value)||'').trim();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    if(st){ st.textContent='Please enter a valid email address.'; st.className='m-foot-news-status err'; }
-    if(i) i.focus(); return;
-  }
-  var btn = i && i.parentNode ? i.parentNode.querySelector('button') : null;
-  if(btn){ btn.disabled=true; btn.textContent='\u2026'; }
-  if(st){ st.textContent=''; st.className='m-foot-news-status'; }
-  try{
-    var local=email.split('@')[0];
-    var payload={ name:local||'Subscriber', firstName:local||'Subscriber', lastName:'',
-      email:email, phone:'', service:'Newsletter', project_type:'Newsletter',
-      details:'Newsletter signup from website footer', message:'Newsletter signup from website footer',
-      source:'Newsletter (Footer)' };
-    var res=await fetch(window.location.origin+'/api/leads',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
-    var data={}; try{ data=await res.json(); }catch(_){ data={}; }
-    if(res.ok && data.success){
-      if(i) i.value='';
-      if(st){ st.textContent='\u2713 You\u2019re subscribed \u2014 thanks!'; st.className='m-foot-news-status ok'; }
-    } else {
-      if(st){ st.textContent='Sorry, that didn\u2019t go through \u2014 please try again.'; st.className='m-foot-news-status err'; }
-    }
-  }catch(e){
-    if(st){ st.textContent='Network error \u2014 please try again.'; st.className='m-foot-news-status err'; }
-  }finally{
-    if(btn){ btn.disabled=false; btn.textContent='Subscribe'; }
-  }
-};
-</script>
+<script>window.mQuote=function(){window.location.href="contact.html";};</script>
+<!-- ============================================================ END CROWN MOBILE v3 ============================================================ -->
 
-<!-- ============================================================
-     END CROWN MOBILE APP (index)
-     ============================================================ -->
 
 
 
