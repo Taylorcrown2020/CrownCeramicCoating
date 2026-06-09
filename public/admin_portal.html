@@ -4447,7 +4447,7 @@ body.crown-2025 .search-input:focus { border-color: var(--accent); box-shadow: 0
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
                     <span class="icon-badge" id="msgTriggerBadge" style="display:none;">0</span>
                 </button>
-                <button class="icon-btn" id="notifBtn" onclick="openMessenger()" aria-label="Notifications" title="Notifications">
+                <button class="icon-btn" id="notifBtn" onclick="openNotifications(event)" aria-label="Notifications" title="Notifications">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                     <span class="icon-badge" id="notifBadge" style="display:none;">0</span>
                 </button>
@@ -23142,5 +23142,102 @@ window.sendPortalBroadcast = async function () {
     setInterval(refreshAuxBadges, 60000);
 })();
 </script>
+<script id="crown-notifications-live">
+/* Notifications bell (separate from Messages) + live refresh so badges
+   update without a manual page refresh. */
+(function () {
+    const SEEN_KEY = 'crownNotifSeen';
+    const NT = { items: [], lastSeen: parseInt(localStorage.getItem(SEEN_KEY) || '0', 10) || 0 };
+    function tok() { return (typeof getAuthToken === 'function' ? getAuthToken() : (window.authToken || localStorage.getItem('adminToken'))); }
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const when = (d) => { if (!d) return ''; const t = new Date(d), now = new Date(); const m = Math.round((now - t) / 60000); if (m < 1) return 'just now'; if (m < 60) return m + 'm ago'; const h = Math.round(m / 60); if (h < 24) return h + 'h ago'; return t.toLocaleDateString([], { month: 'short', day: 'numeric' }); };
+    const ICONS = {
+        request: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+        lead: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+        payment: '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>'
+    };
+
+    async function loadNotifications() {
+        const t = tok(); if (!t) return;
+        try {
+            const d = await (await fetch(`${API_URL}/api/admin/notifications`, { headers: { 'Authorization': `Bearer ${t}` } })).json();
+            NT.items = (d && d.notifications) || [];
+        } catch (e) { return; }
+        const unseen = NT.items.filter(n => new Date(n.time || 0).getTime() > NT.lastSeen).length;
+        const b = document.getElementById('notifBadge');
+        if (b) { b.textContent = unseen > 99 ? '99+' : unseen; b.style.display = unseen > 0 ? 'flex' : 'none'; }
+        if (document.getElementById('notifPanel')) renderPanel();
+    }
+    window.loadNotifications = loadNotifications;
+
+    function renderPanel() {
+        const panel = document.getElementById('notifPanel'); if (!panel) return;
+        const rows = NT.items.length ? NT.items.map(n => `
+            <div class="notif-row" onclick="gotoNotif('${n.section}')">
+                <div class="notif-ic notif-${n.type}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICONS[n.icon] || ICONS.lead}</svg></div>
+                <div class="notif-tx"><div class="notif-t">${esc(n.title)}</div>${n.detail ? `<div class="notif-d">${esc(n.detail)}</div>` : ''}</div>
+                <div class="notif-tm">${esc(when(n.time))}</div>
+            </div>`).join('') : `<div style="padding:34px 16px;text-align:center;color:var(--text-muted);font-size:13px;">You're all caught up.</div>`;
+        panel.querySelector('.notif-list').innerHTML = rows;
+    }
+    window.gotoNotif = function (section) { closeNotifications(); if (window.renderSection) renderSection(section); };
+
+    function ensurePanel() {
+        let p = document.getElementById('notifPanel'); if (p) return p;
+        p = document.createElement('div'); p.id = 'notifPanel'; p.className = 'notif-panel';
+        p.innerHTML = `<div class="notif-head">Notifications</div><div class="notif-list"></div>`;
+        document.body.appendChild(p);
+        return p;
+    }
+    window.openNotifications = function (e) {
+        if (e) e.stopPropagation();
+        const existing = document.getElementById('notifPanel');
+        if (existing && existing.classList.contains('open')) { closeNotifications(); return; }
+        const p = ensurePanel();
+        const btn = document.getElementById('notifBtn'); const r = btn.getBoundingClientRect();
+        p.style.top = (r.bottom + 8) + 'px';
+        p.style.right = Math.max(12, window.innerWidth - r.right) + 'px';
+        renderPanel();
+        requestAnimationFrame(() => p.classList.add('open'));
+        // mark seen
+        NT.lastSeen = Date.now(); localStorage.setItem(SEEN_KEY, String(NT.lastSeen));
+        const b = document.getElementById('notifBadge'); if (b) b.style.display = 'none';
+    };
+    window.closeNotifications = function () { const p = document.getElementById('notifPanel'); if (p) p.classList.remove('open'); };
+    document.addEventListener('click', (e) => {
+        const p = document.getElementById('notifPanel');
+        if (p && p.classList.contains('open') && !p.contains(e.target) && e.target.closest('#notifBtn') === null) closeNotifications();
+    });
+
+    // ---- LIVE REFRESH: poll faster + refresh instantly when tab regains focus ----
+    function refreshAll() {
+        if (window.loadMessengerData) loadMessengerData();   // envelope badge
+        if (window.refreshAuxBadges) refreshAuxBadges();      // sidebar tab badges
+        loadNotifications();                                  // bell badge
+    }
+    window.crownRefreshAll = refreshAll;
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshAll(); });
+    window.addEventListener('focus', refreshAll);
+    document.addEventListener('DOMContentLoaded', () => { setTimeout(refreshAll, 2200); });
+    setInterval(refreshAll, 20000);  // every 20s while open
+})();
+</script>
+<style id="crown-notif-css">
+.notif-panel{position:fixed;width:360px;max-width:calc(100vw - 24px);max-height:70vh;overflow:hidden;display:flex;flex-direction:column;
+  background:var(--bg-primary);border:1px solid var(--border-default);border-radius:16px;box-shadow:var(--shadow-xl);
+  z-index:10050;opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .16s,transform .16s;}
+.notif-panel.open{opacity:1;transform:none;pointer-events:auto;}
+.notif-head{padding:16px 18px;font-weight:800;font-size:15px;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);}
+.notif-list{overflow-y:auto;}
+.notif-row{display:flex;gap:12px;align-items:flex-start;padding:13px 16px;cursor:pointer;border-bottom:1px solid var(--border-subtle);transition:background .12s;}
+.notif-row:hover{background:var(--bg-hover);}
+.notif-ic{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;}
+.notif-ic svg{width:17px;height:17px;}
+.notif-request{background:#4C6FFF;}.notif-lead{background:#9B6DFF;}.notif-payment{background:#16a34a;}
+.notif-tx{flex:1;min-width:0;}
+.notif-t{font-size:13.5px;font-weight:600;color:var(--text-primary);}
+.notif-d{font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.notif-tm{font-size:11px;color:var(--text-faint);flex-shrink:0;}
+</style>
 </body>
 </html>

@@ -242,7 +242,9 @@ async function startApp(){
   await loadRequests();
   await loadMessages();
   refreshMsgBadge();
-  setInterval(refreshMsgBadge, 45000);
+  setInterval(refreshMsgBadge, 20000);
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') refreshMsgBadge(); });
+  window.addEventListener('focus', refreshMsgBadge);
   nav('dashboard');
 }
 async function loadDashboard(){

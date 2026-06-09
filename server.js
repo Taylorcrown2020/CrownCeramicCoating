@@ -25257,6 +25257,60 @@ app.post('/api/admin/marketing/broadcast', authenticateToken, async (req, res) =
     }
 });
 
+// Admin: notifications feed — recent activity ONLY (separate from Messages).
+// New leads, new service requests, payments received. (Client messages are
+// intentionally excluded here; those live in the Messages inbox/envelope.)
+app.get('/api/admin/notifications', authenticateToken, async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        const out = [];
+        // New service requests (still 'new')
+        try {
+            const r = await pool.query(`
+                SELECT sr.id, sr.service_type, sr.created_at, l.name
+                  FROM service_requests sr LEFT JOIN leads l ON sr.lead_id = l.id
+                 WHERE sr.status = 'new'
+                 ORDER BY sr.created_at DESC LIMIT 15`);
+            r.rows.forEach(x => out.push({
+                type: 'request', icon: 'request', section: 'serviceRequests',
+                title: `New service request${x.name ? ' from ' + x.name : ''}`,
+                detail: x.service_type || '', time: x.created_at
+            }));
+        } catch (e) {}
+        // New leads (last 14 days)
+        try {
+            const r = await pool.query(`
+                SELECT id, name, email, created_at FROM leads
+                 WHERE COALESCE(is_customer,FALSE) = FALSE
+                   AND created_at > NOW() - INTERVAL '14 days'
+                 ORDER BY created_at DESC LIMIT 15`);
+            r.rows.forEach(x => out.push({
+                type: 'lead', icon: 'lead', section: 'leads',
+                title: `New lead: ${x.name || x.email || 'Unknown'}`,
+                detail: x.email || '', time: x.created_at
+            }));
+        } catch (e) {}
+        // Payments received (last 14 days)
+        try {
+            const r = await pool.query(`
+                SELECT id, invoice_number, total_amount, paid_at FROM invoices
+                 WHERE status = 'paid' AND paid_at > NOW() - INTERVAL '14 days'
+                 ORDER BY paid_at DESC LIMIT 15`);
+            r.rows.forEach(x => out.push({
+                type: 'payment', icon: 'payment', section: 'invoices',
+                title: `Payment received`,
+                detail: `${x.invoice_number || ('Invoice #' + x.id)} · $${Number(x.total_amount || 0).toFixed(2)}`,
+                time: x.paid_at
+            }));
+        } catch (e) {}
+        out.sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
+        res.json({ success: true, notifications: out.slice(0, 30) });
+    } catch (e) {
+        console.error('[ADMIN] notifications error:', e.message);
+        res.json({ success: true, notifications: [] });
+    }
+});
+
 // Public: book a consultation from the website contact form.
 // Creates/links a lead and an appointment so it appears on the admin Schedule tab.
 app.post('/api/public/consultations', async (req, res) => {
