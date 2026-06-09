@@ -998,7 +998,7 @@ async function sendViaBrevo(brevoApiKey, senderEmail, senderName, to, subject, h
     // the client's address so replies go directly to them, and include their
     // identity in the display name so recipients know who it's from.
     //
-    // Recipients see:  "Taylor Crownover via Crown Ceramic Coating CRM <contact@crownceramiccoating.com>"
+    // Recipients see:  "Taylor Crownover via Crown Ceramic Coating CRM <crownpolishingUSA@gmail.com>"
     // Replies go to:   taylor.crownover2024@gmail.com
     // ── Sender verification logic ─────────────────────────────────────────
     // If the sender's email domain is verified in Brevo, send directly from
@@ -15030,7 +15030,7 @@ async function sendClientWelcomeEmail(email, name, temporaryPassword) {
                         <p><strong>Crown Ceramic Coating</strong></p>
                         <p>15709 Spillman Ranch Loop, Austin, TX 78738</p>
                         <p>
-                            <a href="mailto:contact@crownceramiccoating.com">contact@crownceramiccoating.com</a> | 
+                            <a href="mailto:crownpolishingUSA@gmail.com">crownpolishingUSA@gmail.com</a> | 
                             <a href="tel:+19402178680">(940) 217-8680</a>
                         </p>
                         <p class="footer-copy">
@@ -15331,7 +15331,7 @@ Our objective is to provide businesses with the best and most cost-effective web
 <span style="color:#2C3E50;font-size:16px;font-weight:700;font-family:Arial,sans-serif;display:block;margin-bottom:15px">Contact Us</span>
 <span style="color:#6B7280;font-size:14px;font-family:Arial,sans-serif;line-height:2;display:block">
 <strong>Phone:</strong> <a href="tel:+15129800393" style="color:#F59E0B;text-decoration:none">(512) 980-0393</a><br>
-<strong>Email:</strong> <a href="mailto:contact@crownceramiccoating.com" style="color:#F59E0B;text-decoration:none">contact@crownceramiccoating.com</a><br>
+<strong>Email:</strong> <a href="mailto:crownpolishingUSA@gmail.com" style="color:#F59E0B;text-decoration:none">crownpolishingUSA@gmail.com</a><br>
 <strong>Web:</strong> <a href="https://www.crownceramiccoating.com" style="color:#F59E0B;text-decoration:none">www.crownceramiccoating.com</a><br>
 <strong>Address:</strong> 5000 Plaza on the Lake, Suite 100 PMB 2017<br>Austin, TX 78746
 </span>
@@ -18209,7 +18209,7 @@ app.get('/api/unsubscribe/:token', async (req, res) => {
                     </p>
                     <p style="color: #6b7280; margin: 0; font-size: 13px;">
                         You will no longer receive follow-up emails from us. If you change your mind, 
-                        please reach out to <a href="mailto:contact@crownceramiccoating.com" style="color: #16a34a;">contact@crownceramiccoating.com</a>.
+                        please reach out to <a href="mailto:crownpolishingUSA@gmail.com" style="color: #16a34a;">crownpolishingUSA@gmail.com</a>.
                     </p>
                 </div>
             </body>
@@ -18222,7 +18222,7 @@ app.get('/api/unsubscribe/:token', async (req, res) => {
             <!DOCTYPE html><html><head><title>Error</title></head>
             <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 80px auto; text-align: center; padding: 0 20px;">
                 <h2 style="color: #ef4444;">Something Went Wrong</h2>
-                <p style="color: #666;">Please try again later or contact us at <a href="mailto:contact@crownceramiccoating.com">contact@crownceramiccoating.com</a>.</p>
+                <p style="color: #666;">Please try again later or contact us at <a href="mailto:crownpolishingUSA@gmail.com">crownpolishingUSA@gmail.com</a>.</p>
             </body></html>
         `);
     }
