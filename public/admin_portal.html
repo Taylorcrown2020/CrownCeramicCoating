@@ -3372,208 +3372,566 @@ body.light-mode ::-webkit-scrollbar-thumb:hover {
     }
 }
 
-/* ========================================
-   GRAFFITI MODE - FUN VIBRANT BACKGROUND
-======================================== */
+/* (graffiti mode rewritten in #crown-redesign-2025 stylesheet) */
+    </style>
+<style id="crown-redesign-2025">
+/* =====================================================================
+   CROWN ADMIN — 2025 REDESIGN  ·  "Detail-Bay Daylight"
+   A clean, bright SaaS surface that keeps Crown's gold but ditches the
+   neon-on-black look. Light is the default; dark = "Graphite Night";
+   graffiti = the fun mode (rewritten below). All rules are token-driven
+   so they adapt across the three modes. Scoped to body.crown-2025 so
+   they win over base + .light-mode rules; graffiti uses !important so it
+   still wins over these.
+   ===================================================================== */
 
+:root {
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 26px;
+    --shadow-sm: 0 1px 2px rgba(24,20,14,.05), 0 2px 6px rgba(24,20,14,.05);
+    --shadow-md: 0 4px 14px rgba(24,20,14,.08), 0 2px 4px rgba(24,20,14,.05);
+    --shadow-lg: 0 14px 36px rgba(24,20,14,.11), 0 4px 10px rgba(24,20,14,.06);
+    --shadow-xl: 0 28px 64px rgba(24,20,14,.16);
+    --shadow-glow: 0 10px 28px rgba(168,123,44,.18);
+}
+
+/* ---- Canvas / chrome ---- */
+body.crown-2025 { letter-spacing: -0.005em; }
+
+body.crown-2025 .sidebar { border-right: 1px solid var(--border-subtle); }
+body.crown-2025 .sidebar::before { display: none; }
+body.crown-2025 .sidebar-header { border-bottom: 1px solid var(--border-subtle); }
+
+body.crown-2025 .logo-mark {
+    box-shadow: var(--shadow-sm);
+    border-radius: 13px;
+}
+body.crown-2025 .logo-mark::before { display: none; }
+body.crown-2025 .logo-title {
+    background: none;
+    -webkit-text-fill-color: var(--text-primary);
+    color: var(--text-primary);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+body.crown-2025 .logo-subtitle { color: var(--accent-amber); letter-spacing: 0.18em; }
+
+/* ---- Sidebar nav: calm pill rows, small gold marker ---- */
+body.crown-2025 .nav-section-title::after {
+    background: linear-gradient(90deg, var(--border-subtle), transparent);
+}
+body.crown-2025 .nav-item {
+    border-radius: 11px;
+    font-weight: 500;
+}
+body.crown-2025 .nav-item:hover {
+    transform: none;
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+body.crown-2025 .nav-item.active {
+    background: var(--accent-amber-dim);
+    color: var(--accent-amber);
+    box-shadow: none;
+    font-weight: 600;
+}
+body.crown-2025 .nav-item.active::before {
+    box-shadow: none;
+    width: 3px;
+    height: 18px;
+    border-radius: 0 3px 3px 0;
+}
+body.crown-2025 .nav-icon { opacity: .9; }
+body.crown-2025 .nav-badge {
+    background: var(--accent-amber-dim);
+    color: var(--accent-amber);
+    font-weight: 700;
+    font-family: var(--font-display);
+}
+
+body.crown-2025 .user-card {
+    background: var(--bg-secondary);
+    border-radius: 14px;
+    border: 1px solid var(--border-subtle);
+}
+body.crown-2025 .sidebar-footer { background: none; border-top: 1px solid var(--border-subtle); }
+
+/* ---- Topbar ---- */
+body.crown-2025 .topbar {
+    background: var(--bg-primary);
+    backdrop-filter: none;
+    border-bottom: 1px solid var(--border-subtle);
+}
+body.crown-2025 .page-title { font-weight: 700; }
+body.crown-2025 .page-title::before {
+    box-shadow: none;
+    width: 4px;
+    height: 20px;
+    border-radius: 3px;
+    background: var(--accent-amber);
+}
+
+/* ---- Buttons ---- */
+body.crown-2025 .btn { border-radius: 11px; }
+body.crown-2025 .btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+    font-weight: 600;
+}
+body.crown-2025 .btn-secondary:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+}
+
+/* ---- Metric cards (the signature) ---- */
+body.crown-2025 .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    box-shadow: var(--shadow-sm);
+}
+body.crown-2025 .stat-card::before {
+    height: 3px;
+    opacity: .55;
+    background: linear-gradient(90deg, var(--accent-amber), transparent 70%);
+}
+body.crown-2025 .stat-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+}
+body.crown-2025 .stat-card:hover::before { opacity: 1; }
+body.crown-2025 .stat-value {
+    background: none;
+    -webkit-text-fill-color: var(--text-primary);
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+/* ---- Cards / tables / surfaces ---- */
+body.crown-2025 .card,
+body.crown-2025 .content-box,
+body.crown-2025 .table-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 18px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+body.crown-2025 .data-table thead { background: var(--bg-secondary); }
+body.crown-2025 .data-table tbody tr:hover { background: var(--bg-hover); }
+
+/* ---- Inputs / search / filters ---- */
+body.crown-2025 .search-input {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+}
+body.crown-2025 .search-input:focus {
+    border-color: var(--accent-amber);
+    box-shadow: 0 0 0 3px var(--accent-amber-dim);
+}
+body.crown-2025 .filter-group {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+}
+body.crown-2025 .filter-btn.active {
+    background: var(--accent-amber);
+    color: #fff;
+}
+
+/* ---- Modals ---- */
+body.crown-2025 .modal { border-radius: 22px; box-shadow: var(--shadow-xl); }
+
+/* =====================================================================
+   MESSAGES BUTTON IN TOPBAR
+   ===================================================================== */
+.msg-trigger {
+    position: relative;
+    width: 42px; height: 42px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+    border: 1px solid var(--border-default);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all .18s ease;
+}
+.msg-trigger:hover {
+    color: var(--accent-amber);
+    border-color: var(--border-strong);
+    background: var(--bg-hover);
+    transform: translateY(-1px);
+}
+.msg-trigger svg { width: 19px; height: 19px; }
+.msg-trigger-badge {
+    position: absolute;
+    top: -6px; right: -6px;
+    min-width: 19px; height: 19px;
+    padding: 0 5px;
+    border-radius: 10px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--bg-primary);
+    box-shadow: 0 2px 6px rgba(239,68,68,.45);
+    animation: msgPop .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes msgPop { from { transform: scale(0); } to { transform: scale(1); } }
+
+/* =====================================================================
+   iMESSAGE-STYLE MESSENGER  (two-pane: conversations + thread)
+   ===================================================================== */
+.msg-overlay {
+    position: fixed; inset: 0;
+    background: rgba(18,16,12,.55);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s ease;
+}
+.msg-overlay.open { opacity: 1; pointer-events: auto; }
+.msg-window {
+    width: 100%; max-width: 960px; height: min(80vh, 720px);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-default);
+    border-radius: 22px;
+    box-shadow: var(--shadow-xl);
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    overflow: hidden;
+    transform: translateY(12px) scale(.99);
+    transition: transform .22s cubic-bezier(.34,1.3,.64,1);
+}
+.msg-overlay.open .msg-window { transform: none; }
+
+/* --- left: conversation list --- */
+.msg-list-pane {
+    border-right: 1px solid var(--border-subtle);
+    display: flex; flex-direction: column;
+    background: var(--bg-secondary);
+    min-height: 0;
+}
+.msg-list-head {
+    padding: 18px 18px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+.msg-list-head h3 {
+    font-size: 19px; font-weight: 800; color: var(--text-primary);
+    display: flex; align-items: center; gap: 8px; margin: 0 0 12px;
+}
+.msg-search {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 11px;
+    border: 1px solid var(--border-default);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 13px; font-family: inherit;
+}
+.msg-search:focus { outline: none; border-color: var(--accent-amber); }
+.msg-list {
+    flex: 1; overflow-y: auto; padding: 8px;
+    display: flex; flex-direction: column; gap: 2px;
+}
+.msg-convo {
+    display: flex; gap: 12px; align-items: center;
+    padding: 11px 12px;
+    border-radius: 13px;
+    cursor: pointer;
+    transition: background .15s ease;
+    position: relative;
+}
+.msg-convo:hover { background: var(--bg-hover); }
+.msg-convo.active { background: var(--accent-amber-dim); }
+.msg-avatar {
+    width: 42px; height: 42px; flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; color: #fff;
+}
+.msg-convo-body { flex: 1; min-width: 0; }
+.msg-convo-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.msg-convo-name { font-weight: 700; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-convo-time { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+.msg-convo-preview { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.msg-convo.unread .msg-convo-name { color: var(--text-primary); }
+.msg-convo.unread .msg-convo-preview { color: var(--text-secondary); font-weight: 600; }
+.msg-unread-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent-amber); flex-shrink: 0;
+    box-shadow: 0 0 0 3px var(--accent-amber-dim);
+}
+
+/* --- right: thread --- */
+.msg-thread-pane { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.msg-thread-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex; align-items: center; gap: 12px;
+}
+.msg-thread-head .msg-avatar { width: 38px; height: 38px; font-size: 14px; }
+.msg-thread-title { flex: 1; min-width: 0; }
+.msg-thread-title .n { font-weight: 800; font-size: 15px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-thread-title .s { font-size: 12px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-thread-status {
+    padding: 6px 10px; border-radius: 9px;
+    border: 1px solid var(--border-default);
+    background: var(--bg-tertiary); color: var(--text-secondary);
+    font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer;
+    flex: 0 0 auto; width: auto; min-width: 108px; max-width: 128px;
+}
+.msg-close {
+    width: 34px; height: 34px; border-radius: 9px; border: none;
+    background: var(--bg-tertiary); color: var(--text-secondary);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .15s ease; flex-shrink: 0;
+}
+.msg-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.msg-body {
+    flex: 1; overflow-y: auto;
+    padding: 22px 20px;
+    display: flex; flex-direction: column; gap: 4px;
+    background: var(--bg-secondary);
+}
+.msg-daydiv { text-align: center; font-size: 11px; color: var(--text-muted); margin: 10px 0 14px; font-weight: 600; }
+.msg-req-card {
+    align-self: flex-start; max-width: 78%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 16px;
+    padding: 14px 16px; margin-bottom: 8px;
+    box-shadow: var(--shadow-sm);
+}
+.msg-req-card .rh { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-amber); margin-bottom: 8px; }
+.msg-req-card .row { font-size: 13px; color: var(--text-secondary); margin: 3px 0; }
+.msg-req-card .row b { color: var(--text-primary); font-weight: 600; }
+.msg-bubble {
+    max-width: 72%;
+    padding: 10px 14px;
+    border-radius: 19px;
+    font-size: 14px; line-height: 1.45;
+    word-wrap: break-word;
+    margin-bottom: 3px;
+    animation: bubbleIn .25s ease;
+}
+@keyframes bubbleIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.msg-bubble.them {
+    align-self: flex-start;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    border-bottom-left-radius: 6px;
+}
+.msg-bubble.me {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--brand-gold) 0%, var(--brand-gold-dark) 100%);
+    color: #1a1408;
+    font-weight: 500;
+    border-bottom-right-radius: 6px;
+}
+.msg-meta { font-size: 10.5px; color: var(--text-muted); margin: 0 4px 12px; }
+.msg-meta.me { align-self: flex-end; }
+.msg-meta.them { align-self: flex-start; }
+
+.msg-composer {
+    border-top: 1px solid var(--border-subtle);
+    padding: 12px 14px;
+    display: flex; gap: 10px; align-items: flex-end;
+    background: var(--bg-primary);
+}
+.msg-composer textarea {
+    flex: 1;
+    resize: none;
+    min-height: 42px; max-height: 140px;
+    padding: 11px 14px;
+    border-radius: 18px;
+    border: 1px solid var(--border-default);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: inherit; font-size: 14px; line-height: 1.4;
+}
+.msg-composer textarea:focus { outline: none; border-color: var(--accent-amber); }
+.msg-send {
+    width: 42px; height: 42px; flex-shrink: 0;
+    border-radius: 50%; border: none; cursor: pointer;
+    background: linear-gradient(135deg, var(--brand-gold) 0%, var(--brand-gold-dark) 100%);
+    color: #1a1408;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .15s ease, opacity .15s ease;
+    box-shadow: var(--shadow-sm);
+}
+.msg-send:hover { transform: scale(1.06); }
+.msg-send:disabled { opacity: .45; cursor: default; transform: none; }
+.msg-send svg { width: 18px; height: 18px; }
+.msg-empty {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; color: var(--text-muted); text-align: center; padding: 30px;
+    background: var(--bg-secondary);
+}
+.msg-empty svg { width: 54px; height: 54px; opacity: .4; }
+
+@media (max-width: 720px) {
+    .msg-overlay { padding: 0; }
+    .msg-window { max-width: none; width: 100%; height: 100%; border-radius: 0; grid-template-columns: 1fr; }
+    .msg-list-pane { display: flex; }
+    .msg-thread-pane { display: none; }
+    .msg-window.show-thread .msg-list-pane { display: none; }
+    .msg-window.show-thread .msg-thread-pane { display: flex; }
+}
+.msg-back {
+    display: none; width: 34px; height: 34px; border-radius: 9px; border: none;
+    background: var(--bg-tertiary); color: var(--text-secondary); cursor: pointer;
+    align-items: center; justify-content: center; flex-shrink: 0;
+}
+@media (max-width: 720px) { .msg-back { display: flex; } }
+
+/* =====================================================================
+   GRAFFITI MODE — rewritten so it's FUN *and* fully legible.
+   Confetti-bright canvas, crisp opaque cards, dark ink everywhere,
+   playful rounded "sticker" accents that never break the layout.
+   Every rule is !important so it wins over the redesign + base.
+   ===================================================================== */
 body.graffiti-mode {
-    background: linear-gradient(180deg, 
-        #ff6b6b 0%,
-        #ff8585 15%,
-        #ffa07a 30%,
-        #ffb88c 45%,
-        #f5d5c8 60%,
-        #e0e8f0 70%,
-        #b8d4e8 80%,
-        #7ab8d9 90%,
-        #4a9fc8 100%
-    ) !important;
-    position: relative;
-    min-height: 100vh;
-    overflow-x: hidden;
+    background:
+        radial-gradient(circle at 12% 18%, #ffd166 0, transparent 32%),
+        radial-gradient(circle at 88% 12%, #ff6b9d 0, transparent 30%),
+        radial-gradient(circle at 78% 82%, #4ec1ff 0, transparent 34%),
+        radial-gradient(circle at 18% 86%, #7bdff2 0, transparent 32%),
+        radial-gradient(circle at 50% 50%, #b08bff 0, transparent 55%),
+        linear-gradient(135deg, #fef6e4 0%, #f4f0ff 100%) !important;
+    background-attachment: fixed !important;
 }
-
-/* Create the wavy layers effect */
+/* floating confetti shapes — purely decorative, behind everything */
 body.graffiti-mode::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(ellipse 800px 400px at 20% 30%, rgba(255, 107, 107, 0.6) 0%, transparent 50%),
-        radial-gradient(ellipse 900px 500px at 80% 20%, rgba(255, 165, 100, 0.5) 0%, transparent 50%),
-        radial-gradient(ellipse 700px 400px at 50% 50%, rgba(245, 213, 200, 0.7) 0%, transparent 60%),
-        radial-gradient(ellipse 800px 450px at 15% 70%, rgba(74, 159, 200, 0.6) 0%, transparent 55%),
-        radial-gradient(ellipse 900px 500px at 85% 75%, rgba(122, 184, 217, 0.5) 0%, transparent 50%),
-        radial-gradient(ellipse 600px 350px at 30% 85%, rgba(74, 159, 200, 0.7) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
+    content: '' !important;
+    position: fixed !important; inset: 0 !important;
+    background-image:
+        radial-gradient(circle, rgba(255,255,255,.55) 0 6px, transparent 7px),
+        radial-gradient(circle, rgba(255,255,255,.4) 0 4px, transparent 5px);
+    background-size: 90px 90px, 140px 140px !important;
+    background-position: 0 0, 40px 60px !important;
+    opacity: .5 !important; z-index: 0 !important; pointer-events: none !important;
 }
-
-/* Create white wave shapes overlaying */
 body.graffiti-mode::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(ellipse 500px 300px at 25% 40%, rgba(255, 255, 255, 0.9) 0%, transparent 50%),
-        radial-gradient(ellipse 450px 280px at 75% 55%, rgba(255, 255, 255, 0.85) 0%, transparent 50%),
-        radial-gradient(ellipse 400px 250px at 50% 50%, rgba(240, 240, 245, 0.8) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.9;
+    content: '✦  ★  ◆  ●  ✦' !important;
+    position: fixed !important; top: 50%; left: 0; right: 0;
+    text-align: center; font-size: 0; z-index: 0 !important; pointer-events: none !important;
 }
 
-/* Add subtle overlay for readability */
-body.graffiti-mode .main-content::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.25);
-    pointer-events: none;
-    z-index: 0;
-}
-
-/* FIX THE ACTUAL ADMIN PORTAL LAYOUT */
-body.graffiti-mode .main-content {
-    position: relative;
-    z-index: 1;
-    background: transparent !important;
-    min-height: 100vh;
-}
+/* keep the app chrome readable and floating above the fun bg */
+body.graffiti-mode .main-content { background: transparent !important; }
+body.graffiti-mode .content { background: transparent !important; position: relative; z-index: 1; }
 
 body.graffiti-mode .sidebar {
-    position: fixed;
-    z-index: 100;
-    background: rgba(255, 255, 255, 0.96) !important;
-    backdrop-filter: blur(15px);
-    border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+    background: rgba(255,255,255,.94) !important;
+    backdrop-filter: blur(16px) !important;
+    border-right: 2px solid rgba(176,139,255,.35) !important;
+    z-index: 100 !important;
 }
+body.graffiti-mode .sidebar::before { display: none !important; }
+body.graffiti-mode .logo-title { color: #6b3fb0 !important; -webkit-text-fill-color: #6b3fb0 !important; background: none !important; }
+body.graffiti-mode .logo-subtitle { color: #e0518a !important; }
+body.graffiti-mode .logo-mark { background: linear-gradient(135deg,#ff6b9d,#b08bff) !important; box-shadow: 0 6px 18px rgba(176,139,255,.5) !important; }
 
-body.graffiti-mode .content {
-    background: transparent !important;
-    position: relative;
-    z-index: 1;
+body.graffiti-mode .topbar {
+    background: rgba(255,255,255,.9) !important;
+    backdrop-filter: blur(14px) !important;
+    border-bottom: 2px solid rgba(255,209,102,.5) !important;
 }
+body.graffiti-mode .page-title { color: #1d1530 !important; }
+body.graffiti-mode .page-title::before { background: linear-gradient(180deg,#ff6b9d,#b08bff) !important; box-shadow: 0 0 0 transparent !important; }
 
-/* Make sure the header/topbar is properly positioned */
-body.graffiti-mode .topbar,
-body.graffiti-mode .header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: rgba(255, 255, 255, 0.94) !important;
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-}
+/* nav */
+body.graffiti-mode .nav-section-title { color: #9a7fc7 !important; }
+body.graffiti-mode .nav-item { color: #3a3550 !important; }
+body.graffiti-mode .nav-item:hover { background: rgba(176,139,255,.14) !important; color: #1d1530 !important; }
+body.graffiti-mode .nav-item.active { background: linear-gradient(135deg, rgba(255,107,157,.18), rgba(176,139,255,.18)) !important; color: #b0379a !important; }
+body.graffiti-mode .nav-item.active::before { background: linear-gradient(180deg,#ff6b9d,#b08bff) !important; box-shadow: none !important; }
+body.graffiti-mode .nav-item.active .nav-icon { color: #b0379a !important; }
+body.graffiti-mode .nav-badge { background: linear-gradient(135deg,#ffd166,#ff6b9d) !important; color: #fff !important; box-shadow: 0 2px 8px rgba(255,107,157,.4) !important; }
 
-/* Adjust cards for better readability */
+/* surfaces — opaque & high contrast */
 body.graffiti-mode .stat-card,
 body.graffiti-mode .card,
-body.graffiti-mode .content-box {
-    background: rgba(255, 255, 255, 0.93) !important;
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.7) !important;
-    box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.08),
-        0 2px 4px rgba(0, 0, 0, 0.04),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+body.graffiti-mode .content-box,
+body.graffiti-mode .table-container {
+    background: rgba(255,255,255,.97) !important;
+    border: 2px solid rgba(255,255,255,.9) !important;
+    box-shadow: 0 8px 28px rgba(176,139,255,.18), 0 2px 6px rgba(255,107,157,.12) !important;
 }
+body.graffiti-mode .stat-card::before { background: linear-gradient(90deg,#ff6b9d,#b08bff,#4ec1ff) !important; opacity: 1 !important; height: 4px !important; }
+body.graffiti-mode .stat-value { color: #1d1530 !important; -webkit-text-fill-color: #1d1530 !important; background: none !important; }
+body.graffiti-mode .stat-label,
+body.graffiti-mode .nav-section-title { letter-spacing: .08em !important; }
 
-/* Improve text contrast */
-body.graffiti-mode h1,
-body.graffiti-mode h2,
-body.graffiti-mode h3,
-body.graffiti-mode .nav-link {
-    color: #1a1a1a !important;
-    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
+/* text contrast */
+body.graffiti-mode h1, body.graffiti-mode h2, body.graffiti-mode h3,
+body.graffiti-mode .card-title, body.graffiti-mode .stat-value { color: #1d1530 !important; }
+body.graffiti-mode, body.graffiti-mode p, body.graffiti-mode td, body.graffiti-mode label { color: #2c2640 !important; }
+body.graffiti-mode .text-secondary { color: #4a4360 !important; }
+body.graffiti-mode .text-muted { color: #6b6480 !important; }
+body.graffiti-mode .data-table thead { background: rgba(176,139,255,.1) !important; }
+body.graffiti-mode .data-table th { color: #6b3fb0 !important; }
+body.graffiti-mode .data-table tbody tr:hover { background: rgba(255,209,102,.14) !important; }
+
+/* inputs */
+body.graffiti-mode .search-input,
+body.graffiti-mode .filter-group,
+body.graffiti-mode .form-input,
+body.graffiti-mode .form-select,
+body.graffiti-mode .form-textarea {
+    background: #fff !important; color: #1d1530 !important;
+    border: 2px solid rgba(176,139,255,.3) !important;
 }
+body.graffiti-mode .filter-btn { color: #4a4360 !important; }
+body.graffiti-mode .filter-btn.active { background: linear-gradient(135deg,#ff6b9d,#b08bff) !important; color: #fff !important; }
 
-body.graffiti-mode .text-secondary {
-    color: #4a4a4a !important;
-}
-
-body.graffiti-mode .text-muted {
-    color: #5a5a5a !important;
-}
-
-/* Style buttons */
+/* buttons */
 body.graffiti-mode .btn-primary,
 body.graffiti-mode .action-btn.primary {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%) !important;
-    border: none !important;
-    color: white !important;
-    box-shadow: 
-        0 4px 12px rgba(255, 107, 107, 0.4),
-        inset 0 -2px 8px rgba(0, 0, 0, 0.2) !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg,#ff6b9d 0%,#b08bff 100%) !important;
+    color: #fff !important; border: none !important;
+    box-shadow: 0 6px 16px rgba(255,107,157,.4) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,.15) !important;
 }
+body.graffiti-mode .btn-primary:hover { background: linear-gradient(135deg,#b08bff 0%,#4ec1ff 100%) !important; transform: translateY(-2px) !important; }
+body.graffiti-mode .btn-secondary { background: #fff !important; color: #6b3fb0 !important; border: 2px solid rgba(176,139,255,.4) !important; }
 
-body.graffiti-mode .btn-primary:hover,
-body.graffiti-mode .action-btn.primary:hover {
-    background: linear-gradient(135deg, #ff8787 0%, #ff6b6b 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 
-        0 6px 16px rgba(255, 107, 107, 0.5),
-        inset 0 -2px 8px rgba(0, 0, 0, 0.2) !important;
-}
+/* modals + messenger surfaces */
+body.graffiti-mode .modal { background: #fff !important; border: 2px solid rgba(176,139,255,.3) !important; }
+body.graffiti-mode .msg-window { background: #fff !important; border: 2px solid rgba(176,139,255,.35) !important; }
+body.graffiti-mode .msg-list-pane,
+body.graffiti-mode .msg-body { background: linear-gradient(160deg,#fef6e4,#f4f0ff) !important; }
+body.graffiti-mode .msg-bubble.me { background: linear-gradient(135deg,#ff6b9d,#b08bff) !important; color: #fff !important; }
+body.graffiti-mode .msg-bubble.them { background: #fff !important; color: #1d1530 !important; border-color: rgba(176,139,255,.3) !important; }
+body.graffiti-mode .msg-send { background: linear-gradient(135deg,#ff6b9d,#b08bff) !important; color: #fff !important; }
+body.graffiti-mode .user-card { background: rgba(176,139,255,.1) !important; border-color: rgba(176,139,255,.25) !important; }
+body.graffiti-mode .user-name { color: #1d1530 !important; }
 
-/* Colorful nav badges in graffiti mode */
-body.graffiti-mode .nav-badge {
-    background: linear-gradient(135deg, #fdcb6e 0%, #ff7675 100%) !important;
-    box-shadow: 0 2px 8px rgba(253, 203, 110, 0.4);
+/* playful corner sticker that floats but stays out of the way */
+body.graffiti-mode .content::after {
+    content: '🎨' !important;
+    position: fixed !important; bottom: 22px; right: 26px;
+    font-size: 34px; z-index: 0 !important; pointer-events: none !important;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,.15)) !important;
+    animation: gWiggle 5s ease-in-out infinite !important;
 }
-
-/* Add graffiti-style decorative elements in corners */
-body.graffiti-mode .content-area {
-    position: relative;
-}
-
-body.graffiti-mode .content-area::before {
-    content: '★';
-    position: fixed;
-    font-size: 80px;
-    color: rgba(255, 107, 107, 0.08);
-    bottom: 30px;
-    right: 30px;
-    pointer-events: none;
-    z-index: 0;
-    transform: rotate(-15deg);
-    animation: float 6s ease-in-out infinite;
-}
-
-body.graffiti-mode .sidebar::after {
-    content: '◆';
-    position: absolute;
-    font-size: 60px;
-    color: rgba(72, 219, 251, 0.08);
-    top: 50%;
-    right: 10px;
-    pointer-events: none;
-    transform: rotate(45deg);
-    animation: pulse 4s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: rotate(-15deg) translateY(0px); }
-    50% { transform: rotate(-15deg) translateY(-20px); }
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 0.08; transform: rotate(45deg) scale(1); }
-    50% { opacity: 0.12; transform: rotate(45deg) scale(1.1); }
-}
-    </style>
+@keyframes gWiggle { 0%,100% { transform: rotate(-8deg) translateY(0); } 50% { transform: rotate(8deg) translateY(-10px); } }
+</style>
 </head>
-<body>
+<body class="crown-2025">
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -3817,6 +4175,10 @@ body.graffiti-mode .sidebar::after {
                 <h1 class="page-title" id="pageTitle">Dashboard</h1>
             </div>
             <div class="topbar-actions">
+                <button class="msg-trigger" id="msgTrigger" onclick="openMessenger()" aria-label="Messages" title="Messages">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                    <span class="msg-trigger-badge" id="msgTriggerBadge" style="display:none;">0</span>
+                </button>
                 <button class="btn btn-secondary" onclick="openExportModal()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -4037,7 +4399,7 @@ const state = {
     settings: {
         emailNotifications: true,
         pushNotifications: false,
-        darkMode: true,
+        darkMode: false,
         autoAssign: false,
         weeklyReport: true,
         sessionTimeout: 30,
@@ -4094,6 +4456,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     await loadAllData();
 loadSettings();  // ADD THIS LINE
+    applySettings();
 setupNavigation();
 renderSection('dashboard');
 // Load setup calls badge count on startup
@@ -4621,6 +4984,10 @@ async function renderSection(section) {
     const topbarActions = document.querySelector('.topbar-actions');
     if (topbarActions) {
         let actionButtons = `
+            <button class="msg-trigger" id="msgTrigger" onclick="openMessenger()" aria-label="Messages" title="Messages">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                <span class="msg-trigger-badge" id="msgTriggerBadge" style="display:none;">0</span>
+            </button>
             <button class="btn btn-secondary" onclick="openExportModal()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -4704,6 +5071,7 @@ async function renderSection(section) {
         }
         
         topbarActions.innerHTML = actionButtons;
+        if (window.refreshMsgBadge) window.refreshMsgBadge();
     }
     
     console.log(' renderSection - about to switch to:', section);
@@ -13547,40 +13915,42 @@ async function showActivityLog() {
 }
 
 function applySettings() {
-    // Apply dark/light mode
+    const R = document.documentElement.style;
+    const set = (k, v) => R.setProperty(k, v);
     if (state.settings.darkMode) {
-        document.documentElement.style.setProperty('--bg-void', '#000000');
-        document.documentElement.style.setProperty('--bg-primary', '#0a0a0a');
-        document.documentElement.style.setProperty('--bg-secondary', '#121212');
-        document.documentElement.style.setProperty('--bg-tertiary', '#1a1a1a');
-        document.documentElement.style.setProperty('--bg-elevated', '#1e1e1e');
-        document.documentElement.style.setProperty('--bg-hover', '#242424');
-        document.documentElement.style.setProperty('--text-primary', '#f4f4f5');
-        document.documentElement.style.setProperty('--text-secondary', '#a1a1aa');
-        document.documentElement.style.setProperty('--text-muted', '#71717a');
-        document.documentElement.style.setProperty('--text-faint', '#52525b');
-        document.documentElement.style.setProperty('--border-subtle', 'rgba(255,255,255,0.04)');
-        document.documentElement.style.setProperty('--border-default', 'rgba(255,255,255,0.08)');
-        document.documentElement.style.setProperty('--border-strong', 'rgba(255,255,255,0.12)');
+        // ---- Graphite Night (modern deep-slate + gold) ----
+        set('--bg-void', '#0E1117');     set('--bg-primary', '#151A22');
+        set('--bg-secondary', '#1A2029'); set('--bg-tertiary', '#20262F');
+        set('--bg-elevated', '#232A34');  set('--bg-hover', '#232B36');
+        set('--bg-card', '#151A22');
+        set('--text-primary', '#F2F0EA'); set('--text-secondary', '#A8AEB8');
+        set('--text-muted', '#777E89');   set('--text-faint', '#525862');
+        set('--border-subtle', 'rgba(255,255,255,0.06)');
+        set('--border-default', 'rgba(255,255,255,0.10)');
+        set('--border-strong', 'rgba(212,165,116,0.28)');
+        set('--accent-primary', '#D4A574'); set('--accent-amber', '#D4A574');
+        set('--accent-amber-dim', 'rgba(212,165,116,0.14)');
+        set('--accent-amber-glow', 'rgba(212,165,116,0.25)');
+        set('--accent-rust', '#B88F5F');
         document.body.classList.remove('light-mode');
     } else {
-        // Light mode colors
-        document.documentElement.style.setProperty('--bg-void', '#f5f5f7');
-        document.documentElement.style.setProperty('--bg-primary', '#ffffff');
-        document.documentElement.style.setProperty('--bg-secondary', '#f8f9fa');
-        document.documentElement.style.setProperty('--bg-tertiary', '#f1f3f5');
-        document.documentElement.style.setProperty('--bg-elevated', '#ffffff');
-        document.documentElement.style.setProperty('--bg-hover', '#e9ecef');
-        document.documentElement.style.setProperty('--text-primary', '#1a1a1a');
-        document.documentElement.style.setProperty('--text-secondary', '#495057');
-        document.documentElement.style.setProperty('--text-muted', '#6c757d');
-        document.documentElement.style.setProperty('--text-faint', '#adb5bd');
-        document.documentElement.style.setProperty('--border-subtle', 'rgba(0,0,0,0.06)');
-        document.documentElement.style.setProperty('--border-default', 'rgba(0,0,0,0.1)');
-        document.documentElement.style.setProperty('--border-strong', 'rgba(0,0,0,0.15)');
+        // ---- Detail-Bay Daylight (warm light, deep-gold accent) ----
+        set('--bg-void', '#F1EEE8');     set('--bg-primary', '#FFFFFF');
+        set('--bg-secondary', '#FAF8F3'); set('--bg-tertiary', '#F2EFE9');
+        set('--bg-elevated', '#FFFFFF');  set('--bg-hover', '#F4EEE2');
+        set('--bg-card', '#FFFFFF');
+        set('--text-primary', '#1C1A16'); set('--text-secondary', '#5E5950');
+        set('--text-muted', '#8E897E');   set('--text-faint', '#B6B0A4');
+        set('--border-subtle', 'rgba(28,26,22,0.07)');
+        set('--border-default', 'rgba(28,26,22,0.12)');
+        set('--border-strong', 'rgba(168,123,44,0.30)');
+        set('--accent-primary', '#A87B2C'); set('--accent-amber', '#A87B2C');
+        set('--accent-amber-dim', 'rgba(168,123,44,0.12)');
+        set('--accent-amber-glow', 'rgba(168,123,44,0.22)');
+        set('--accent-rust', '#8A6321');
         document.body.classList.add('light-mode');
     }
-    
+
     // Apply graffiti mode
     if (state.settings.graffitiMode) {
         document.body.classList.add('graffiti-mode');
@@ -22047,6 +22417,307 @@ function _closeSubModal() {
 document.getElementById('subCancelModal').addEventListener('click', function(e) {
     if (e.target === this) _closeSubModal();
 });
+</script>
+<script id="crown-messenger">
+/* =====================================================================
+   CROWN MESSENGER — iMessage-style conversations for Service Requests
+   Each service request is a conversation. The customer's request shows
+   as their message; admin replies show as gold "me" bubbles and are
+   sent through the existing /service-requests/:id/respond endpoint
+   (which also emails the customer + posts to their client portal).
+   Unread = open requests that still need a first reply.
+   ===================================================================== */
+(function () {
+    const MSG = {
+        reqs: [],
+        activeId: null,
+        sent: {},                 // in-session sent bubbles per request id
+        loaded: false
+    };
+    window.__MSG = MSG;
+
+    const READ_KEY = 'crownMsgRead';
+    const readSet = () => { try { return new Set(JSON.parse(localStorage.getItem(READ_KEY) || '[]')); } catch (e) { return new Set(); } };
+    const markRead = (id) => { const s = readSet(); s.add(String(id)); localStorage.setItem(READ_KEY, JSON.stringify([...s])); };
+
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const initials = (name) => { const p = String(name || '?').trim().split(/\s+/); return ((p[0] || '?')[0] + (p[1] ? p[1][0] : '')).toUpperCase(); };
+    const AV = ['#e0518a', '#b08bff', '#4ec1ff', '#3fae6b', '#f5a623', '#6b8cff', '#ef6c5a', '#27b3a3'];
+    const avatarColor = (name) => { let h = 0; for (const ch of String(name || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return AV[h % AV.length]; };
+    const when = (d) => {
+        if (!d) return '';
+        const t = new Date(d), now = new Date();
+        if (isNaN(t)) return '';
+        const sameDay = t.toDateString() === now.toDateString();
+        if (sameDay) return t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        const days = Math.round((now - t) / 86400000);
+        if (days === 1) return 'Yesterday';
+        if (days < 7) return t.toLocaleDateString([], { weekday: 'short' });
+        return t.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    };
+    const needsReply = (r) => r.status !== 'completed' && r.status !== 'closed' && !r.admin_response && !(MSG.sent[r.id] && MSG.sent[r.id].length);
+    const isUnread = (r) => needsReply(r) && !readSet().has(String(r.id));
+
+    /* ---------- data + badges ---------- */
+    async function loadMessengerData() {
+        const token = (typeof getAuthToken === 'function') ? getAuthToken() : null;
+        if (!token) return;
+        try {
+            const res = await fetch(`${API_URL}/api/admin/service-requests`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            MSG.reqs = (data && data.requests) || [];
+            MSG.loaded = true;
+            updateMsgBadges();
+            if (document.querySelector('.msg-overlay.open')) { renderConvoList(); }
+        } catch (e) { /* offline — leave badge as-is */ }
+    }
+    window.loadMessengerData = loadMessengerData;
+    window.refreshMsgBadge = function () { try { updateMsgBadges(); } catch (e) {} };
+
+    function updateMsgBadges() {
+        const unread = MSG.reqs.filter(isUnread).length;
+        const tb = document.getElementById('msgTriggerBadge');
+        if (tb) { tb.textContent = unread > 99 ? '99+' : unread; tb.style.display = unread > 0 ? 'flex' : 'none'; }
+        // keep the sidebar Service Requests badge in sync (open count)
+        const open = MSG.reqs.filter(r => r.status !== 'completed' && r.status !== 'closed').length;
+        const sb = document.getElementById('serviceRequestsBadge');
+        if (sb) { sb.textContent = open; sb.style.display = open > 0 ? 'inline-block' : 'none'; }
+    }
+
+    /* ---------- overlay shell ---------- */
+    function ensureOverlay() {
+        let ov = document.getElementById('msgOverlay');
+        if (ov) return ov;
+        ov = document.createElement('div');
+        ov.id = 'msgOverlay';
+        ov.className = 'msg-overlay';
+        ov.innerHTML = `
+            <div class="msg-window" id="msgWindow">
+                <div class="msg-list-pane">
+                    <div class="msg-list-head">
+                        <h3>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-amber)"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                            Messages
+                        </h3>
+                        <input class="msg-search" id="msgSearch" placeholder="Search conversations" oninput="renderConvoList()">
+                    </div>
+                    <div class="msg-list" id="msgList"></div>
+                </div>
+                <div class="msg-thread-pane" id="msgThreadPane"></div>
+            </div>`;
+        ov.addEventListener('click', (e) => { if (e.target === ov) closeMessenger(); });
+        document.body.appendChild(ov);
+        return ov;
+    }
+
+    function openMessenger(focusId) {
+        const ov = ensureOverlay();
+        renderConvoList();
+        if (focusId != null) {
+            openThread(focusId);
+        } else if (!MSG.activeId && MSG.reqs.length) {
+            // desktop: preview first conversation; mobile starts on the list
+            if (window.innerWidth > 720) openThread(MSG.reqs[0].id);
+            else renderEmptyThread();
+        } else if (MSG.activeId) {
+            openThread(MSG.activeId);
+        } else {
+            renderEmptyThread();
+        }
+        requestAnimationFrame(() => ov.classList.add('open'));
+        if (!MSG.loaded) loadMessengerData();
+    }
+    window.openMessenger = openMessenger;
+
+    function closeMessenger() {
+        const ov = document.getElementById('msgOverlay');
+        if (ov) ov.classList.remove('open');
+    }
+    window.closeMessenger = closeMessenger;
+
+    /* ---------- conversation list ---------- */
+    function renderConvoList() {
+        const list = document.getElementById('msgList');
+        if (!list) return;
+        const q = (document.getElementById('msgSearch')?.value || '').toLowerCase().trim();
+        let reqs = [...MSG.reqs].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        if (q) reqs = reqs.filter(r => (`${r.customer_name} ${r.service_type} ${r.vehicle} ${r.details}`).toLowerCase().includes(q));
+
+        if (!reqs.length) {
+            list.innerHTML = `<div style="padding:40px 16px;text-align:center;color:var(--text-muted);font-size:13px;">${MSG.loaded ? 'No conversations yet.' : 'Loading…'}</div>`;
+            return;
+        }
+        list.innerHTML = reqs.map(r => {
+            const sentLast = (MSG.sent[r.id] && MSG.sent[r.id].length) ? MSG.sent[r.id][MSG.sent[r.id].length - 1].text : null;
+            const preview = sentLast ? 'You: ' + sentLast : (r.admin_response ? 'You: ' + r.admin_response : (r.details || r.service_type || 'New request'));
+            const unread = isUnread(r);
+            return `<div class="msg-convo ${r.id === MSG.activeId ? 'active' : ''} ${unread ? 'unread' : ''}" onclick="__openThread(${r.id})">
+                <div class="msg-avatar" style="background:${avatarColor(r.customer_name)}">${esc(initials(r.customer_name))}</div>
+                <div class="msg-convo-body">
+                    <div class="msg-convo-top">
+                        <span class="msg-convo-name">${esc(r.customer_name || 'Unknown')}</span>
+                        <span class="msg-convo-time">${esc(when(r.created_at))}</span>
+                    </div>
+                    <div class="msg-convo-preview">${esc(preview).slice(0, 60)}</div>
+                </div>
+                ${unread ? '<span class="msg-unread-dot"></span>' : ''}
+            </div>`;
+        }).join('');
+    }
+    window.renderConvoList = renderConvoList;
+
+    function renderEmptyThread() {
+        const pane = document.getElementById('msgThreadPane');
+        if (!pane) return;
+        pane.innerHTML = `<div class="msg-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <div>Pick a conversation to read and reply.</div>
+        </div>`;
+    }
+
+    /* ---------- thread ---------- */
+    function openThread(id) {
+        MSG.activeId = id;
+        markRead(id);
+        const r = MSG.reqs.find(x => String(x.id) === String(id));
+        const pane = document.getElementById('msgThreadPane');
+        const win = document.getElementById('msgWindow');
+        if (!pane || !r) { renderEmptyThread(); return; }
+        if (win) win.classList.add('show-thread');
+
+        const statusOpts = ['new', 'scheduled', 'in-progress', 'completed', 'closed']
+            .map(s => `<option value="${s}" ${r.status === s ? 'selected' : ''}>${s}</option>`).join('');
+
+        // build message bubbles: original request, stored admin_response, then session-sent
+        let bubbles = '';
+        if (r.details) {
+            bubbles += `<div class="msg-bubble them">${esc(r.details)}</div>
+                        <div class="msg-meta them">${esc(when(r.created_at))}</div>`;
+        }
+        if (r.admin_response) {
+            bubbles += `<div class="msg-bubble me">${esc(r.admin_response)}</div>
+                        <div class="msg-meta me">Sent · emailed to customer</div>`;
+        }
+        (MSG.sent[id] || []).forEach(m => {
+            bubbles += `<div class="msg-bubble me">${esc(m.text)}</div>
+                        <div class="msg-meta me">${esc(when(m.ts))} · emailed to customer</div>`;
+        });
+
+        const sub = [r.service_type, r.vehicle].filter(Boolean).join(' · ') || r.customer_email || '';
+        pane.innerHTML = `
+            <div class="msg-thread-head">
+                <button class="msg-back" onclick="document.getElementById('msgWindow').classList.remove('show-thread')" aria-label="Back">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <div class="msg-avatar" style="background:${avatarColor(r.customer_name)}">${esc(initials(r.customer_name))}</div>
+                <div class="msg-thread-title">
+                    <div class="n">${esc(r.customer_name || 'Unknown')}</div>
+                    <div class="s">${esc(sub)}</div>
+                </div>
+                <select class="msg-thread-status" onchange="__threadStatus(${r.id}, this.value)" title="Update status">${statusOpts}</select>
+                <button class="msg-close" onclick="closeMessenger()" aria-label="Close">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="msg-body" id="msgBody">
+                <div class="msg-daydiv">${esc(r.created_at ? new Date(r.created_at).toLocaleDateString([], { month: 'long', day: 'numeric' }) : 'Request')}</div>
+                <div class="msg-req-card">
+                    <div class="rh">Service Request</div>
+                    <div class="row"><b>Service:</b> ${esc(r.service_type || '—')}</div>
+                    <div class="row"><b>Vehicle:</b> ${esc(r.vehicle || '—')}</div>
+                    <div class="row"><b>Preferred:</b> ${esc(r.preferred_date ? new Date(r.preferred_date).toLocaleDateString() : '—')}</div>
+                    ${r.customer_phone ? `<div class="row"><b>Phone:</b> ${esc(r.customer_phone)}</div>` : ''}
+                    ${r.customer_email ? `<div class="row"><b>Email:</b> ${esc(r.customer_email)}</div>` : ''}
+                </div>
+                ${bubbles}
+            </div>
+            <div class="msg-composer">
+                <textarea id="msgInput" placeholder="Message ${esc((r.customer_name || 'customer').split(' ')[0])}…" rows="1"
+                    oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,140)+'px'"
+                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();__sendReply(${r.id});}"></textarea>
+                <button class="msg-send" id="msgSendBtn" onclick="__sendReply(${r.id})" aria-label="Send">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+            </div>`;
+        const body = document.getElementById('msgBody');
+        if (body) body.scrollTop = body.scrollHeight;
+        const inp = document.getElementById('msgInput');
+        if (inp && window.innerWidth > 720) inp.focus();
+        renderConvoList();
+        updateMsgBadges();
+    }
+    window.__openThread = openThread;
+
+    async function sendReply(id) {
+        const inp = document.getElementById('msgInput');
+        const text = (inp?.value || '').trim();
+        if (!text) return;
+        const btn = document.getElementById('msgSendBtn');
+        if (btn) btn.disabled = true;
+        try {
+            const res = await fetch(`${API_URL}/api/admin/service-requests/${id}/respond`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ response: text })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && (data.success !== false)) {
+                MSG.sent[id] = MSG.sent[id] || [];
+                MSG.sent[id].push({ text, ts: new Date().toISOString() });
+                const r = MSG.reqs.find(x => String(x.id) === String(id));
+                if (r) r.admin_response = text;
+                if (inp) { inp.value = ''; inp.style.height = 'auto'; }
+                // append the bubble live
+                const body = document.getElementById('msgBody');
+                if (body) {
+                    body.insertAdjacentHTML('beforeend',
+                        `<div class="msg-bubble me">${esc(text)}</div><div class="msg-meta me">Just now · emailed to customer</div>`);
+                    body.scrollTop = body.scrollHeight;
+                }
+                if (typeof showToast === 'function') showToast('Reply sent & emailed', 'success');
+                renderConvoList();
+                updateMsgBadges();
+            } else {
+                if (typeof showToast === 'function') showToast((data && data.message) || 'Failed to send', 'error');
+            }
+        } catch (e) {
+            if (typeof showToast === 'function') showToast('Network error', 'error');
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+    window.__sendReply = sendReply;
+
+    async function threadStatus(id, status) {
+        const r = MSG.reqs.find(x => String(x.id) === String(id));
+        if (r) r.status = status;
+        updateMsgBadges();
+        try {
+            await fetch(`${API_URL}/api/admin/service-requests/${id}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            if (typeof showToast === 'function') showToast('Request updated', 'success');
+        } catch (e) {
+            if (typeof showToast === 'function') showToast('Update failed', 'error');
+        }
+        renderConvoList();
+    }
+    window.__threadStatus = threadStatus;
+
+    /* Reroute the Service Requests page "Reply" button into the messenger */
+    window.openServiceReply = function (id) { openMessenger(id); };
+
+    /* Esc closes */
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMessenger(); });
+
+    /* boot: load badge shortly after auth, then poll */
+    document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(loadMessengerData, 1800);
+        setInterval(loadMessengerData, 60000);
+    });
+})();
 </script>
 </body>
 </html>
