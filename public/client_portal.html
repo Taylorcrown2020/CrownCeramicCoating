@@ -106,6 +106,29 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-wei
 .mobile-bar{display:none;position:fixed;top:0;left:0;right:0;height:60px;background:#111;border-bottom:1px solid var(--line);
   align-items:center;justify-content:space-between;padding:0 16px;z-index:40}
 .hamb{background:none;border:none;color:var(--text);cursor:pointer}
+
+/* ---- MESSAGES INBOX ---- */
+.msg-wrap{display:flex;flex-direction:column;height:calc(100vh - 120px);max-height:720px;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.msg-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.msg-head .av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:#1a1a1a;display:flex;align-items:center;justify-content:center;font-weight:800}
+.msg-head .n{font-weight:700;font-size:15px}
+.msg-head .s{font-size:12px;color:var(--muted)}
+.msg-feed{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:3px;background:var(--bg)}
+.msg-day{text-align:center;font-size:11px;color:var(--muted);margin:12px 0 6px;font-weight:600}
+.bub{max-width:74%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.45;word-wrap:break-word;margin-bottom:2px}
+.bub.them{align-self:flex-start;background:var(--panel-2);color:var(--text);border-bottom-left-radius:5px}
+.bub.me{align-self:flex-end;background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:#1a1408;font-weight:500;border-bottom-right-radius:5px}
+.bub.mkt{align-self:stretch;max-width:100%;background:rgba(244,200,126,.10);border:1px solid rgba(244,200,126,.30);color:var(--text);border-radius:12px;padding:14px 16px}
+.bub.mkt .mk-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.bub.mkt .mk-sub{font-weight:700;font-size:15px;margin-bottom:4px}
+.bub-meta{font-size:10.5px;color:var(--muted);margin:0 4px 10px}
+.bub-meta.me{align-self:flex-end}.bub-meta.them{align-self:flex-start}
+.msg-compose{border-top:1px solid var(--line);padding:12px 14px;display:flex;gap:10px;align-items:flex-end;background:var(--panel)}
+.msg-compose textarea{flex:1;resize:none;min-height:44px;max-height:130px;border-radius:18px;padding:11px 15px;background:var(--panel-2)}
+.msg-send{flex-shrink:0;width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:#1a1408;display:flex;align-items:center;justify-content:center;transition:.15s}
+.msg-send:hover{transform:scale(1.06)}.msg-send:disabled{opacity:.5}
+.msg-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);text-align:center;padding:30px}
+.msg-empty svg{width:48px;height:48px;opacity:.4}
 </style>
 </head>
 <body>
@@ -135,6 +158,10 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-wei
 <div id="app" class="hidden">
   <div class="mobile-bar">
     <div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="#f4c87e" stroke-width="1.6" stroke-linejoin="round"><path d="M3 18.5L5 7.5L9 12.5L12 5L15 12.5L19 7.5L21 18.5H3Z"/><line x1="3" y1="21" x2="21" y2="21" stroke-linecap="round"/></svg>Crown</div>
+    <button class="hamb" style="position:relative;margin-left:auto;margin-right:8px;" onclick="nav('messages')" aria-label="Messages">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <span id="msgMobileBadge" class="hidden" style="position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#e2685f;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;">0</span>
+    </button>
     <button class="hamb" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
   </div>
   <aside class="sidebar">
@@ -146,6 +173,7 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-wei
     <div class="nav-link" data-view="invoices" onclick="nav('invoices')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Invoices<span class="nav-badge hidden" id="invBadge">0</span></div>
     <div class="nav-link" data-view="projects" onclick="nav('projects')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Sales Agreements</div>
     <div class="nav-link" data-view="requests" onclick="nav('requests')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Service Requests</div>
+    <div class="nav-link" data-view="messages" onclick="nav('messages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Messages<span class="nav-badge hidden" id="msgNavBadge">0</span></div>
     <div class="nav-link" data-view="documents" onclick="nav('documents')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>Receipts &amp; Docs</div>
     <div class="spacer"></div>
     <div class="nav-link" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</div>
@@ -212,6 +240,9 @@ async function startApp(){
   try{ const c = await (await fetch(API+'/api/config/stripe')).json(); STRIPE_PK = c.publishableKey||STRIPE_PK_FALLBACK||''; if(STRIPE_PK && window.Stripe) STRIPE = Stripe(STRIPE_PK); }catch(e){ if(STRIPE_PK_FALLBACK && window.Stripe){ STRIPE_PK = STRIPE_PK_FALLBACK; STRIPE = Stripe(STRIPE_PK); } }
   await loadDashboard();
   await loadRequests();
+  await loadMessages();
+  refreshMsgBadge();
+  setInterval(refreshMsgBadge, 45000);
   nav('dashboard');
 }
 async function loadDashboard(){
@@ -232,7 +263,7 @@ async function loadRequests(){
 function nav(view){
   document.querySelectorAll('.nav-link').forEach(n=>n.classList.toggle('active', n.dataset.view===view));
   document.querySelector('.sidebar').classList.remove('open');
-  ({dashboard:viewDashboard,invoices:viewInvoices,projects:viewProjects,requests:viewRequests,documents:viewDocuments}[view]||viewDashboard)();
+  ({dashboard:viewDashboard,invoices:viewInvoices,projects:viewProjects,requests:viewRequests,documents:viewDocuments,messages:viewMessages}[view]||viewDashboard)();
 }
 
 function viewDashboard(){
@@ -536,6 +567,89 @@ async function confirmPay(){
   } else { if(msg) msg.textContent='Payment could not be completed.'; btn.disabled=false; btn.textContent='Pay '+money(payState.breakdown.total); }
 }
 async function afterPaid(){ closePay(); await loadDashboard(); nav('invoices'); }
+
+/* ===================== MESSAGES (shared inbox with the shop) ===================== */
+let MESSAGES = [];
+function msgTime(d){ if(!d) return ''; const t=new Date(d), now=new Date(); if(isNaN(t)) return '';
+  if(t.toDateString()===now.toDateString()) return t.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+  const days=Math.round((now-t)/86400000); if(days===1) return 'Yesterday';
+  if(days<7) return t.toLocaleDateString([], {weekday:'short'}); return t.toLocaleDateString([], {month:'short',day:'numeric'}); }
+
+async function loadMessages(){
+  try{ const d = await (await fetch(API+'/api/client/messages',{headers:authHeaders()})).json(); MESSAGES = d.messages||[]; }
+  catch(e){ MESSAGES=[]; }
+}
+async function refreshMsgBadge(){
+  try{
+    const d = await (await fetch(API+'/api/client/messages/unread-count',{headers:authHeaders()})).json();
+    const n = d.count||0;
+    ['msgNavBadge','msgMobileBadge'].forEach(id=>{
+      const b=document.getElementById(id); if(!b) return;
+      b.textContent=n; if(n>0) b.classList.remove('hidden'); else b.classList.add('hidden');
+    });
+  }catch(e){}
+}
+
+function viewMessages(){
+  const initials = (CLIENT&&CLIENT.name)? CLIENT.name.trim().split(/\s+/).map(s=>s[0]).slice(0,2).join('').toUpperCase() : 'CC';
+  let feed;
+  if(!MESSAGES.length){
+    feed = `<div class="msg-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><div>No messages yet. Send us a note and we'll reply right here.</div></div>`;
+  } else {
+    let lastDay='';
+    feed = MESSAGES.map(m=>{
+      const day = m.created_at ? new Date(m.created_at).toLocaleDateString([], {month:'long',day:'numeric'}) : '';
+      let dayDiv=''; if(day && day!==lastDay){ dayDiv=`<div class="msg-day">${esc(day)}</div>`; lastDay=day; }
+      const txt = esc(m.body).replace(/\n/g,'<br>');
+      if(m.kind==='marketing'){
+        return `${dayDiv}<div class="bub mkt"><span class="mk-tag">★ Offer from Crown</span>${m.subject?`<div class="mk-sub">${esc(m.subject)}</div>`:''}<div>${txt}</div></div><div class="bub-meta them">${esc(msgTime(m.created_at))}</div>`;
+      }
+      const side = m.sender==='admin' ? 'them' : 'me';
+      const meta = m.sender==='admin' ? 'Crown Ceramic Coating' : 'You';
+      return `${dayDiv}<div class="bub ${side}">${txt}</div><div class="bub-meta ${side}">${meta} · ${esc(msgTime(m.created_at))}</div>`;
+    }).join('');
+  }
+  document.getElementById('main').innerHTML = `
+    <div class="page-title">Messages</div>
+    <div class="page-sub">Chat directly with Crown Ceramic Coating. We'll reply right here.</div>
+    <div class="msg-wrap">
+      <div class="msg-head">
+        <div class="av">${esc(initials)}</div>
+        <div><div class="n">Crown Ceramic Coating</div><div class="s">Typically replies within a day</div></div>
+      </div>
+      <div class="msg-feed" id="msgFeed">${feed}</div>
+      <div class="msg-compose">
+        <textarea id="msgInput" placeholder="Write a message…" rows="1"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,130)+'px'"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendClientMessage();}"></textarea>
+        <button class="msg-send" id="msgSendBtn" onclick="sendClientMessage()" aria-label="Send">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>`;
+  const feedEl=document.getElementById('msgFeed'); if(feedEl) feedEl.scrollTop=feedEl.scrollHeight;
+  refreshMsgBadge();
+}
+
+async function sendClientMessage(){
+  const inp=document.getElementById('msgInput'); const txt=(inp?.value||'').trim(); if(!txt) return;
+  const btn=document.getElementById('msgSendBtn'); if(btn) btn.disabled=true;
+  try{
+    const r = await fetch(API+'/api/client/messages',{method:'POST',headers:authHeaders(),body:JSON.stringify({body:txt})});
+    const d = await r.json();
+    if(r.ok && d.success){
+      MESSAGES.push(d.message);
+      const feed=document.getElementById('msgFeed');
+      if(feed){
+        if(feed.querySelector('.msg-empty')) feed.innerHTML='';
+        feed.insertAdjacentHTML('beforeend',`<div class="bub me">${esc(txt).replace(/\n/g,'<br>')}</div><div class="bub-meta me">You · just now</div>`);
+        feed.scrollTop=feed.scrollHeight;
+      }
+      if(inp){ inp.value=''; inp.style.height='auto'; }
+    } else { alert(d.message||'Could not send message.'); }
+  }catch(e){ alert('Could not send message.'); }
+  finally{ if(btn) btn.disabled=false; }
+}
 
 /* ---------------- INIT ---------------- */
 if(TOKEN && CLIENT){ startApp(); }

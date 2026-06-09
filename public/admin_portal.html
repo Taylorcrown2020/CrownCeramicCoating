@@ -21927,6 +21927,40 @@ async function renderMarketing(content) {
                 <p style="color:var(--text-secondary);font-size:14px;margin:0;">Send promotional or outreach emails to any audience group. These do <strong>not</strong> count toward the follow-up cadence — but link clicks will still promote cold leads to hot.</p>
             </div>
 
+            <!-- Portal message broadcast -->
+            <div style="background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:28px;margin-bottom:24px;">
+                <div style="font-size:18px;font-weight:800;margin:0 0 4px;">Send a Portal Message</div>
+                <p style="color:var(--text-secondary);font-size:13px;margin:0 0 18px;">Posts a message straight into your clients' portal inbox and emails them a link to go read it (the message itself stays in the portal). Ideal for deals &amp; announcements.</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+                    <div style="flex:1;min-width:240px;">
+                        <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);display:block;margin-bottom:6px;">Deal template</label>
+                        <select id="portalTemplate" class="form-input form-select" onchange="applyPortalTemplate(this.value)">
+                            <option value="">— Choose a template —</option>
+                            <option value="ceramic">Ceramic Coating Deal</option>
+                            <option value="polishing">Polishing Special</option>
+                            <option value="paint">Paint Correction Offer</option>
+                            <option value="detail">Detailing Package</option>
+                            <option value="summer">Summer Deals</option>
+                            <option value="maintenance">Maintenance Plan</option>
+                            <option value="custom">Custom (blank)</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;min-width:200px;">
+                        <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);display:block;margin-bottom:6px;">Send to</label>
+                        <select id="portalAudience" class="form-input form-select">
+                            <option value="customers">All portal customers</option>
+                            <option value="all">All portal accounts</option>
+                        </select>
+                    </div>
+                </div>
+                <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);display:block;margin-bottom:6px;">Subject</label>
+                <input id="portalSubject" class="form-input" placeholder="e.g. Summer Ceramic Special — 20% Off" style="margin-bottom:12px;">
+                <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);display:block;margin-bottom:6px;">Message</label>
+                <textarea id="portalBody" class="form-input form-textarea" rows="5" placeholder="Write your offer…" style="margin-bottom:14px;"></textarea>
+                <button class="btn btn-primary" onclick="sendPortalBroadcast()">Send to portal inboxes</button>
+                <span id="portalSendMsg" style="margin-left:14px;font-size:13px;color:var(--text-secondary);"></span>
+            </div>
+
             <!-- Audience selector -->
             <div style="background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:28px;margin-bottom:24px;">
                 <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:16px;">1 · Choose Audience</div>
@@ -22718,71 +22752,53 @@ document.getElementById('subCancelModal').addEventListener('click', function(e) 
 </script>
 <script id="crown-messenger">
 /* =====================================================================
-   CROWN MESSENGER — iMessage-style conversations for Service Requests
-   Each service request is a conversation. The customer's request shows
-   as their message; admin replies show as gold "me" bubbles and are
-   sent through the existing /service-requests/:id/respond endpoint
-   (which also emails the customer + posts to their client portal).
-   Unread = open requests that still need a first reply.
+   CROWN MESSENGER (admin) — per-client conversations over the SHARED
+   inbox. Reads/writes the same client_messages the client portal uses,
+   so both sides see the identical thread. Admin sends notify the client
+   by email (link only — the message lives in the portal).
    ===================================================================== */
 (function () {
-    const MSG = {
-        reqs: [],
-        activeId: null,
-        sent: {},                 // in-session sent bubbles per request id
-        loaded: false
-    };
+    const MSG = { convos: [], activeLead: null, threads: {}, loaded: false, totalUnread: 0 };
     window.__MSG = MSG;
-
-    const READ_KEY = 'crownMsgRead';
-    const readSet = () => { try { return new Set(JSON.parse(localStorage.getItem(READ_KEY) || '[]')); } catch (e) { return new Set(); } };
-    const markRead = (id) => { const s = readSet(); s.add(String(id)); localStorage.setItem(READ_KEY, JSON.stringify([...s])); };
 
     const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const initials = (name) => { const p = String(name || '?').trim().split(/\s+/); return ((p[0] || '?')[0] + (p[1] ? p[1][0] : '')).toUpperCase(); };
     const AV = ['#e0518a', '#b08bff', '#4ec1ff', '#3fae6b', '#f5a623', '#6b8cff', '#ef6c5a', '#27b3a3'];
     const avatarColor = (name) => { let h = 0; for (const ch of String(name || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return AV[h % AV.length]; };
+    const tok = () => (typeof getAuthToken === 'function' ? getAuthToken() : (window.authToken || localStorage.getItem('adminToken')));
     const when = (d) => {
         if (!d) return '';
-        const t = new Date(d), now = new Date();
-        if (isNaN(t)) return '';
-        const sameDay = t.toDateString() === now.toDateString();
-        if (sameDay) return t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        const t = new Date(d), now = new Date(); if (isNaN(t)) return '';
+        if (t.toDateString() === now.toDateString()) return t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
         const days = Math.round((now - t) / 86400000);
         if (days === 1) return 'Yesterday';
         if (days < 7) return t.toLocaleDateString([], { weekday: 'short' });
         return t.toLocaleDateString([], { month: 'short', day: 'numeric' });
     };
-    const needsReply = (r) => r.status !== 'completed' && r.status !== 'closed' && !r.admin_response && !(MSG.sent[r.id] && MSG.sent[r.id].length);
-    const isUnread = (r) => needsReply(r) && !readSet().has(String(r.id));
 
-    /* ---------- data + badges ---------- */
     async function loadMessengerData() {
-        const token = (typeof getAuthToken === 'function') ? getAuthToken() : null;
-        if (!token) return;
+        const token = tok(); if (!token) return;
         try {
-            const res = await fetch(`${API_URL}/api/admin/service-requests`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch(`${API_URL}/api/admin/conversations`, { headers: { 'Authorization': `Bearer ${token}` } });
             const data = await res.json();
-            MSG.reqs = (data && data.requests) || [];
+            MSG.convos = (data && data.conversations) || [];
+            MSG.totalUnread = MSG.convos.reduce((s, c) => s + (Number(c.unread) || 0), 0);
             MSG.loaded = true;
             updateMsgBadges();
-            if (document.querySelector('.msg-overlay.open')) { renderConvoList(); }
-        } catch (e) { /* offline — leave badge as-is */ }
+            if (document.querySelector('.msg-overlay.open')) renderConvoList();
+        } catch (e) { /* offline */ }
     }
     window.loadMessengerData = loadMessengerData;
     window.refreshMsgBadge = function () { try { updateMsgBadges(); } catch (e) {} };
 
     function updateMsgBadges() {
-        const unread = MSG.reqs.filter(isUnread).length;
-        const tb = document.getElementById('msgTriggerBadge');
-        if (tb) { tb.textContent = unread > 99 ? '99+' : unread; tb.style.display = unread > 0 ? 'flex' : 'none'; }
-        // keep the sidebar Service Requests badge in sync (open count)
-        const open = MSG.reqs.filter(r => r.status !== 'completed' && r.status !== 'closed').length;
-        const sb = document.getElementById('serviceRequestsBadge');
-        if (sb) { sb.textContent = open; sb.style.display = open > 0 ? 'inline-block' : 'none'; }
+        const n = MSG.totalUnread;
+        ['msgTriggerBadge', 'notifBadge'].forEach(id => {
+            const b = document.getElementById(id);
+            if (b) { b.textContent = n > 99 ? '99+' : n; b.style.display = n > 0 ? 'flex' : 'none'; }
+        });
     }
 
-    /* ---------- overlay shell ---------- */
     function ensureOverlay() {
         let ov = document.getElementById('msgOverlay');
         if (ov) return ov;
@@ -22793,11 +22809,8 @@ document.getElementById('subCancelModal').addEventListener('click', function(e) 
             <div class="msg-window" id="msgWindow">
                 <div class="msg-list-pane">
                     <div class="msg-list-head">
-                        <h3>
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-amber)"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                            Messages
-                        </h3>
-                        <input class="msg-search" id="msgSearch" placeholder="Search conversations" oninput="renderConvoList()">
+                        <h3><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg> Messages</h3>
+                        <input class="msg-search" id="msgSearch" placeholder="Search clients" oninput="renderConvoList()">
                     </div>
                     <div class="msg-list" id="msgList"></div>
                 </div>
@@ -22808,209 +22821,127 @@ document.getElementById('subCancelModal').addEventListener('click', function(e) 
         return ov;
     }
 
-    function openMessenger(focusId) {
+    function openMessenger(focusLead) {
         const ov = ensureOverlay();
         renderConvoList();
-        if (focusId != null) {
-            openThread(focusId);
-        } else if (!MSG.activeId && MSG.reqs.length) {
-            // desktop: preview first conversation; mobile starts on the list
-            if (window.innerWidth > 720) openThread(MSG.reqs[0].id);
-            else renderEmptyThread();
-        } else if (MSG.activeId) {
-            openThread(MSG.activeId);
-        } else {
-            renderEmptyThread();
-        }
+        if (focusLead != null) openThread(focusLead);
+        else if (MSG.activeLead) openThread(MSG.activeLead);
+        else if (window.innerWidth > 720 && MSG.convos.length) openThread(MSG.convos[0].lead_id);
+        else renderEmptyThread();
         requestAnimationFrame(() => ov.classList.add('open'));
         if (!MSG.loaded) loadMessengerData();
     }
     window.openMessenger = openMessenger;
-
-    function closeMessenger() {
-        const ov = document.getElementById('msgOverlay');
-        if (ov) ov.classList.remove('open');
-    }
+    function closeMessenger() { const ov = document.getElementById('msgOverlay'); if (ov) ov.classList.remove('open'); }
     window.closeMessenger = closeMessenger;
 
-    /* ---------- conversation list ---------- */
     function renderConvoList() {
-        const list = document.getElementById('msgList');
-        if (!list) return;
+        const list = document.getElementById('msgList'); if (!list) return;
         const q = (document.getElementById('msgSearch')?.value || '').toLowerCase().trim();
-        let reqs = [...MSG.reqs].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-        if (q) reqs = reqs.filter(r => (`${r.customer_name} ${r.service_type} ${r.vehicle} ${r.details}`).toLowerCase().includes(q));
-
-        if (!reqs.length) {
-            list.innerHTML = `<div style="padding:40px 16px;text-align:center;color:var(--text-muted);font-size:13px;">${MSG.loaded ? 'No conversations yet.' : 'Loading…'}</div>`;
-            return;
-        }
-        list.innerHTML = reqs.map(r => {
-            const sentLast = (MSG.sent[r.id] && MSG.sent[r.id].length) ? MSG.sent[r.id][MSG.sent[r.id].length - 1].text : null;
-            const preview = sentLast ? 'You: ' + sentLast : (r.admin_response ? 'You: ' + r.admin_response : (r.details || r.service_type || 'New request'));
-            const unread = isUnread(r);
-            return `<div class="msg-convo ${r.id === MSG.activeId ? 'active' : ''} ${unread ? 'unread' : ''}" onclick="__openThread(${r.id})">
-                <div class="msg-avatar" style="background:${avatarColor(r.customer_name)}">${esc(initials(r.customer_name))}</div>
+        let convos = [...MSG.convos];
+        if (q) convos = convos.filter(c => (`${c.name} ${c.email} ${c.last_body || ''}`).toLowerCase().includes(q));
+        if (!convos.length) { list.innerHTML = `<div style="padding:40px 16px;text-align:center;color:var(--text-muted);font-size:13px;">${MSG.loaded ? 'No conversations yet.' : 'Loading…'}</div>`; return; }
+        list.innerHTML = convos.map(c => {
+            const unread = Number(c.unread) || 0;
+            const preview = c.last_body ? (c.last_sender === 'admin' ? 'You: ' + c.last_body : c.last_body) : (c.request_count > 0 ? c.request_count + ' service request(s)' : 'No messages yet');
+            return `<div class="msg-convo ${String(c.lead_id) === String(MSG.activeLead) ? 'active' : ''} ${unread ? 'unread' : ''}" onclick="__openThread(${c.lead_id})">
+                <div class="msg-avatar" style="background:${avatarColor(c.name)}">${esc(initials(c.name))}</div>
                 <div class="msg-convo-body">
-                    <div class="msg-convo-top">
-                        <span class="msg-convo-name">${esc(r.customer_name || 'Unknown')}</span>
-                        <span class="msg-convo-time">${esc(when(r.created_at))}</span>
-                    </div>
-                    <div class="msg-convo-preview">${esc(preview).slice(0, 60)}</div>
+                    <div class="msg-convo-top"><span class="msg-convo-name">${esc(c.name || 'Unknown')}</span><span class="msg-convo-time">${esc(when(c.last_at))}</span></div>
+                    <div class="msg-convo-preview">${esc(preview).slice(0, 64)}</div>
                 </div>
-                ${unread ? '<span class="msg-unread-dot"></span>' : ''}
+                ${unread ? `<span class="msg-unread-dot"></span>` : ''}
             </div>`;
         }).join('');
     }
     window.renderConvoList = renderConvoList;
 
     function renderEmptyThread() {
-        const pane = document.getElementById('msgThreadPane');
-        if (!pane) return;
-        pane.innerHTML = `<div class="msg-empty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-            <div>Pick a conversation to read and reply.</div>
-        </div>`;
+        const pane = document.getElementById('msgThreadPane'); if (!pane) return;
+        pane.innerHTML = `<div class="msg-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg><div>Pick a client to read and reply.</div></div>`;
     }
 
-    /* ---------- thread ---------- */
-    function openThread(id) {
-        MSG.activeId = id;
-        markRead(id);
-        const r = MSG.reqs.find(x => String(x.id) === String(id));
-        const pane = document.getElementById('msgThreadPane');
-        const win = document.getElementById('msgWindow');
-        if (!pane || !r) { renderEmptyThread(); return; }
+    async function openThread(leadId) {
+        MSG.activeLead = leadId;
+        const pane = document.getElementById('msgThreadPane'); const win = document.getElementById('msgWindow');
         if (win) win.classList.add('show-thread');
+        if (pane) pane.innerHTML = `<div class="msg-empty">Loading…</div>`;
+        let data;
+        try {
+            data = await (await fetch(`${API_URL}/api/admin/conversations/${leadId}/messages`, { headers: { 'Authorization': `Bearer ${tok()}` } })).json();
+        } catch (e) { if (pane) pane.innerHTML = `<div class="msg-empty">Could not load conversation.</div>`; return; }
+        const client = data.client || {}; const messages = data.messages || []; const requests = data.requests || [];
+        MSG.threads[leadId] = messages;
+        // mark read locally
+        const cv = MSG.convos.find(c => String(c.lead_id) === String(leadId)); if (cv) cv.unread = 0;
+        MSG.totalUnread = MSG.convos.reduce((s, c) => s + (Number(c.unread) || 0), 0); updateMsgBadges();
 
-        const statusOpts = ['new', 'scheduled', 'in-progress', 'completed', 'closed']
-            .map(s => `<option value="${s}" ${r.status === s ? 'selected' : ''}>${s}</option>`).join('');
+        const reqCard = requests.length ? `<div class="msg-req-card"><div class="rh">Service Requests (${requests.length})</div>${requests.slice(0, 4).map(r => `<div class="row"><b>${esc(r.service_type || 'Service')}</b> — ${esc(r.vehicle || '—')} · <span style="text-transform:capitalize">${esc(r.status || '')}</span></div>`).join('')}</div>` : '';
+        let lastDay = '';
+        const bubbles = messages.map(m => {
+            const day = m.created_at ? new Date(m.created_at).toLocaleDateString([], { month: 'long', day: 'numeric' }) : '';
+            let dd = ''; if (day && day !== lastDay) { dd = `<div class="msg-daydiv">${esc(day)}</div>`; lastDay = day; }
+            const txt = esc(m.body).replace(/\n/g, '<br>');
+            if (m.kind === 'marketing') return `${dd}<div class="msg-req-card" style="align-self:stretch;max-width:100%;"><div class="rh">★ Marketing — ${esc(m.subject || 'Offer')}</div><div style="font-size:14px;color:var(--text-primary);">${txt}</div></div><div class="msg-meta me">Sent</div>`;
+            const side = m.sender === 'admin' ? 'me' : 'them';
+            return `${dd}<div class="msg-bubble ${side}">${txt}</div><div class="msg-meta ${side}">${m.sender === 'admin' ? 'You' : esc((client.name || 'Client').split(' ')[0])} · ${esc(when(m.created_at))}</div>`;
+        }).join('');
 
-        // build message bubbles: original request, stored admin_response, then session-sent
-        let bubbles = '';
-        if (r.details) {
-            bubbles += `<div class="msg-bubble them">${esc(r.details)}</div>
-                        <div class="msg-meta them">${esc(when(r.created_at))}</div>`;
-        }
-        if (r.admin_response) {
-            bubbles += `<div class="msg-bubble me">${esc(r.admin_response)}</div>
-                        <div class="msg-meta me">Sent · emailed to customer</div>`;
-        }
-        (MSG.sent[id] || []).forEach(m => {
-            bubbles += `<div class="msg-bubble me">${esc(m.text)}</div>
-                        <div class="msg-meta me">${esc(when(m.ts))} · emailed to customer</div>`;
-        });
-
-        const sub = [r.service_type, r.vehicle].filter(Boolean).join(' · ') || r.customer_email || '';
+        const sub = [client.email, client.phone].filter(Boolean).join(' · ');
         pane.innerHTML = `
             <div class="msg-thread-head">
-                <button class="msg-back" onclick="document.getElementById('msgWindow').classList.remove('show-thread')" aria-label="Back">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-                </button>
-                <div class="msg-avatar" style="background:${avatarColor(r.customer_name)}">${esc(initials(r.customer_name))}</div>
-                <div class="msg-thread-title">
-                    <div class="n">${esc(r.customer_name || 'Unknown')}</div>
-                    <div class="s">${esc(sub)}</div>
-                </div>
-                <select class="msg-thread-status" onchange="__threadStatus(${r.id}, this.value)" title="Update status">${statusOpts}</select>
-                <button class="msg-close" onclick="closeMessenger()" aria-label="Close">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
+                <button class="msg-back" onclick="document.getElementById('msgWindow').classList.remove('show-thread')" aria-label="Back"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+                <div class="msg-avatar" style="background:${avatarColor(client.name)}">${esc(initials(client.name))}</div>
+                <div class="msg-thread-title"><div class="n">${esc(client.name || 'Client')}</div><div class="s">${esc(sub)}</div></div>
+                <button class="msg-close" onclick="closeMessenger()" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
-            <div class="msg-body" id="msgBody">
-                <div class="msg-daydiv">${esc(r.created_at ? new Date(r.created_at).toLocaleDateString([], { month: 'long', day: 'numeric' }) : 'Request')}</div>
-                <div class="msg-req-card">
-                    <div class="rh">Service Request</div>
-                    <div class="row"><b>Service:</b> ${esc(r.service_type || '—')}</div>
-                    <div class="row"><b>Vehicle:</b> ${esc(r.vehicle || '—')}</div>
-                    <div class="row"><b>Preferred:</b> ${esc(r.preferred_date ? new Date(r.preferred_date).toLocaleDateString() : '—')}</div>
-                    ${r.customer_phone ? `<div class="row"><b>Phone:</b> ${esc(r.customer_phone)}</div>` : ''}
-                    ${r.customer_email ? `<div class="row"><b>Email:</b> ${esc(r.customer_email)}</div>` : ''}
-                </div>
-                ${bubbles}
-            </div>
+            <div class="msg-body" id="msgBody">${reqCard}${bubbles || '<div style="text-align:center;color:var(--text-muted);font-size:13px;margin-top:20px;">No messages yet — say hello.</div>'}</div>
             <div class="msg-composer">
-                <textarea id="msgInput" placeholder="Message ${esc((r.customer_name || 'customer').split(' ')[0])}…" rows="1"
+                <textarea id="msgInput" placeholder="Message ${esc((client.name || 'client').split(' ')[0])}…" rows="1"
                     oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,140)+'px'"
-                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();__sendReply(${r.id});}"></textarea>
-                <button class="msg-send" id="msgSendBtn" onclick="__sendReply(${r.id})" aria-label="Send">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                </button>
+                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();__sendMsg(${leadId});}"></textarea>
+                <button class="msg-send" id="msgSendBtn" onclick="__sendMsg(${leadId})" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
             </div>`;
-        const body = document.getElementById('msgBody');
-        if (body) body.scrollTop = body.scrollHeight;
-        const inp = document.getElementById('msgInput');
-        if (inp && window.innerWidth > 720) inp.focus();
+        const body = document.getElementById('msgBody'); if (body) body.scrollTop = body.scrollHeight;
+        const inp = document.getElementById('msgInput'); if (inp && window.innerWidth > 720) inp.focus();
         renderConvoList();
-        updateMsgBadges();
     }
     window.__openThread = openThread;
 
-    async function sendReply(id) {
-        const inp = document.getElementById('msgInput');
-        const text = (inp?.value || '').trim();
-        if (!text) return;
-        const btn = document.getElementById('msgSendBtn');
-        if (btn) btn.disabled = true;
+    async function sendMsg(leadId) {
+        const inp = document.getElementById('msgInput'); const text = (inp?.value || '').trim(); if (!text) return;
+        const btn = document.getElementById('msgSendBtn'); if (btn) btn.disabled = true;
         try {
-            const res = await fetch(`${API_URL}/api/admin/service-requests/${id}/respond`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ response: text })
+            const res = await fetch(`${API_URL}/api/admin/conversations/${leadId}/messages`, {
+                method: 'POST', headers: { 'Authorization': `Bearer ${tok()}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ body: text })
             });
             const data = await res.json().catch(() => ({}));
-            if (res.ok && (data.success !== false)) {
-                MSG.sent[id] = MSG.sent[id] || [];
-                MSG.sent[id].push({ text, ts: new Date().toISOString() });
-                const r = MSG.reqs.find(x => String(x.id) === String(id));
-                if (r) r.admin_response = text;
+            if (res.ok && data.success) {
                 if (inp) { inp.value = ''; inp.style.height = 'auto'; }
-                // append the bubble live
                 const body = document.getElementById('msgBody');
-                if (body) {
-                    body.insertAdjacentHTML('beforeend',
-                        `<div class="msg-bubble me">${esc(text)}</div><div class="msg-meta me">Just now · emailed to customer</div>`);
-                    body.scrollTop = body.scrollHeight;
-                }
-                if (typeof showToast === 'function') showToast('Reply sent & emailed', 'success');
+                if (body) { body.insertAdjacentHTML('beforeend', `<div class="msg-bubble me">${esc(text).replace(/\n/g, '<br>')}</div><div class="msg-meta me">You · just now · client notified</div>`); body.scrollTop = body.scrollHeight; }
+                const cv = MSG.convos.find(c => String(c.lead_id) === String(leadId));
+                if (cv) { cv.last_body = text; cv.last_at = new Date().toISOString(); cv.last_sender = 'admin'; }
+                if (typeof showToast === 'function') showToast('Message sent — client emailed a link', 'success');
                 renderConvoList();
-                updateMsgBadges();
-            } else {
-                if (typeof showToast === 'function') showToast((data && data.message) || 'Failed to send', 'error');
-            }
-        } catch (e) {
-            if (typeof showToast === 'function') showToast('Network error', 'error');
-        } finally {
-            if (btn) btn.disabled = false;
-        }
+            } else if (typeof showToast === 'function') showToast(data.message || 'Failed to send', 'error');
+        } catch (e) { if (typeof showToast === 'function') showToast('Network error', 'error'); }
+        finally { if (btn) btn.disabled = false; }
     }
-    window.__sendReply = sendReply;
+    window.__sendMsg = sendMsg;
 
-    async function threadStatus(id, status) {
-        const r = MSG.reqs.find(x => String(x.id) === String(id));
-        if (r) r.status = status;
-        updateMsgBadges();
+    // Service Requests page "Reply" -> open that customer's conversation.
+    window.openServiceReply = async function (reqId) {
         try {
-            await fetch(`${API_URL}/api/admin/service-requests/${id}`, {
-                method: 'PATCH',
-                headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status })
-            });
-            if (typeof showToast === 'function') showToast('Request updated', 'success');
-        } catch (e) {
-            if (typeof showToast === 'function') showToast('Update failed', 'error');
-        }
-        renderConvoList();
-    }
-    window.__threadStatus = threadStatus;
+            const data = await (await fetch(`${API_URL}/api/admin/service-requests`, { headers: { 'Authorization': `Bearer ${tok()}` } })).json();
+            const r = (data.requests || []).find(x => String(x.id) === String(reqId));
+            if (r && r.lead_id) { await loadMessengerData(); openMessenger(r.lead_id); return; }
+        } catch (e) {}
+        openMessenger();
+    };
 
-    /* Reroute the Service Requests page "Reply" button into the messenger */
-    window.openServiceReply = function (id) { openMessenger(id); };
-
-    /* Esc closes */
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMessenger(); });
-
-    /* boot: load badge shortly after auth, then poll */
     document.addEventListener('DOMContentLoaded', function () {
         setTimeout(loadMessengerData, 1800);
         setInterval(loadMessengerData, 60000);
@@ -23101,6 +23032,114 @@ document.getElementById('subCancelModal').addEventListener('click', function(e) 
 
     if (document.readyState !== 'loading') startObserver();
     else document.addEventListener('DOMContentLoaded', startObserver);
+})();
+</script>
+<script id="crown-marketing-and-badges">
+/* ---- Portal message deal templates (Marketing) ---- */
+const CROWN_PORTAL_TEMPLATES = {
+    ceramic: {
+        subject: 'Ceramic Coating Special — Protect Your Paint',
+        body: "Hi! For a limited time we're offering a deal on our premium ceramic coating. A professionally applied coating gives you years of gloss, hydrophobic protection, and easier washes.\n\nReply here or book through your portal to lock in your spot — slots fill fast."
+    },
+    polishing: {
+        subject: 'Polishing Special — Bring Back the Shine',
+        body: "Hi! Treat your vehicle to a machine polish at a special rate this month. We'll remove light swirls and oxidation to restore a deep, wet-look gloss.\n\nReply here to schedule, or book right from your portal."
+    },
+    paint: {
+        subject: 'Paint Correction Offer — Erase Swirls & Scratches',
+        body: "Hi! We're running a deal on multi-stage paint correction. Perfect for removing swirl marks, water spots, and scratches before a coating.\n\nReply to this message and we'll get you on the calendar."
+    },
+    detail: {
+        subject: 'Detailing Package Deal — Inside & Out',
+        body: "Hi! Refresh your ride with our full interior + exterior detailing package, now at a special price. Includes deep interior clean, exterior wash, and finishing touches.\n\nReply here to book your appointment."
+    },
+    summer: {
+        subject: 'Summer Deals at Crown Ceramic Coating ☀️',
+        body: "Hi! Summer is the perfect time to protect your paint from heat, UV, and bugs. We've got special summer pricing across ceramic coatings, paint correction, and detailing.\n\nReply to this message or book through your portal to claim your summer deal."
+    },
+    maintenance: {
+        subject: 'Maintenance Plan — Keep It Looking New',
+        body: "Hi! Keep your coating performing its best with our maintenance plan — scheduled wash + decontamination + top-up at a member rate.\n\nReply here and we'll set you up."
+    },
+    custom: { subject: '', body: '' }
+};
+window.applyPortalTemplate = function (key) {
+    const t = CROWN_PORTAL_TEMPLATES[key]; if (!t) return;
+    const s = document.getElementById('portalSubject'); const b = document.getElementById('portalBody');
+    if (s) s.value = t.subject; if (b) b.value = t.body;
+};
+window.sendPortalBroadcast = async function () {
+    const subject = (document.getElementById('portalSubject')?.value || '').trim();
+    const body = (document.getElementById('portalBody')?.value || '').trim();
+    const audience = document.getElementById('portalAudience')?.value || 'customers';
+    const msg = document.getElementById('portalSendMsg');
+    if (!body) { if (msg) { msg.style.color = '#ef4444'; msg.textContent = 'Write a message first.'; } return; }
+    const token = (typeof getAuthToken === 'function' ? getAuthToken() : (window.authToken || localStorage.getItem('adminToken')));
+    if (msg) { msg.style.color = 'var(--text-secondary)'; msg.textContent = 'Sending…'; }
+    try {
+        const res = await fetch(`${API_URL}/api/admin/marketing/broadcast`, {
+            method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audience, subject, body })
+        });
+        const d = await res.json();
+        if (res.ok && d.success) {
+            if (msg) { msg.style.color = '#16a34a'; msg.textContent = `Sent to ${d.sent} portal inbox${d.sent === 1 ? '' : 'es'}.`; }
+            const sb = document.getElementById('portalSubject'), bb = document.getElementById('portalBody');
+            if (sb) sb.value = ''; if (bb) bb.value = '';
+            if (typeof showToast === 'function') showToast(`Posted to ${d.sent} portal inbox(es)`, 'success');
+        } else if (msg) { msg.style.color = '#ef4444'; msg.textContent = d.message || 'Could not send.'; }
+    } catch (e) { if (msg) { msg.style.color = '#ef4444'; msg.textContent = 'Network error.'; } }
+};
+
+/* ---- Badge audit: make every sidebar badge populate on load, not only
+        when its tab is opened. Runs after the app's own updateBadges(). ---- */
+(function () {
+    function tok() { return (typeof getAuthToken === 'function' ? getAuthToken() : (window.authToken || localStorage.getItem('adminToken'))); }
+    function setBadge(id, n) {
+        const b = document.getElementById(id); if (!b) return;
+        b.textContent = n; b.style.display = (Number(n) > 0) ? '' : (b.classList.contains('nav-badge') ? '' : 'none');
+    }
+    async function refreshAuxBadges() {
+        const token = tok(); if (!token) return;
+        const H = { 'Authorization': `Bearer ${token}` };
+        // service requests (open)
+        try {
+            const d = await (await fetch(`${API_URL}/api/admin/service-requests`, { headers: H })).json();
+            const open = (d.requests || []).filter(r => r.status !== 'completed' && r.status !== 'closed').length;
+            setBadge('serviceRequestsBadge', open);
+        } catch (e) {}
+        // schedule (upcoming appointments)
+        try {
+            const d = await (await fetch(`${API_URL}/api/appointments/upcoming`, { headers: H })).json();
+            const arr = d.appointments || d.data || [];
+            setBadge('scheduleBadge', arr.length);
+        } catch (e) {}
+        // setup calls
+        try {
+            const d = await (await fetch(`${API_URL}/api/appointments/setup-calls`, { headers: H })).json();
+            const now = new Date();
+            const c = (d.appointments || []).filter(a => new Date(a.scheduled_time) > now && a.status === 'scheduled').length;
+            setBadge('setupCallsBadge', c);
+        } catch (e) {}
+        // subscriptions (if endpoint exists)
+        try {
+            const r = await fetch(`${API_URL}/api/admin/subscriptions`, { headers: H });
+            if (r.ok) { const d = await r.json(); const arr = d.subscriptions || d.data || []; setBadge('subscriptionsBadge', (arr.filter ? arr.filter(s => (s.status || '') === 'active').length : arr.length)); }
+        } catch (e) {}
+    }
+    window.refreshAuxBadges = refreshAuxBadges;
+
+    // Wrap the app's updateBadges so aux badges refresh whenever it runs.
+    function hook() {
+        if (typeof window.updateBadges === 'function' && !window.__auxHooked) {
+            const orig = window.updateBadges;
+            window.updateBadges = async function () { try { await orig.apply(this, arguments); } finally { refreshAuxBadges(); } };
+            window.__auxHooked = true;
+        }
+        refreshAuxBadges();
+    }
+    document.addEventListener('DOMContentLoaded', () => setTimeout(hook, 2000));
+    setInterval(refreshAuxBadges, 60000);
 })();
 </script>
 </body>

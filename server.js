@@ -24810,6 +24810,25 @@ async function ensurePortalSchema() {
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='invoices' AND column_name='stripe_payment_intent_id')
         THEN ALTER TABLE invoices ADD COLUMN stripe_payment_intent_id VARCHAR(255); END IF;
     END $$;`).catch(() => {});
+
+    // Shared messaging between admin <-> client. One row per message; both the
+    // admin portal and the client portal read/write the SAME table so they see
+    // the exact same conversation. request_id optionally links a message to a
+    // service request; kind='marketing' marks promotional broadcasts.
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS client_messages (
+            id SERIAL PRIMARY KEY,
+            lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+            request_id INTEGER,
+            sender VARCHAR(10) NOT NULL,
+            kind VARCHAR(20) DEFAULT 'message',
+            subject VARCHAR(200),
+            body TEXT NOT NULL,
+            read_by_admin BOOLEAN DEFAULT FALSE,
+            read_by_client BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_client_messages_lead ON client_messages(lead_id)`).catch(() => {});
 }
 ensurePortalSchema().then(() => console.log('[PORTAL] Schema ensured (service_requests, appointments, invoices.stripe_payment_intent_id)'))
                     .catch(e => console.error('[PORTAL] Schema ensure failed:', e.message));
@@ -25004,24 +25023,237 @@ app.post('/api/admin/service-requests/:id/respond', authenticateToken, async (re
              WHERE id = $2
              RETURNING *`, [response.trim(), req.params.id])).rows[0];
 
-        // Customer email goes out in the background so the reply returns instantly.
+        // Thread the reply into the shared inbox so the client sees it in-portal.
+        if (reqRow.lead_id) {
+            await pool.query(
+                `INSERT INTO client_messages (lead_id, request_id, sender, kind, body, read_by_admin, read_by_client)
+                 VALUES ($1, $2, 'admin', 'message', $3, TRUE, FALSE)`,
+                [reqRow.lead_id, req.params.id, response.trim()]
+            ).catch(e => console.warn('[MSG] thread insert (respond) failed:', e.message));
+        }
+
+        // Notification-only email — the message itself lives in the portal.
         if (reqRow.customer_email) {
-            const safe = String(response).replace(/</g, '&lt;').replace(/\n/g, '<br>');
-            crownMailAsync({
-                to: reqRow.customer_email,
-                subject: `Re: your ${reqRow.service_type || 'service'} request — Crown Ceramic Coating`,
-                html: `<p>Hi ${reqRow.customer_name || 'there'},</p>
-                       <p>Thanks for your ${reqRow.service_type || 'service'} request. Here's our reply:</p>
-                       <blockquote style="border-left:3px solid #c9a14a;padding:6px 14px;color:#333;background:#faf7f0;">${safe}</blockquote>
-                       <p>You can also view this in your client portal. Reply to this email or call (940) 217-8680 with any questions.</p>
-                       <p>— Crown Ceramic Coating</p>`
-            });
+            crownMailAsync(buildPortalMessageEmail(reqRow.customer_name, reqRow.customer_email));
         }
 
         res.json({ success: true, request: updated });
     } catch (e) {
         console.error('[SERVICE-REQUEST] respond error:', e.message);
         res.status(500).json({ success: false, message: 'Could not send reply: ' + e.message });
+    }
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// SHARED MESSAGING  (admin portal <-> client portal, one source of truth)
+// Replies are NOT emailed; the customer just gets a "you have a new message"
+// notification with a link to the portal.
+// ──────────────────────────────────────────────────────────────────────────
+
+// Build the notification-only email (no message content included).
+function buildPortalMessageEmail(name, email, opts = {}) {
+    const portalUrl = `${BASE_URL}/client_portal.html`;
+    const heading = opts.marketing ? 'A new offer is waiting in your portal' : 'You have a new message';
+    const line = opts.marketing
+        ? 'Crown Ceramic Coating just posted a new offer to your client portal.'
+        : 'Crown Ceramic Coating sent you a new message in your client portal.';
+    return {
+        to: email,
+        subject: opts.marketing
+            ? (opts.subject ? `${opts.subject} — Crown Ceramic Coating` : 'A new offer from Crown Ceramic Coating')
+            : 'You have a new message — Crown Ceramic Coating',
+        html: `
+            <div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;color:#222;">
+              <h2 style="border-bottom:2px solid #c9a14a;padding-bottom:10px;color:#1a1a1a;">Crown Ceramic Coating</h2>
+              <p>Hi ${name || 'there'},</p>
+              <p style="font-size:16px;font-weight:600;">${heading}.</p>
+              <p>${line} Sign in to read it and reply.</p>
+              <p style="text-align:center;margin:26px 0;">
+                <a href="${portalUrl}" style="display:inline-block;background:#c9a14a;color:#1a1a1a;text-decoration:none;font-weight:700;font-size:14px;padding:13px 28px;border-radius:8px;">View message in your portal →</a>
+              </p>
+              <p style="color:#777;font-size:13px;">Or go to: <a href="${portalUrl}">${portalUrl}</a></p>
+              <p style="color:#777;font-size:13px;">Questions? Reply to this email or call (940) 217-8680.</p>
+              <p>— Crown Ceramic Coating</p>
+            </div>`
+    };
+}
+global.buildPortalMessageEmail = buildPortalMessageEmail;
+
+// ── CLIENT SIDE ──
+// Client: fetch their whole conversation (and mark admin→client messages read).
+app.get('/api/client/messages', authenticateClient, async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        const clientId = await resolveLeadId(req.user.id, req.user.email) || req.user.id;
+        const r = await pool.query(
+            'SELECT id, request_id, sender, kind, subject, body, created_at FROM client_messages WHERE lead_id = $1 ORDER BY created_at ASC',
+            [clientId]);
+        await pool.query('UPDATE client_messages SET read_by_client = TRUE WHERE lead_id = $1 AND sender = $2', [clientId, 'admin']);
+        res.json({ success: true, messages: r.rows });
+    } catch (e) {
+        console.error('[CLIENT] messages load error:', e.message);
+        res.status(500).json({ success: false, message: 'Could not load messages.' });
+    }
+});
+
+// Client: unread count (admin→client messages not yet read).
+app.get('/api/client/messages/unread-count', authenticateClient, async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        const clientId = await resolveLeadId(req.user.id, req.user.email) || req.user.id;
+        const r = await pool.query(
+            "SELECT COUNT(*)::int AS c FROM client_messages WHERE lead_id = $1 AND sender = 'admin' AND read_by_client = FALSE",
+            [clientId]);
+        res.json({ success: true, count: r.rows[0].c });
+    } catch (e) {
+        res.json({ success: true, count: 0 });
+    }
+});
+
+// Client: send a message to the shop.
+app.post('/api/client/messages', authenticateClient, async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        const clientId = await resolveLeadId(req.user.id, req.user.email) || req.user.id;
+        const { body, request_id } = req.body || {};
+        if (!body || !body.trim()) return res.status(400).json({ success: false, message: 'Message cannot be empty.' });
+        const row = (await pool.query(
+            `INSERT INTO client_messages (lead_id, request_id, sender, kind, body, read_by_admin, read_by_client)
+             VALUES ($1, $2, 'client', 'message', $3, FALSE, TRUE) RETURNING id, request_id, sender, kind, subject, body, created_at`,
+            [clientId, request_id || null, body.trim()])).rows[0];
+        res.json({ success: true, message: row });
+    } catch (e) {
+        console.error('[CLIENT] message send error:', e.message);
+        res.status(500).json({ success: false, message: 'Could not send message.' });
+    }
+});
+
+// ── ADMIN SIDE ──
+// Admin: list conversations (one per client), newest activity first.
+app.get('/api/admin/conversations', authenticateToken, async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        const r = await pool.query(`
+            SELECT l.id AS lead_id, l.name, l.email, l.phone,
+                   m.last_body, m.last_at, m.last_sender,
+                   COALESCE(u.unread, 0) AS unread,
+                   COALESCE(rq.req_count, 0) AS request_count
+              FROM leads l
+              JOIN (
+                    SELECT DISTINCT lead_id FROM client_messages
+                    UNION
+                    SELECT DISTINCT lead_id FROM service_requests WHERE lead_id IS NOT NULL
+                   ) act ON act.lead_id = l.id
+              LEFT JOIN LATERAL (
+                    SELECT body AS last_body, created_at AS last_at, sender AS last_sender
+                      FROM client_messages cm WHERE cm.lead_id = l.id
+                     ORDER BY created_at DESC LIMIT 1
+                   ) m ON TRUE
+              LEFT JOIN (
+                    SELECT lead_id, COUNT(*)::int AS unread FROM client_messages
+                     WHERE sender = 'client' AND read_by_admin = FALSE GROUP BY lead_id
+                   ) u ON u.lead_id = l.id
+              LEFT JOIN (
+                    SELECT lead_id, COUNT(*)::int AS req_count FROM service_requests GROUP BY lead_id
+                   ) rq ON rq.lead_id = l.id
+             ORDER BY COALESCE(m.last_at, '1970-01-01') DESC, l.name ASC`);
+        res.json({ success: true, conversations: r.rows });
+    } catch (e) {
+        console.error('[ADMIN] conversations error:', e.message);
+        res.status(500).json({ success: false, message: 'Could not load conversations.' });
+    }
+});
+
+// Admin: total unread (client→admin) for the topbar badge.
+app.get('/api/admin/messages/unread-count', authenticateToken, async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        const r = await pool.query("SELECT COUNT(*)::int AS c FROM client_messages WHERE sender = 'client' AND read_by_admin = FALSE");
+        res.json({ success: true, count: r.rows[0].c });
+    } catch (e) {
+        res.json({ success: true, count: 0 });
+    }
+});
+
+// Admin: full thread for one client + that client's service requests (context).
+// Marks client→admin messages as read.
+app.get('/api/admin/conversations/:leadId/messages', authenticateToken, async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        const leadId = req.params.leadId;
+        const client = (await pool.query('SELECT id, name, email, phone FROM leads WHERE id = $1', [leadId])).rows[0];
+        const messages = (await pool.query(
+            'SELECT id, request_id, sender, kind, subject, body, created_at FROM client_messages WHERE lead_id = $1 ORDER BY created_at ASC',
+            [leadId])).rows;
+        const requests = (await pool.query(
+            'SELECT id, service_type, vehicle, preferred_date, details, status, created_at FROM service_requests WHERE lead_id = $1 ORDER BY created_at DESC',
+            [leadId])).rows;
+        await pool.query('UPDATE client_messages SET read_by_admin = TRUE WHERE lead_id = $1 AND sender = $2', [leadId, 'client']);
+        res.json({ success: true, client, messages, requests });
+    } catch (e) {
+        console.error('[ADMIN] thread error:', e.message);
+        res.status(500).json({ success: false, message: 'Could not load conversation.' });
+    }
+});
+
+// Admin: send a message to a client. Notifies by email (link only, no content).
+app.post('/api/admin/conversations/:leadId/messages', authenticateToken, async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        const leadId = req.params.leadId;
+        const { body, request_id } = req.body || {};
+        if (!body || !body.trim()) return res.status(400).json({ success: false, message: 'Message cannot be empty.' });
+        const client = (await pool.query('SELECT id, name, email FROM leads WHERE id = $1', [leadId])).rows[0];
+        if (!client) return res.status(404).json({ success: false, message: 'Client not found.' });
+        const row = (await pool.query(
+            `INSERT INTO client_messages (lead_id, request_id, sender, kind, body, read_by_admin, read_by_client)
+             VALUES ($1, $2, 'admin', 'message', $3, TRUE, FALSE) RETURNING id, request_id, sender, kind, subject, body, created_at`,
+            [leadId, request_id || null, body.trim()])).rows[0];
+        if (client.email) crownMailAsync(buildPortalMessageEmail(client.name, client.email));
+        res.json({ success: true, message: row });
+    } catch (e) {
+        console.error('[ADMIN] message send error:', e.message);
+        res.status(500).json({ success: false, message: 'Could not send message.' });
+    }
+});
+
+// Admin: marketing broadcast — posts a promotional message into each selected
+// client's portal inbox and emails them a notification with a link.
+app.post('/api/admin/marketing/broadcast', authenticateToken, async (req, res) => {
+    try {
+        await ensurePortalSchema();
+        let { leadIds, subject, body, audience } = req.body || {};
+        if (!body || !body.trim()) return res.status(400).json({ success: false, message: 'Message body is required.' });
+
+        // Resolve recipients: explicit ids, or audience='all'/'customers' (portal accounts).
+        let recipients;
+        if (Array.isArray(leadIds) && leadIds.length) {
+            recipients = (await pool.query('SELECT id, name, email FROM leads WHERE id = ANY($1::int[])', [leadIds])).rows;
+        } else if (audience === 'all' || audience === 'customers') {
+            const sql = audience === 'customers'
+                ? "SELECT id, name, email FROM leads WHERE client_password IS NOT NULL AND COALESCE(is_customer, FALSE) = TRUE"
+                : "SELECT id, name, email FROM leads WHERE client_password IS NOT NULL";
+            recipients = (await pool.query(sql)).rows;
+        } else {
+            return res.status(400).json({ success: false, message: 'Choose recipients (leadIds or audience).' });
+        }
+        if (!recipients.length) return res.json({ success: true, sent: 0, message: 'No matching portal clients.' });
+
+        let sent = 0;
+        for (const r of recipients) {
+            try {
+                await pool.query(
+                    `INSERT INTO client_messages (lead_id, sender, kind, subject, body, read_by_admin, read_by_client)
+                     VALUES ($1, 'admin', 'marketing', $2, $3, TRUE, FALSE)`,
+                    [r.id, (subject || '').trim() || null, body.trim()]);
+                if (r.email) crownMailAsync(buildPortalMessageEmail(r.name, r.email, { marketing: true, subject: (subject || '').trim() }));
+                sent++;
+            } catch (e) { console.warn('[MARKETING] insert failed for lead', r.id, e.message); }
+        }
+        res.json({ success: true, sent });
+    } catch (e) {
+        console.error('[ADMIN] marketing broadcast error:', e.message);
+        res.status(500).json({ success: false, message: 'Could not send broadcast.' });
     }
 });
 
