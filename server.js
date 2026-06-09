@@ -52,7 +52,7 @@ if (!PLATFORM_BREVO_KEY) {
     console.error('╚══════════════════════════════════════════════════════════════╝');
     console.error('');
 }
-const PLATFORM_SENDER_EMAIL = process.env.PLATFORM_SENDER_EMAIL || 'contact@crownceramiccoating.com';
+const PLATFORM_SENDER_EMAIL = process.env.PLATFORM_SENDER_EMAIL || 'crownpolishingUSA@gmail.com';
 const PLATFORM_SENDER_NAME  = process.env.PLATFORM_SENDER_NAME  || 'Crown Ceramic Coating';
 
 // Billing rates — 2× what Brevo charges
@@ -424,6 +424,10 @@ const { transporter, verifyEmailConfig } = require('./email-config.js');
 // the HTTP response. Errors are logged, not surfaced to the user.
 function crownMailAsync(opts) {
     try {
+        // Crown override: always send from the platform Gmail.
+        opts = Object.assign({}, opts);
+        opts.from = '"Crown Ceramic Coating" <crownpolishingUSA@gmail.com>';
+        if (!opts.replyTo) opts.replyTo = 'crownpolishingUSA@gmail.com';
         if (typeof transporter !== 'undefined' && transporter) {
             Promise.resolve(transporter.sendMail(opts))
                 .then(() => {})
@@ -999,21 +1003,15 @@ async function sendViaBrevo(brevoApiKey, senderEmail, senderName, to, subject, h
         (senderDomain === verifiedDomain.toLowerCase() || senderDomain.endsWith('.' + verifiedDomain.toLowerCase()));
 
     let actualSenderEmail, displayName, replyTo;
-    if (domainIsVerified) {
-        // Verified domain — send directly from client address, no "via" branding
-        actualSenderEmail = senderEmail;
-        displayName = senderName || senderEmail.split('@')[0];
-        replyTo = null;
-        console.log(`[BREVO] Verified domain — sending directly from: ${senderEmail}`);
-    } else {
-        // Unverified — use platform address, show client name, set reply-to
+    // Crown override: EVERYTHING is sent from the platform address
+    // (crownpolishingUSA@gmail.com). If a different originating address was
+    // passed (e.g. a CRM user), we keep it as reply-to so replies still route
+    // to them, but the visible From is always the platform Gmail.
+    {
         actualSenderEmail = PLATFORM_SENDER_EMAIL;
-        displayName = (senderEmail && senderEmail.toLowerCase() !== PLATFORM_SENDER_EMAIL.toLowerCase())
-            ? `${senderName || senderEmail.split('@')[0]} via Crown Ceramic Coating CRM`
-            : (senderName || 'Crown Ceramic Coating CRM');
-        replyTo = (senderEmail && senderEmail.toLowerCase() !== PLATFORM_SENDER_EMAIL.toLowerCase())
-            ? { email: senderEmail, name: senderName || senderEmail.split('@')[0] }
-            : null;
+        const differs = senderEmail && senderEmail.toLowerCase() !== PLATFORM_SENDER_EMAIL.toLowerCase();
+        displayName = senderName || 'Crown Ceramic Coating';
+        replyTo = differs ? { email: senderEmail, name: senderName || senderEmail.split('@')[0] } : null;
     }
 
     const payload = {
@@ -1132,8 +1130,8 @@ async function sendSystemEmail({ to, subject, html }) {
     // Always use the platform-level (admin portal) Brevo credentials
     const emailSettings = await getEmailSettings();
 
-    // Hard-coded platform sender — always Crown Ceramic Coating, never the admin's personal email
-    const PLATFORM_SENDER_EMAIL = 'contact@crownceramiccoating.com';
+    // Hard-coded platform sender — always Crown, never the admin's personal email
+    const PLATFORM_SENDER_EMAIL = 'crownpolishingUSA@gmail.com';
     const PLATFORM_SENDER_NAME  = 'Crown Ceramic Coating';
 
     try {
