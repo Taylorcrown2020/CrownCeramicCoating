@@ -428,10 +428,17 @@ function crownMailAsync(opts) {
         opts = Object.assign({}, opts);
         opts.from = '"Crown Ceramic Coating" <crownpolishingUSA@gmail.com>';
         if (!opts.replyTo) opts.replyTo = 'crownpolishingUSA@gmail.com';
-        if (typeof transporter !== 'undefined' && transporter) {
+        // Prefer the platform Brevo path (the proven, configured sender). Only
+        // fall back to the nodemailer transporter if no Brevo key is present.
+        if (PLATFORM_BREVO_KEY) {
+            sendViaBrevo(PLATFORM_BREVO_KEY, PLATFORM_SENDER_EMAIL, PLATFORM_SENDER_NAME, opts.to, opts.subject, opts.html)
+                .catch(err => console.warn('[MAIL] Brevo send failed:', err && err.message));
+        } else if (typeof transporter !== 'undefined' && transporter) {
             Promise.resolve(transporter.sendMail(opts))
                 .then(() => {})
                 .catch(err => console.warn('[MAIL] background send failed:', err && err.message));
+        } else {
+            console.warn('[MAIL] No send path available (BREVO_API_KEY not set and no transporter).');
         }
     } catch (err) {
         console.warn('[MAIL] background send error:', err && err.message);
@@ -15037,11 +15044,20 @@ async function sendClientWelcomeEmail(email, name, temporaryPassword) {
     };
 
     try {
-        await transporter.sendMail(mailOptions);
+        if (PLATFORM_BREVO_KEY) {
+            await sendViaBrevo(PLATFORM_BREVO_KEY, PLATFORM_SENDER_EMAIL, PLATFORM_SENDER_NAME,
+                email, mailOptions.subject, mailOptions.html);
+        } else if (typeof transporter !== 'undefined' && transporter) {
+            mailOptions.from = `"${PLATFORM_SENDER_NAME}" <${PLATFORM_SENDER_EMAIL}>`;
+            await transporter.sendMail(mailOptions);
+        } else {
+            console.warn('[EMAIL] Welcome email NOT sent — no BREVO_API_KEY and no transporter configured.');
+            return;
+        }
         console.log('[EMAIL] Welcome email sent to:', email);
     } catch (error) {
-        console.error('[EMAIL] Failed to send welcome email:', error);
-        // Don't throw error - account creation should succeed even if email fails
+        console.error('[EMAIL] Failed to send welcome email:', error && error.message);
+        // Don't throw — account creation should still succeed even if email fails.
     }
 }
 
