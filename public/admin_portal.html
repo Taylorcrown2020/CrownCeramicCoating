@@ -3930,6 +3930,248 @@ body.graffiti-mode .content::after {
 }
 @keyframes gWiggle { 0%,100% { transform: rotate(-8deg) translateY(0); } 50% { transform: rotate(8deg) translateY(-10px); } }
 </style>
+<style id="crown-photo-overhaul">
+/* =====================================================================
+   CROWN ADMIN — PHOTO-MATCH OVERHAUL
+   Rebuilds the chrome to the clean SaaS template look in the references:
+   topbar with search + envelope/bell icons + profile, sparkline metric
+   cards with colored tops, solid pill nav, flat buttons, real mobile.
+   Token-driven so Light / Dark / Minimal all work. Scoped to
+   body.crown-2025 so it wins over the base + earlier redesign rules.
+   ===================================================================== */
+
+/* ---------- TOPBAR ---------- */
+body.crown-2025 .topbar {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 26px;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-subtle);
+    backdrop-filter: none;
+}
+body.crown-2025 .topbar-left { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+body.crown-2025 .topbar .page-header { margin: 0; }
+body.crown-2025 .topbar .page-title { font-size: 22px; font-weight: 700; }
+body.crown-2025 .topbar .page-title::before { display: none; }
+
+body.crown-2025 .topbar-search {
+    flex: 1;
+    max-width: 460px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg-tertiary);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 0 14px;
+    height: 42px;
+    transition: border-color .15s, background .15s;
+}
+body.crown-2025 .topbar-search:focus-within { background: var(--bg-primary); border-color: var(--accent); }
+body.crown-2025 .topbar-search svg { width: 17px; height: 17px; color: var(--text-muted); flex-shrink: 0; }
+body.crown-2025 .topbar-search input {
+    flex: 1; border: none; background: none; outline: none;
+    color: var(--text-primary); font-size: 14px; font-family: inherit;
+}
+body.crown-2025 .topbar-search input::placeholder { color: var(--text-muted); }
+
+body.crown-2025 .topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-shrink: 0; }
+body.crown-2025 .topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+body.crown-2025 .icon-btn {
+    position: relative;
+    width: 42px; height: 42px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    cursor: pointer; transition: all .15s ease;
+}
+body.crown-2025 .icon-btn:hover { color: var(--accent); border-color: var(--border-strong); background: var(--bg-hover); }
+body.crown-2025 .icon-btn svg { width: 19px; height: 19px; }
+body.crown-2025 .icon-badge {
+    position: absolute; top: -5px; right: -5px;
+    min-width: 18px; height: 18px; padding: 0 5px;
+    border-radius: 9px; background: #ef4444; color: #fff;
+    font-size: 10.5px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--bg-primary);
+}
+body.crown-2025 .topbar-profile { display: flex; align-items: center; gap: 10px; padding-left: 6px; }
+body.crown-2025 .tp-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-rust));
+    color: var(--accent-contrast);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px;
+}
+body.crown-2025 .tp-name { font-size: 13.5px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+body.crown-2025 .tp-role { font-size: 11.5px; color: var(--text-muted); }
+body.crown-2025 .mobile-nav-toggle {
+    display: none; width: 40px; height: 40px; border-radius: 10px; border: none;
+    background: var(--bg-tertiary); color: var(--text-primary); cursor: pointer;
+    align-items: center; justify-content: center;
+}
+body.crown-2025 .mobile-nav-toggle svg { width: 20px; height: 20px; }
+
+/* ---------- SIDEBAR (solid pill active, like the template) ---------- */
+body.crown-2025 .sidebar { border-right: 1px solid var(--border-subtle); }
+body.crown-2025 .sidebar::before { display: none; }
+body.crown-2025 .sidebar-header { border-bottom: 1px solid var(--border-subtle); }
+body.crown-2025 .logo-mark { box-shadow: none; border-radius: 12px; }
+body.crown-2025 .logo-mark::before { display: none; }
+body.crown-2025 .logo-title { background: none; -webkit-text-fill-color: var(--text-primary); color: var(--text-primary); font-weight: 800; }
+body.crown-2025 .logo-subtitle { color: var(--text-muted); letter-spacing: .14em; }
+body.crown-2025 .nav-section-title { color: var(--text-faint); font-weight: 700; letter-spacing: .12em; }
+body.crown-2025 .nav-section-title::after { display: none; }
+body.crown-2025 .nav-item {
+    border-radius: 11px; font-weight: 500; color: var(--text-secondary);
+    margin: 2px 0;
+}
+body.crown-2025 .nav-item:hover { transform: none; background: var(--bg-hover); color: var(--text-primary); }
+body.crown-2025 .nav-item.active {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    box-shadow: 0 6px 16px -6px var(--accent);
+    font-weight: 600;
+}
+body.crown-2025 .nav-item.active .nav-icon { color: var(--accent-contrast); opacity: 1; }
+body.crown-2025 .nav-item.active::before { display: none; }
+body.crown-2025 .nav-icon { opacity: .85; }
+body.crown-2025 .nav-badge {
+    background: var(--bg-tertiary); color: var(--text-secondary);
+    font-weight: 700; font-family: var(--font-display); border-radius: 8px;
+}
+body.crown-2025 .nav-item.active .nav-badge { background: rgba(255,255,255,.25); color: var(--accent-contrast); }
+body.crown-2025 .user-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 14px; }
+body.crown-2025 .sidebar-footer { border-top: 1px solid var(--border-subtle); background: none; }
+
+/* ---------- METRIC CARDS (Adm00n style: colored top + sparkline) ---------- */
+body.crown-2025 .stats-grid { gap: 18px; }
+body.crown-2025 .stat-card {
+    position: relative;
+    display: block;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    padding: 20px 22px 14px;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+body.crown-2025 .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--border-default); }
+body.crown-2025 .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; opacity: 1;
+    background: var(--card-accent, var(--accent));
+}
+body.crown-2025 .stat-card .stat-icon {
+    width: 38px; height: 38px; border-radius: 11px; float: right;
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    box-shadow: none; margin: 0;
+}
+body.crown-2025 .stat-card .stat-content { display: block; }
+body.crown-2025 .stat-card .stat-label {
+    font-size: 12.5px; color: var(--text-muted); font-weight: 600;
+    letter-spacing: .01em; margin-bottom: 8px; text-transform: none;
+}
+body.crown-2025 .stat-card .stat-value {
+    font-size: 30px; font-weight: 800; letter-spacing: -.03em;
+    color: var(--text-primary); -webkit-text-fill-color: var(--text-primary);
+    background: none; font-family: var(--font-display); line-height: 1.05;
+}
+body.crown-2025 .stat-card .stat-change { font-size: 12px; font-weight: 600; margin-top: 4px; }
+body.crown-2025 .stat-card .stat-change.positive { color: #16a34a; }
+body.crown-2025 .stat-card .stat-change.negative { color: #ef4444; }
+body.crown-2025 .stat-spark { display: block; width: 100%; height: 44px; margin-top: 12px; }
+
+/* per-card accent palette (cycles), like the reference dashboard */
+body.crown-2025 .stats-grid > .stat-card:nth-child(6n+1) { --card-accent: #4C6FFF; }
+body.crown-2025 .stats-grid > .stat-card:nth-child(6n+2) { --card-accent: #F5A623; }
+body.crown-2025 .stats-grid > .stat-card:nth-child(6n+3) { --card-accent: #FF5C6C; }
+body.crown-2025 .stats-grid > .stat-card:nth-child(6n+4) { --card-accent: #9B6DFF; }
+body.crown-2025 .stats-grid > .stat-card:nth-child(6n+5) { --card-accent: #2BB7B3; }
+body.crown-2025 .stats-grid > .stat-card:nth-child(6n+6) { --card-accent: #3FB950; }
+/* minimalist theme = monochrome card accents */
+body.crown-2025.theme-minimal .stat-card { --card-accent: var(--accent) !important; }
+body.crown-2025.theme-minimal .stat-card .stat-icon { background: var(--accent) !important; color: var(--accent-contrast) !important; }
+
+/* ---------- BUTTONS (flat & clean) ---------- */
+body.crown-2025 .btn { border-radius: 10px; font-weight: 600; }
+body.crown-2025 .btn-primary {
+    background: var(--accent); color: var(--accent-contrast);
+    border: none; box-shadow: 0 6px 16px -8px var(--accent);
+}
+body.crown-2025 .btn-primary:hover { filter: brightness(.94); transform: translateY(-1px); }
+body.crown-2025 .btn-secondary {
+    background: var(--bg-primary); color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+}
+body.crown-2025 .btn-secondary:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-strong); }
+
+/* ---------- CARDS / TABLES / SURFACES ---------- */
+body.crown-2025 .card, body.crown-2025 .content-box, body.crown-2025 .table-container {
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    border-radius: 16px; box-shadow: var(--shadow-sm);
+}
+body.crown-2025 .data-table thead { background: var(--bg-secondary); }
+body.crown-2025 .data-table thead th { color: var(--text-muted); font-weight: 700; letter-spacing: .02em; }
+body.crown-2025 .data-table tbody tr:hover { background: var(--bg-hover); }
+body.crown-2025 .filter-btn.active { background: var(--accent); color: var(--accent-contrast); }
+body.crown-2025 .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-amber-dim); }
+
+/* ---------- THEME PICKER (settings) ---------- */
+.theme-picker { display: inline-flex; background: var(--bg-tertiary); border-radius: 11px; padding: 4px; gap: 2px; }
+.theme-chip {
+    border: none; background: none; cursor: pointer;
+    padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    color: var(--text-secondary); font-family: inherit; transition: .15s;
+}
+.theme-chip.active { background: var(--bg-primary); color: var(--text-primary); box-shadow: var(--shadow-sm); }
+.accent-picker { display: inline-flex; gap: 10px; align-items: center; }
+.accent-dot {
+    width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+    background: var(--dot); border: 2px solid var(--bg-primary);
+    box-shadow: 0 0 0 1px var(--border-default); transition: .15s;
+}
+.accent-dot.active { box-shadow: 0 0 0 2px var(--accent); transform: scale(1.08); }
+
+/* ---------- MOBILE — proper responsive shell ---------- */
+.sidebar-backdrop { display: none; }
+@media (max-width: 1000px) { body.crown-2025 .topbar-search { display: none; } }
+@media (max-width: 768px) {
+    body.crown-2025 .mobile-nav-toggle { display: inline-flex; }
+    body.crown-2025 .sidebar {
+        left: 0;
+        transform: translateX(-100%);
+        transition: transform .26s cubic-bezier(.4,0,.2,1);
+        width: 270px; box-shadow: none; z-index: 10001;
+    }
+    body.crown-2025 .sidebar.open { transform: none; left: 0; box-shadow: 0 0 50px rgba(0,0,0,.35); }
+    body.crown-2025 .main-content { margin-left: 0; }
+    body.crown-2025 .sidebar-backdrop {
+        display: block; position: fixed; inset: 0; background: rgba(0,0,0,.45);
+        z-index: 99; opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    body.crown-2025 .sidebar-backdrop.show { opacity: 1; pointer-events: auto; }
+    body.crown-2025 .topbar { padding: 0 14px; gap: 10px; }
+    body.crown-2025 .topbar .page-title { font-size: 18px; }
+    body.crown-2025 .topbar-right { gap: 8px; }
+    body.crown-2025 .topbar-actions { display: none; }
+    body.crown-2025 .topbar-profile .tp-meta { display: none; }
+    body.crown-2025 .content { padding: 18px 14px; }
+    body.crown-2025 .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 12px; }
+    body.crown-2025 .stat-card { padding: 16px 16px 12px; }
+    body.crown-2025 .stat-card .stat-value { font-size: 24px; }
+    body.crown-2025 .stat-spark { height: 34px; }
+    body.crown-2025 .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    body.crown-2025 .data-table { min-width: 600px; }
+    body.crown-2025 .theme-picker { flex-wrap: wrap; }
+}
+@media (max-width: 480px) {
+    body.crown-2025 .stats-grid { grid-template-columns: 1fr !important; }
+    body.crown-2025 .tp-name, body.crown-2025 .tp-role { display: none; }
+}
+</style>
 </head>
 <body class="crown-2025">
 <!-- Sidebar -->
@@ -4171,14 +4413,20 @@ body.graffiti-mode .content::after {
     <!-- Main Content -->
     <main class="main-content">
         <header class="topbar">
-            <div class="page-header">
-                <h1 class="page-title" id="pageTitle">Dashboard</h1>
-            </div>
-            <div class="topbar-actions">
-                <button class="msg-trigger" id="msgTrigger" onclick="openMessenger()" aria-label="Messages" title="Messages">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                    <span class="msg-trigger-badge" id="msgTriggerBadge" style="display:none;">0</span>
+            <div class="topbar-left">
+                <button class="mobile-nav-toggle" onclick="toggleSidebar()" aria-label="Menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
+                <div class="page-header">
+                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                </div>
+            </div>
+            <div class="topbar-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input id="globalSearch" placeholder="Search something…" oninput="if(window.globalSearchInput)globalSearchInput(this.value)">
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-actions">
                 <button class="btn btn-secondary" onclick="openExportModal()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -4194,6 +4442,19 @@ body.graffiti-mode .content::after {
                     </svg>
                     Add Lead
                 </button>
+                </div>
+                <button class="icon-btn" id="msgTrigger" onclick="openMessenger()" aria-label="Messages" title="Messages">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+                    <span class="icon-badge" id="msgTriggerBadge" style="display:none;">0</span>
+                </button>
+                <button class="icon-btn" id="notifBtn" onclick="openMessenger()" aria-label="Notifications" title="Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    <span class="icon-badge" id="notifBadge" style="display:none;">0</span>
+                </button>
+                <div class="topbar-profile">
+                    <div class="tp-avatar">CC</div>
+                    <div class="tp-meta"><div class="tp-name">Crown Admin</div><div class="tp-role">Administrator</div></div>
+                </div>
             </div>
         </header>
         
@@ -4984,10 +5245,6 @@ async function renderSection(section) {
     const topbarActions = document.querySelector('.topbar-actions');
     if (topbarActions) {
         let actionButtons = `
-            <button class="msg-trigger" id="msgTrigger" onclick="openMessenger()" aria-label="Messages" title="Messages">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                <span class="msg-trigger-badge" id="msgTriggerBadge" style="display:none;">0</span>
-            </button>
             <button class="btn btn-secondary" onclick="openExportModal()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -11186,28 +11443,27 @@ function renderSettingsTabContent(tab) {
             <div class="settings-section">
                 <h3 class="settings-section-title">Appearance</h3>
                 <p class="settings-section-desc">Customize the look and feel</p>
-                
+
                 <div class="setting-row">
                     <div class="setting-info">
-                        <div class="setting-label">Dark Mode</div>
-                        <div class="setting-desc">Use dark theme across the app</div>
+                        <div class="setting-label">Theme</div>
+                        <div class="setting-desc">Choose your portal appearance</div>
                     </div>
-                    <label class="toggle">
-                        <input type="checkbox" ${state.settings.darkMode ? 'checked' : ''} onchange="toggleSetting('darkMode')">
-                        <span class="toggle-slider"></span>
-                    </label>
+                    <div class="theme-picker">
+                        ${['light','dark','minimal'].map(t=>`<button class="theme-chip ${((state.settings.theme||(state.settings.darkMode?'dark':'light'))===t)?'active':''}" onclick="setTheme('${t}')">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}
+                    </div>
                 </div>
-                
+
+                ${((state.settings.theme||'')==='minimal') ? `
                 <div class="setting-row">
                     <div class="setting-info">
-                        <div class="setting-label">Graffiti Mode</div>
-                        <div class="setting-desc">Add a fun, vibrant graffiti background to the CRM</div>
+                        <div class="setting-label">Accent color</div>
+                        <div class="setting-desc">A pop of color for the minimalist theme</div>
                     </div>
-                    <label class="toggle">
-                        <input type="checkbox" ${state.settings.graffitiMode ? 'checked' : ''} onchange="toggleSetting('graffitiMode')">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
+                    <div class="accent-picker">
+                        ${[['mono','#1A1A1A'],['red','#E5484D'],['green','#2E9E5B'],['yellow','#D99400']].map(([a,c])=>`<button class="accent-dot ${((state.settings.accent||'mono')===a)?'active':''}" onclick="setAccent('${a}')" title="${a}" style="--dot:${c}"></button>`).join('')}
+                    </div>
+                </div>` : ``}
             </div>
             
             <div class="settings-section">
@@ -13917,8 +14173,15 @@ async function showActivityLog() {
 function applySettings() {
     const R = document.documentElement.style;
     const set = (k, v) => R.setProperty(k, v);
-    if (state.settings.darkMode) {
-        // ---- Graphite Night (modern deep-slate + gold) ----
+    // Resolve theme: prefer explicit state.settings.theme; fall back to legacy darkMode flag.
+    let theme = state.settings.theme;
+    if (!theme) theme = state.settings.darkMode ? 'dark' : 'light';
+    const accent = state.settings.accent || 'mono';
+    const body = document.body;
+    body.classList.remove('light-mode', 'theme-minimal', 'graffiti-mode',
+        'accent-mono', 'accent-red', 'accent-green', 'accent-yellow');
+
+    if (theme === 'dark') {
         set('--bg-void', '#0E1117');     set('--bg-primary', '#151A22');
         set('--bg-secondary', '#1A2029'); set('--bg-tertiary', '#20262F');
         set('--bg-elevated', '#232A34');  set('--bg-hover', '#232B36');
@@ -13928,36 +14191,71 @@ function applySettings() {
         set('--border-subtle', 'rgba(255,255,255,0.06)');
         set('--border-default', 'rgba(255,255,255,0.10)');
         set('--border-strong', 'rgba(212,165,116,0.28)');
+        set('--accent', '#D4A574'); set('--accent-contrast', '#16130c');
         set('--accent-primary', '#D4A574'); set('--accent-amber', '#D4A574');
-        set('--accent-amber-dim', 'rgba(212,165,116,0.14)');
+        set('--accent-amber-dim', 'rgba(212,165,116,0.16)');
         set('--accent-amber-glow', 'rgba(212,165,116,0.25)');
         set('--accent-rust', '#B88F5F');
-        document.body.classList.remove('light-mode');
-    } else {
-        // ---- Detail-Bay Daylight (warm light, deep-gold accent) ----
-        set('--bg-void', '#F1EEE8');     set('--bg-primary', '#FFFFFF');
-        set('--bg-secondary', '#FAF8F3'); set('--bg-tertiary', '#F2EFE9');
-        set('--bg-elevated', '#FFFFFF');  set('--bg-hover', '#F4EEE2');
+    } else if (theme === 'minimal') {
+        // Clean, minimalist black & white — optional color accent.
+        const accents = {
+            mono:   { c: '#1A1A1A', contrast: '#FFFFFF', dim: 'rgba(0,0,0,0.06)' },
+            red:    { c: '#E5484D', contrast: '#FFFFFF', dim: 'rgba(229,72,77,0.10)' },
+            green:  { c: '#2E9E5B', contrast: '#FFFFFF', dim: 'rgba(46,158,91,0.10)' },
+            yellow: { c: '#D99400', contrast: '#1A1A1A', dim: 'rgba(217,148,0,0.12)' }
+        };
+        const a = accents[accent] || accents.mono;
+        set('--bg-void', '#FFFFFF');     set('--bg-primary', '#FFFFFF');
+        set('--bg-secondary', '#FAFAFA'); set('--bg-tertiary', '#F4F4F5');
+        set('--bg-elevated', '#FFFFFF');  set('--bg-hover', '#F4F4F5');
         set('--bg-card', '#FFFFFF');
-        set('--text-primary', '#1C1A16'); set('--text-secondary', '#5E5950');
-        set('--text-muted', '#8E897E');   set('--text-faint', '#B6B0A4');
-        set('--border-subtle', 'rgba(28,26,22,0.07)');
-        set('--border-default', 'rgba(28,26,22,0.12)');
-        set('--border-strong', 'rgba(168,123,44,0.30)');
-        set('--accent-primary', '#A87B2C'); set('--accent-amber', '#A87B2C');
-        set('--accent-amber-dim', 'rgba(168,123,44,0.12)');
-        set('--accent-amber-glow', 'rgba(168,123,44,0.22)');
-        set('--accent-rust', '#8A6321');
-        document.body.classList.add('light-mode');
-    }
-
-    // Apply graffiti mode
-    if (state.settings.graffitiMode) {
-        document.body.classList.add('graffiti-mode');
+        set('--text-primary', '#0E0E10'); set('--text-secondary', '#52525B');
+        set('--text-muted', '#8A8A92');   set('--text-faint', '#C4C4CC');
+        set('--border-subtle', 'rgba(0,0,0,0.07)');
+        set('--border-default', 'rgba(0,0,0,0.12)');
+        set('--border-strong', 'rgba(0,0,0,0.20)');
+        set('--accent', a.c); set('--accent-contrast', a.contrast);
+        set('--accent-primary', a.c); set('--accent-amber', a.c);
+        set('--accent-amber-dim', a.dim);
+        set('--accent-amber-glow', a.dim);
+        set('--accent-rust', a.c);
+        body.classList.add('light-mode', 'theme-minimal', 'accent-' + accent);
     } else {
-        document.body.classList.remove('graffiti-mode');
+        // Light (default) — clean white SaaS look, Crown gold accent.
+        set('--bg-void', '#F4F5F8');     set('--bg-primary', '#FFFFFF');
+        set('--bg-secondary', '#FAFAFB'); set('--bg-tertiary', '#F2F3F6');
+        set('--bg-elevated', '#FFFFFF');  set('--bg-hover', '#F4F5F8');
+        set('--bg-card', '#FFFFFF');
+        set('--text-primary', '#161A23'); set('--text-secondary', '#5A6072');
+        set('--text-muted', '#8A90A0');   set('--text-faint', '#B6BAC6');
+        set('--border-subtle', 'rgba(20,24,34,0.06)');
+        set('--border-default', 'rgba(20,24,34,0.10)');
+        set('--border-strong', 'rgba(184,134,11,0.30)');
+        set('--accent', '#B8860B'); set('--accent-contrast', '#FFFFFF');
+        set('--accent-primary', '#B8860B'); set('--accent-amber', '#B8860B');
+        set('--accent-amber-dim', 'rgba(184,134,11,0.10)');
+        set('--accent-amber-glow', 'rgba(184,134,11,0.20)');
+        set('--accent-rust', '#9A6F09');
+        body.classList.add('light-mode');
     }
+    state.settings.graffitiMode = false;
 }
+window.setTheme = function (t) {
+    state.settings.theme = t;
+    state.settings.darkMode = (t === 'dark');
+    applySettings();
+    try { localStorage.setItem('adminSettings', JSON.stringify(state.settings)); } catch (e) {}
+    if (typeof saveSettings === 'function') saveSettings();
+    if (state.currentSettingsTab) { const el = document.getElementById('settingsPanelContent'); if (el) el.innerHTML = renderSettingsTabContent(state.currentSettingsTab); }
+    if (window.enhanceStatCards) enhanceStatCards();
+};
+window.setAccent = function (a) {
+    state.settings.accent = a;
+    applySettings();
+    try { localStorage.setItem('adminSettings', JSON.stringify(state.settings)); } catch (e) {}
+    if (typeof saveSettings === 'function') saveSettings();
+    if (state.currentSettingsTab) { const el = document.getElementById('settingsPanelContent'); if (el) el.innerHTML = renderSettingsTabContent(state.currentSettingsTab); }
+};
 
 function loadSettings() {
     const saved = localStorage.getItem('adminSettings');
@@ -22717,6 +23015,92 @@ document.getElementById('subCancelModal').addEventListener('click', function(e) 
         setTimeout(loadMessengerData, 1800);
         setInterval(loadMessengerData, 60000);
     });
+})();
+</script>
+<script id="crown-overhaul-js">
+/* Sparkline decoration for metric cards (visual flourish like the template),
+   mobile sidebar drawer, and a lightweight global search. */
+(function () {
+    // ---- decorative sparklines on metric cards ----
+    const SPARKS = [
+        '4,30 16,22 28,26 40,14 52,20 64,8 76,16 88,6 100,12',
+        '4,26 16,28 28,18 40,24 52,12 64,18 76,10 88,16 100,6',
+        '4,22 16,12 28,18 40,10 52,16 64,22 76,14 88,20 100,10',
+        '4,14 16,20 28,10 40,18 52,8 64,16 76,6 88,14 100,4'
+    ];
+    function colorOf(card) {
+        const cs = getComputedStyle(card).getPropertyValue('--card-accent').trim();
+        return cs || getComputedStyle(document.body).getPropertyValue('--accent').trim() || '#4C6FFF';
+    }
+    function enhanceStatCards() {
+        document.querySelectorAll('body.crown-2025 .stat-card').forEach((card, i) => {
+            if (card.querySelector('.stat-spark')) {
+                // refresh color (theme may have changed)
+                const c = colorOf(card);
+                card.querySelectorAll('.stat-spark [data-stroke]').forEach(p => p.setAttribute('stroke', c));
+                card.querySelectorAll('.stat-spark [data-fill]').forEach(p => p.setAttribute('fill', c));
+                return;
+            }
+            const c = colorOf(card);
+            const pts = SPARKS[i % SPARKS.length];
+            const gid = 'spk' + Math.random().toString(36).slice(2, 8);
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'stat-spark');
+            svg.setAttribute('viewBox', '0 0 104 36');
+            svg.setAttribute('preserveAspectRatio', 'none');
+            svg.innerHTML =
+                `<defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${c}" stop-opacity="0.22"/>
+                    <stop offset="100%" stop-color="${c}" stop-opacity="0"/></linearGradient></defs>
+                 <polygon data-fill fill="url(#${gid})" points="${pts} 100,36 4,36"/>
+                 <polyline data-stroke fill="none" stroke="${c}" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" points="${pts}"/>`;
+            card.appendChild(svg);
+        });
+    }
+    window.enhanceStatCards = enhanceStatCards;
+
+    // watch the content area so cards in every section get decorated
+    function startObserver() {
+        const area = document.getElementById('contentArea') || document.body;
+        const obs = new MutationObserver(() => { clearTimeout(window.__sparkT); window.__sparkT = setTimeout(enhanceStatCards, 60); });
+        obs.observe(area, { childList: true, subtree: true });
+        enhanceStatCards();
+    }
+
+    // ---- mobile sidebar drawer ----
+    window.toggleSidebar = function () {
+        const sb = document.getElementById('sidebar') || document.querySelector('.sidebar');
+        if (!sb) return;
+        let bd = document.querySelector('.sidebar-backdrop');
+        if (!bd) { bd = document.createElement('div'); bd.className = 'sidebar-backdrop'; bd.onclick = window.toggleSidebar; document.body.appendChild(bd); }
+        const open = sb.classList.toggle('open');
+        bd.classList.toggle('show', open);
+    };
+    // close drawer after choosing a nav item on mobile
+    document.addEventListener('click', function (e) {
+        const item = e.target.closest && e.target.closest('.nav-item');
+        if (item && window.innerWidth <= 768) {
+            const sb = document.querySelector('.sidebar'); const bd = document.querySelector('.sidebar-backdrop');
+            if (sb) sb.classList.remove('open'); if (bd) bd.classList.remove('show');
+        }
+    });
+
+    // ---- lightweight global search: filters rows in the visible table ----
+    window.globalSearchInput = function (q) {
+        q = (q || '').toLowerCase().trim();
+        const rows = document.querySelectorAll('#contentArea .data-table tbody tr');
+        if (!rows.length) return;
+        rows.forEach(tr => { tr.style.display = (!q || tr.textContent.toLowerCase().includes(q)) ? '' : 'none'; });
+    };
+
+    // hide the legacy auto-injected mobile toggle (we have our own in the topbar)
+    const style = document.createElement('style');
+    style.textContent = '.mobile-menu-toggle{display:none!important;}';
+    document.head.appendChild(style);
+
+    if (document.readyState !== 'loading') startObserver();
+    else document.addEventListener('DOMContentLoaded', startObserver);
 })();
 </script>
 </body>
