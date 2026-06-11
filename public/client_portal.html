@@ -243,6 +243,28 @@ async function startApp(){
   await loadMessages();
   refreshMsgBadge();
   setInterval(refreshMsgBadge, 20000);
+  // --- Real-time messages: poll the thread itself, not just the unread badge ---
+  function _msgSig(){ return MESSAGES.length + '|' + (MESSAGES.length ? (MESSAGES[MESSAGES.length-1].id || MESSAGES[MESSAGES.length-1].created_at || '') : ''); }
+  let _lastMsgSig = _msgSig();
+  async function pollMessages(){
+    const link = document.querySelector('.nav-link[data-view="messages"]');
+    const onThread = !!(link && link.classList.contains('active'));
+    await loadMessages();
+    refreshMsgBadge();
+    if (onThread) {
+      const sig = _msgSig();
+      if (sig !== _lastMsgSig) {
+        const ta = document.getElementById('msgInput');
+        const draft = ta ? ta.value : '';
+        viewMessages();                       // re-render with new messages
+        const ta2 = document.getElementById('msgInput');
+        if (ta2 && draft) { ta2.value = draft; ta2.style.height='auto'; ta2.style.height=Math.min(ta2.scrollHeight,130)+'px'; }
+      }
+    }
+    _lastMsgSig = _msgSig();
+  }
+  setInterval(pollMessages, 7000);
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') pollMessages(); });
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') refreshMsgBadge(); });
   window.addEventListener('focus', refreshMsgBadge);
   nav('dashboard');

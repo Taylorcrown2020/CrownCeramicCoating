@@ -20047,6 +20047,15 @@ app.post('/api/brevo/sms-webhook', async (req, res) => {
                     VALUES ($1,$2,'inbound','sms',$3,$4,'received',NOW())
                 `, [lead.id, lead.client_portal_id, content, fromPhone]);
 
+                // Honor opt-out / opt-in keywords (SMS compliance).
+                const kw = String(content || '').trim().toUpperCase();
+                if (['STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT'].includes(kw)) {
+                    await pool.query(`ALTER TABLE leads ADD COLUMN IF NOT EXISTS sms_opt_out BOOLEAN DEFAULT FALSE`).catch(() => {});
+                    await pool.query(`UPDATE leads SET sms_opt_out=TRUE WHERE id=$1`, [lead.id]).catch(() => {});
+                } else if (['START', 'UNSTOP', 'YES'].includes(kw)) {
+                    await pool.query(`UPDATE leads SET sms_opt_out=FALSE WHERE id=$1`, [lead.id]).catch(() => {});
+                }
+
                 await pool.query(`
                     UPDATE leads SET last_contact_date=CURRENT_DATE, updated_at=CURRENT_TIMESTAMP WHERE id=$1
                 `, [lead.id]);
@@ -25317,8 +25326,20 @@ app.get('/api/admin/notifications', authenticateToken, async (req, res) => {
                 time: x.paid_at
             }));
         } catch (e) {}
+        // Inbound SMS replies (unread)
+        try {
+            const r = await pool.query(`
+                SELECT ml.id, ml.content, ml.sent_at, l.name
+                  FROM message_log ml LEFT JOIN leads l ON ml.lead_id = l.id
+                 WHERE ml.channel = 'sms' AND ml.direction = 'inbound' AND ml.read_at IS NULL
+                 ORDER BY ml.sent_at DESC LIMIT 15`);
+            r.rows.forEach(x => out.push({
+                type: 'lead', icon: 'lead', section: 'followups',
+                title: `New text reply${x.name ? ' from ' + x.name : ''}`,
+                detail: (x.content || '').slice(0, 80), time: x.sent_at
+            }));
+        } catch (e) {}
         out.sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
-        res.json({ success: true, notifications: out.slice(0, 30) });
     } catch (e) {
         console.error('[ADMIN] notifications error:', e.message);
         res.json({ success: true, notifications: [] });
@@ -25938,6 +25959,17 @@ app.post('/api/public/schedule', async (req, res) => {
             require('./crown-automation.js')({ app, pool, transporter, stripe });
         } catch (e) {
             console.error('[CROWN] Failed to initialize automation module:', e.message);
+        }
+
+        // ===== CROWN SMS (admin-side Brevo SMS: send, threads, config) =====
+        try {
+            require('./crown-sms.js')({
+                app, pool, authenticateToken,
+                sendSmsViaBrevo,
+                getBrevoKey: () => PLATFORM_BREVO_KEY
+            });
+        } catch (e) {
+            console.error('[CROWN-SMS] Failed to initialize SMS module:', e.message);
         }
 
         // ----- 404 + ERROR HANDLERS (registered LAST, after all routes) -----

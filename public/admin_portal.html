@@ -4884,6 +4884,12 @@ async function updateBadges() {
     document.getElementById('contactedBadge').textContent = c;
     document.getElementById('invoicesBadge').textContent = unpaidInvoices;
 
+    // Synchronous fallback so the Client Portal badge isn't stuck at 0 before the fetch returns
+    if (Array.isArray(state.clientAccounts) && state.clientAccounts.length) {
+        const cpBadge = document.getElementById('clientPortalBadge');
+        if (cpBadge) cpBadge.textContent = state.clientAccounts.filter(c => c.is_active).length;
+    }
+
     // Always fetch fresh customer + client portal counts from server — never trust stale state
     try {
         const token = authToken || localStorage.getItem('adminToken');
@@ -11325,13 +11331,6 @@ async function openInvoiceDetail(invoiceId) {
 function renderTasks(content) {
     content.innerHTML = `
         <div class="controls-bar">
-            <div class="search-box">
-                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="m21 21-4.35-4.35"/>
-                </svg>
-                <input type="text" class="search-input" placeholder="Search tasks...">
-            </div>
             <button class="btn btn-primary" onclick="openCreateModal('task')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19"/>
@@ -11416,6 +11415,7 @@ function renderSettings(content) {
             </div>
         </div>
     `;
+    if (state.currentSettingsTab === 'notifications') setTimeout(loadSmsConfigIntoUI, 0);
 }
 
 function renderSettingsTabContent(tab) {
@@ -11523,6 +11523,32 @@ function renderSettingsTabContent(tab) {
                         </svg>
                         Save Brevo Configuration
                     </button>
+                </div>
+
+                <!-- ===== SMS (Text Messaging) via Brevo ===== -->
+                <div style="margin-top: 24px; padding: 20px; background: var(--bg-tertiary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                    <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">SMS / Text Messaging</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Texts send through your Brevo account using the server's API key. Set the sender your customers see, and choose what sends automatically.</div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 13px;">SMS Sender ID</label>
+                        <input type="text" id="smsSenderId" maxlength="15" placeholder="Crown" style="width: 100%; padding: 10px; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary); font-size: 13px;">
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">A name (max 11 letters, e.g. &ldquo;Crown&rdquo;) or a Brevo-purchased number. Alphanumeric IDs can&rsquo;t receive replies in some regions &mdash; use a number if you want two-way texting everywhere.</div>
+                    </div>
+                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; cursor: pointer;">
+                        <input type="checkbox" id="smsEnabled"> Enable SMS sending
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; cursor: pointer;">
+                        <input type="checkbox" id="smsAutoFollowups"> Send follow-up texts automatically
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-size: 13px; cursor: pointer;">
+                        <input type="checkbox" id="smsAutoMarketing"> Send marketing texts automatically
+                    </label>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 13px;">Automatic follow-up text</label>
+                        <textarea id="smsFollowupText" rows="3" placeholder="Hi {{name}}, it's Crown Ceramic Coating following up — still interested in protecting your vehicle? Reply STOP to opt out." style="width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary); font-size: 13px; font-family: inherit; resize: vertical;"></textarea>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Sent automatically to due follow-up leads with a phone number (when the toggle above is on). Use {{name}} to personalize. Always include an opt-out like &ldquo;Reply STOP&rdquo;.</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSmsConfig()" style="width: 100%;">Save SMS Settings</button>
                 </div>
             </div>
         `;
@@ -11739,6 +11765,7 @@ function renderSettingsTabContent(tab) {
 function switchSettingsTab(tab) {
     state.currentSettingsTab = tab;
     document.getElementById('settingsPanelContent').innerHTML = renderSettingsTabContent(tab);
+    if (tab === 'notifications') setTimeout(loadSmsConfigIntoUI, 0);
     
     // Update nav items
     document.querySelectorAll('.settings-nav-item').forEach(item => {
@@ -13936,6 +13963,52 @@ async function saveBrevoConfig() {
     
     await saveSettings();
     showToast('Brevo configuration saved successfully', 'success');
+}
+
+// ----- SMS configuration (sender id + automation flags) -----
+async function loadSmsConfigIntoUI() {
+    const senderEl = document.getElementById('smsSenderId');
+    if (!senderEl) return; // SMS section not on screen
+    try {
+        const token = authToken || localStorage.getItem('adminToken');
+        const res = await fetch(`${API_URL}/api/admin/sms/config`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success && data.config) {
+            const c = data.config;
+            senderEl.value = c.smsSenderId || '';
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.checked = !!v; };
+            set('smsEnabled', c.smsEnabled);
+            set('smsAutoFollowups', c.autoFollowups);
+            set('smsAutoMarketing', c.autoMarketing);
+            const ft = document.getElementById('smsFollowupText'); if (ft) ft.value = c.followupText || '';
+            if (!c.brevoKeySet) {
+                showToast('Heads up: BREVO_API_KEY is not set on the server — texts won\u2019t send until it is.', 'error');
+            }
+        }
+    } catch (e) { /* non-fatal */ }
+}
+
+async function saveSmsConfig() {
+    const token = authToken || localStorage.getItem('adminToken');
+    const body = {
+        smsSenderId:   (document.getElementById('smsSenderId')?.value || '').trim(),
+        smsEnabled:     document.getElementById('smsEnabled')?.checked || false,
+        autoFollowups:  document.getElementById('smsAutoFollowups')?.checked || false,
+        autoMarketing:  document.getElementById('smsAutoMarketing')?.checked || false,
+        followupText:  (document.getElementById('smsFollowupText')?.value || '').trim()
+    };
+    try {
+        const res = await fetch(`${API_URL}/api/admin/sms/config`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.success) showToast('SMS settings saved.', 'success');
+        else showToast(data.message || 'Could not save SMS settings.', 'error');
+    } catch (e) {
+        showToast('Network error saving SMS settings.', 'error');
+    }
 }
 
 function openChangePasswordModal() {
@@ -20588,7 +20661,8 @@ async function renderFollowUps(content) {
         const token = state.authToken || localStorage.getItem('adminToken');
         const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
 
-        // Fetch leads due for follow-up AND all leads to get total counts
+        // Kick the automatic-SMS cadence (server dedups; safe to call on each visit).
+        fetch(`${API_URL}/api/admin/sms/run-due`, { method: 'POST', headers }).catch(() => {});
         const [tempResponse, deadResponse, allLeadsResponse] = await Promise.all([
             fetch(`${API_URL}/api/follow-ups/by-temperature`, { headers }),
             fetch(`${API_URL}/api/follow-ups/dead-leads`, { headers }),
@@ -20857,6 +20931,12 @@ function buildFollowUpTabContent(tab, hotLeads, coldLeads, deadLeads) {
                             </svg>
                             Email
                         </button>
+                        <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); openSmsThread(${lead.id}, '${escapedName}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                            </svg>
+                            Text
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -20885,6 +20965,12 @@ function buildFollowUpTabContent(tab, hotLeads, coldLeads, deadLeads) {
                             <polyline points="22,6 12,13 2,6"/>
                         </svg>
                         Email All
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="openSmsBlast('${isHot ? 'hot_leads' : 'cold_leads'}', '${isHot ? 'Hot Leads' : 'Cold Leads'}', ${leads.length})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                        </svg>
+                        Text All
                     </button>
                 </div>
             </div>
@@ -21981,6 +22067,17 @@ async function renderMarketing(content) {
             <div style="background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:28px;margin-bottom:24px;">
                 <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:16px;">2 · Compose</div>
 
+                <div style="display:flex;gap:8px;margin-bottom:18px;">
+                    <button type="button" id="mktChEmail" class="btn btn-sm btn-primary" onclick="selectMktChannel('email')">Email</button>
+                    <button type="button" id="mktChSms" class="btn btn-sm btn-secondary" onclick="selectMktChannel('sms')">Text Message</button>
+                </div>
+
+                <div id="mktSmsWrap" style="display:none;margin-bottom:16px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Text Message</label>
+                    <textarea id="mktSmsBody" rows="5" placeholder="Write your text… Use {{name}} to personalize." style="width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border-default);background:var(--bg-tertiary);color:var(--text-primary);font-size:14px;font-family:var(--font-display);resize:vertical;box-sizing:border-box;"></textarea>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">No subject or template needed for texts. Contacts who replied STOP are skipped automatically. Standard message rates apply.</div>
+                </div>
+
                 <div style="margin-bottom:16px;">
                     <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Template</label>
                     <select id="mktTemplate" onchange="onMktTemplateChange()" style="width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border-default);background:var(--bg-tertiary);color:var(--text-primary);font-size:14px;">
@@ -22014,12 +22111,108 @@ async function renderMarketing(content) {
                     Send Marketing Blast
                 </button>
             </div>
+
+            <!-- Automatic recurring texts -->
+            <div style="background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:28px;margin-top:24px;">
+                <div style="font-size:18px;font-weight:800;margin:0 0 4px;">Automatic Texts</div>
+                <p style="color:var(--text-secondary);font-size:13px;margin:0 0 8px;">Turn a group on to text it on a repeating schedule. Requires &ldquo;Send marketing texts automatically&rdquo; to be enabled in Settings &rarr; Brevo. Only contacts with a phone number who haven&rsquo;t opted out are texted.</p>
+                <div id="mktAutoMasterNote" style="display:none;font-size:12px;color:var(--status-lost,#c0392b);margin-bottom:12px;">Master switch is OFF — turn on &ldquo;Send marketing texts automatically&rdquo; in Settings for these to run.</div>
+                <div id="mktAutoList" style="display:flex;flex-direction:column;gap:14px;margin-bottom:16px;"><div style="color:var(--text-muted);font-size:13px;">Loading…</div></div>
+                <button class="btn btn-primary" onclick="saveMktAuto()">Save Automatic Texts</button>
+            </div>
         </div>
     `;
 
     // Store data in state for use in send
     state.mktAudiences = audiences;
     state.mktSelectedAudience = null;
+    state.mktChannel = 'email';
+    loadMktAuto();
+}
+
+function selectMktChannel(ch) {
+    state.mktChannel = ch;
+    const isSms = ch === 'sms';
+    // Toggle the two channel buttons
+    const eBtn = document.getElementById('mktChEmail'), sBtn = document.getElementById('mktChSms');
+    if (eBtn) eBtn.className = 'btn btn-sm ' + (isSms ? 'btn-secondary' : 'btn-primary');
+    if (sBtn) sBtn.className = 'btn btn-sm ' + (isSms ? 'btn-primary' : 'btn-secondary');
+    // Email-only fields (wrappers of the template + subject selects, plus custom body + note)
+    const tplWrap = document.getElementById('mktTemplate')?.closest('div');
+    const subWrap = document.getElementById('mktSubject')?.closest('div');
+    const customWrap = document.getElementById('mktCustomBodyWrap');
+    const note = document.getElementById('mktTemplateNote');
+    [tplWrap, subWrap].forEach(el => { if (el) el.style.display = isSms ? 'none' : ''; });
+    const smsWrap = document.getElementById('mktSmsWrap');
+    if (smsWrap) smsWrap.style.display = isSms ? 'block' : 'none';
+    if (isSms) {
+        if (customWrap) customWrap.style.display = 'none';
+        if (note) note.style.display = 'none';
+    } else {
+        // Restore email field visibility based on the selected template
+        if (typeof onMktTemplateChange === 'function') onMktTemplateChange();
+    }
+    // Update send button label
+    const btn = document.getElementById('mktSendBtn');
+    if (btn) btn.innerHTML = isSms
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> Send Text Blast'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Marketing Blast';
+    // Refresh the summary line for the chosen channel
+    if (state.mktSelectedAudience) selectMktAudience(state.mktSelectedAudience);
+}
+
+const MKT_AUTO_LABELS = { all_leads:'All Leads', hot_leads:'Hot Leads', cold_leads:'Cold Leads', all_customers:'All Customers', everyone:'Everyone' };
+
+async function loadMktAuto() {
+    const list = document.getElementById('mktAutoList');
+    if (!list) return;
+    try {
+        const token = state.authToken || localStorage.getItem('adminToken');
+        const res = await fetch(`${API_URL}/api/admin/sms/marketing-auto`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        if (!data.success) { list.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">Could not load.</div>'; return; }
+        const note = document.getElementById('mktAutoMasterNote');
+        if (note) note.style.display = data.masterEnabled ? 'none' : 'block';
+        list.innerHTML = (data.rules || []).map(r => `
+            <div style="border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;background:var(--bg-secondary);" data-aud="${r.audience}">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
+                    <label style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;cursor:pointer;">
+                        <input type="checkbox" class="mktAutoOn" ${r.isActive ? 'checked' : ''}> ${MKT_AUTO_LABELS[r.audience] || r.audience}
+                    </label>
+                    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);">
+                        every <input type="number" min="1" class="mktAutoInterval" value="${r.intervalDays || 14}" style="width:58px;padding:5px 8px;border:1px solid var(--border-default);border-radius:6px;background:var(--bg-tertiary);color:var(--text-primary);font-size:13px;"> days
+                    </div>
+                </div>
+                <textarea class="mktAutoMsg" rows="2" placeholder="Text for this group… Use {{name}} to personalize." style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid var(--border-default);border-radius:8px;background:var(--bg-tertiary);color:var(--text-primary);font-size:13px;font-family:inherit;resize:vertical;">${(r.message || '').replace(/</g,'&lt;')}</textarea>
+                ${r.lastRunAt ? `<div style="font-size:11px;color:var(--text-faint);margin-top:6px;">Last sent ${new Date(r.lastRunAt).toLocaleString()}</div>` : ''}
+            </div>
+        `).join('');
+    } catch (e) {
+        list.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">Could not load.</div>';
+    }
+}
+
+async function saveMktAuto() {
+    const rows = Array.from(document.querySelectorAll('#mktAutoList [data-aud]'));
+    const rules = rows.map(row => ({
+        audience: row.dataset.aud,
+        isActive: row.querySelector('.mktAutoOn')?.checked || false,
+        intervalDays: parseInt(row.querySelector('.mktAutoInterval')?.value || '14', 10),
+        message: (row.querySelector('.mktAutoMsg')?.value || '').trim()
+    }));
+    const active = rules.filter(r => r.isActive);
+    if (active.some(r => !r.message)) { showToast('Add a message for each group you turn on.', 'error'); return; }
+    try {
+        const token = state.authToken || localStorage.getItem('adminToken');
+        const res = await fetch(`${API_URL}/api/admin/sms/marketing-auto`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rules })
+        });
+        const data = await res.json();
+        if (data.success) showToast('Automatic texts saved.', 'success');
+        else showToast(data.message || 'Could not save.', 'error');
+    } catch (e) { showToast('Network error saving automatic texts.', 'error'); }
 }
 
 function selectMktAudience(key) {
@@ -22034,7 +22227,11 @@ function selectMktAudience(key) {
     const a = state.mktAudiences.find(x => x.key === key);
     const summaryEl = document.getElementById('mktSendSummary');
     if (summaryEl && a) {
-        summaryEl.innerHTML = `Ready to send to <strong style="color:var(--text-primary);">${a.count} recipient${a.count !== 1 ? 's' : ''}</strong> — ${a.label}. Each recipient receives an individual personalized email.`;
+        if (state.mktChannel === 'sms') {
+            summaryEl.innerHTML = `Ready to text <strong style="color:var(--text-primary);">${a.label}</strong> (${a.count} in this group). Only contacts with a phone number receive a text; those without one — or who replied STOP — are skipped automatically.`;
+        } else {
+            summaryEl.innerHTML = `Ready to send to <strong style="color:var(--text-primary);">${a.count} recipient${a.count !== 1 ? 's' : ''}</strong> — ${a.label}. Each recipient receives an individual personalized email.`;
+        }
     }
 }
 
@@ -22073,11 +22270,42 @@ function onMktTemplateChange() {
 
 async function sendMarketingBlast() {
     const audience = state.mktSelectedAudience;
+    if (!audience) { showToast('Please select an audience first.', 'error'); return; }
+
+    // ---- SMS channel ----
+    if (state.mktChannel === 'sms') {
+        const smsBody = document.getElementById('mktSmsBody')?.value?.trim();
+        if (!smsBody) { showToast('Please write a text message.', 'error'); return; }
+        const a = state.mktAudiences.find(x => x.key === audience);
+        if (!confirm(`Send this text to everyone in "${a?.label}" who has a phone number?\n\nThis sends immediately and can't be undone.`)) return;
+        const btn = document.getElementById('mktSendBtn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+        try {
+            const token = state.authToken || localStorage.getItem('adminToken');
+            const res = await fetch(`${API_URL}/api/admin/sms/blast`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ audience, message: smsBody })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                showToast(`✅ Sent ${data.sent} text${data.sent === 1 ? '' : 's'}.${data.skipped ? ' ' + data.skipped + ' skipped.' : ''}`, 'success');
+            } else {
+                showToast('Failed: ' + (data.message || 'Unknown error'), 'error');
+            }
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        } finally {
+            if (btn) { btn.disabled = false; selectMktChannel('sms'); }
+        }
+        return;
+    }
+
+    // ---- Email channel ----
     const template = document.getElementById('mktTemplate')?.value;
     const subject = document.getElementById('mktSubject')?.value?.trim();
     const body = document.getElementById('mktBody')?.value?.trim();
 
-    if (!audience) { showToast('Please select an audience first.', 'error'); return; }
     if (!template) { showToast('Please select a template.', 'error'); return; }
     if (!subject) { showToast('Please enter a subject line.', 'error'); return; }
     if (template === 'custom' && !body) { showToast('Please write a message body.', 'error'); return; }
@@ -22785,18 +23013,31 @@ document.getElementById('subCancelModal').addEventListener('click', function(e) 
             MSG.totalUnread = MSG.convos.reduce((s, c) => s + (Number(c.unread) || 0), 0);
             MSG.loaded = true;
             updateMsgBadges();
+            refreshSmsUnread();
             if (document.querySelector('.msg-overlay.open')) renderConvoList();
         } catch (e) { /* offline */ }
     }
     window.loadMessengerData = loadMessengerData;
     window.refreshMsgBadge = function () { try { updateMsgBadges(); } catch (e) {} };
 
+    async function refreshSmsUnread() {
+        const token = tok(); if (!token) return;
+        try {
+            const res = await fetch(`${API_URL}/api/admin/sms/unread-count`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            MSG.smsUnread = (data && data.count) || 0;
+            updateMsgBadges();
+        } catch (e) { /* offline */ }
+    }
+    window.refreshSmsBadge = refreshSmsUnread;
+
     function updateMsgBadges() {
-        const n = MSG.totalUnread;
-        ['msgTriggerBadge', 'notifBadge'].forEach(id => {
-            const b = document.getElementById(id);
-            if (b) { b.textContent = n > 99 ? '99+' : n; b.style.display = n > 0 ? 'flex' : 'none'; }
-        });
+        const portal = MSG.totalUnread || 0;
+        const env = portal + (MSG.smsUnread || 0);   // envelope = portal messages + unread texts
+        const tb = document.getElementById('msgTriggerBadge');
+        if (tb) { tb.textContent = env > 99 ? '99+' : env; tb.style.display = env > 0 ? 'flex' : 'none'; }
+        const nb = document.getElementById('notifBadge');
+        if (nb) { nb.textContent = portal > 99 ? '99+' : portal; nb.style.display = portal > 0 ? 'flex' : 'none'; }
     }
 
     function ensureOverlay() {
@@ -23212,7 +23453,8 @@ window.sendPortalBroadcast = async function () {
     // ---- LIVE REFRESH: poll faster + refresh instantly when tab regains focus ----
     function refreshAll() {
         if (window.loadMessengerData) loadMessengerData();   // envelope badge
-        if (window.refreshAuxBadges) refreshAuxBadges();      // sidebar tab badges
+        if (window.updateBadges) updateBadges();              // leads / clients / follow-ups / invoices nav badges
+        if (window.refreshAuxBadges) refreshAuxBadges();      // service / schedule / setup-call / subscription badges
         loadNotifications();                                  // bell badge
     }
     window.crownRefreshAll = refreshAll;
@@ -23239,5 +23481,180 @@ window.sendPortalBroadcast = async function () {
 .notif-d{font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .notif-tm{font-size:11px;color:var(--text-faint);flex-shrink:0;}
 </style>
+
+<style id="crown-sms-css">
+/* ===== SMS conversation (iMessage-style) + bulk blast ===== */
+.sms-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:10000;}
+.sms-modal{width:420px;max-width:94vw;height:620px;max-height:90vh;background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:18px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.35);}
+.sms-head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border-subtle);background:var(--bg-secondary);}
+.sms-head .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#e0bd6e,#caa14a);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
+.sms-head .who{flex:1;min-width:0;}
+.sms-head .who .n{font-weight:700;font-size:14px;color:var(--text-primary);}
+.sms-head .who .s{font-size:11px;color:var(--text-muted);}
+.sms-head .x{background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:var(--text-muted);}
+.sms-feed{flex:1;overflow-y:auto;padding:18px 14px;display:flex;flex-direction:column;gap:3px;background:var(--bg-primary);}
+.sms-day{align-self:center;font-size:11px;color:var(--text-faint);margin:10px 0 6px;}
+.sms-bub{max-width:74%;padding:9px 13px;border-radius:18px;font-size:14px;line-height:1.4;word-wrap:break-word;white-space:pre-wrap;}
+.sms-bub.them{align-self:flex-start;background:var(--bg-tertiary);color:var(--text-primary);border-bottom-left-radius:5px;}
+.sms-bub.me{align-self:flex-end;background:linear-gradient(135deg,#e0bd6e,#caa14a);color:#fff;border-bottom-right-radius:5px;}
+.sms-meta{font-size:10.5px;color:var(--text-faint);margin:1px 2px 8px;}
+.sms-meta.me{align-self:flex-end;}
+.sms-meta.them{align-self:flex-start;}
+.sms-compose{display:flex;gap:8px;align-items:flex-end;padding:12px 14px;border-top:1px solid var(--border-subtle);background:var(--bg-secondary);}
+.sms-compose textarea{flex:1;resize:none;max-height:120px;padding:10px 14px;border:1px solid var(--border-default);border-radius:20px;background:var(--bg-primary);color:var(--text-primary);font-size:14px;font-family:inherit;}
+.sms-send{flex-shrink:0;width:38px;height:38px;border:none;border-radius:50%;background:linear-gradient(135deg,#e0bd6e,#caa14a);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.sms-send:disabled{opacity:.5;cursor:default;}
+.sms-empty{margin:auto;text-align:center;color:var(--text-muted);font-size:13px;padding:0 24px;}
+.sms-optout{margin:auto;text-align:center;color:var(--status-lost,#c0392b);font-size:12.5px;padding:14px 20px;background:var(--bg-tertiary);border-radius:12px;}
+</style>
+
+<script id="crown-sms-ui">
+(function () {
+  const tok = () => (typeof getAuthToken === 'function' ? getAuthToken() : (window.authToken || localStorage.getItem('adminToken')));
+  const H = () => ({ 'Authorization': `Bearer ${tok()}`, 'Content-Type': 'application/json' });
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  const initials = (n) => (n || 'CC').trim().split(/\s+/).map(s => s[0]).slice(0,2).join('').toUpperCase() || 'CC';
+  function fmtTime(d){ if(!d) return ''; const t=new Date(d); if(isNaN(t)) return ''; return t.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }
+  function fmtDay(d){ if(!d) return ''; const t=new Date(d), now=new Date(); if(isNaN(t)) return '';
+    if(t.toDateString()===now.toDateString()) return 'Today';
+    const diff=Math.round((now-t)/86400000); if(diff===1) return 'Yesterday';
+    return t.toLocaleDateString([], {month:'long',day:'numeric'}); }
+
+  let CUR = { leadId:null, name:'', poll:null, sig:'', optOut:false };
+
+  function sig(msgs){ return msgs.length + '|' + (msgs.length ? (msgs[msgs.length-1].id || msgs[msgs.length-1].sent_at) : ''); }
+
+  function feedHTML(msgs){
+    if(!msgs.length) return `<div class="sms-empty">No texts yet. Send the first message below.</div>`;
+    let lastDay='', out='';
+    msgs.forEach(m => {
+      const day = fmtDay(m.sent_at);
+      if(day && day!==lastDay){ out += `<div class="sms-day">${esc(day)}</div>`; lastDay=day; }
+      const me = m.direction==='outbound';
+      out += `<div class="sms-bub ${me?'me':'them'}">${esc(m.content)}</div>`;
+      out += `<div class="sms-meta ${me?'me':'them'}">${me?'Sent':'Reply'} · ${esc(fmtTime(m.sent_at))}</div>`;
+    });
+    return out;
+  }
+
+  async function load(){
+    try{
+      const d = await (await fetch(`${API_URL}/api/admin/leads/${CUR.leadId}/sms-thread`, { headers: H() })).json();
+      if(!d.success) return null;
+      CUR.optOut = !!(d.lead && d.lead.sms_opt_out);
+      return d;
+    }catch(e){ return null; }
+  }
+
+  function paint(d){
+    const feed = document.getElementById('smsFeed'); if(!feed) return;
+    const msgs = (d && d.messages) || [];
+    const newSig = sig(msgs);
+    if(newSig === CUR.sig) return;       // nothing changed — don't disrupt
+    const ta = document.getElementById('smsInput'); const draft = ta ? ta.value : '';
+    feed.innerHTML = feedHTML(msgs);
+    feed.scrollTop = feed.scrollHeight;
+    const ta2 = document.getElementById('smsInput'); if(ta2 && draft){ ta2.value = draft; }
+    CUR.sig = newSig;
+    // opt-out lock
+    const comp = document.getElementById('smsCompose');
+    if(comp){
+      if(CUR.optOut){ comp.innerHTML = `<div class="sms-optout">This contact replied STOP and has opted out of texts. You can't message them until they reply START.</div>`; }
+    }
+  }
+
+  window.openSmsThread = async function(leadId, name){
+    CUR = { leadId, name: name || '', poll:null, sig:'', optOut:false };
+    const ov = document.createElement('div');
+    ov.className = 'sms-overlay'; ov.id = 'smsOverlay';
+    ov.innerHTML = `
+      <div class="sms-modal" onclick="event.stopPropagation()">
+        <div class="sms-head">
+          <div class="av">${esc(initials(name))}</div>
+          <div class="who"><div class="n">${esc(name || 'Lead')}</div><div class="s">Text message · Crown Ceramic Coating</div></div>
+          <button class="x" onclick="closeSmsThread()">&times;</button>
+        </div>
+        <div class="sms-feed" id="smsFeed"><div class="sms-empty">Loading…</div></div>
+        <div class="sms-compose" id="smsCompose">
+          <textarea id="smsInput" rows="1" placeholder="Text message…"
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendSmsInThread();}"></textarea>
+          <button class="sms-send" id="smsSendBtn" onclick="sendSmsInThread()" aria-label="Send">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>`;
+    ov.onclick = closeSmsThread;
+    document.body.appendChild(ov);
+
+    const d = await load(); paint(d);
+    // mark inbound read
+    fetch(`${API_URL}/api/admin/leads/${leadId}/sms-thread/read`, { method:'POST', headers: H() }).catch(()=>{});
+    // poll for replies while open
+    CUR.poll = setInterval(async () => { paint(await load()); }, 7000);
+  };
+
+  window.closeSmsThread = function(){
+    if(CUR.poll) clearInterval(CUR.poll);
+    const ov = document.getElementById('smsOverlay'); if(ov) ov.remove();
+    if(window.refreshSmsBadge) window.refreshSmsBadge();
+  };
+
+  window.sendSmsInThread = async function(){
+    const inp = document.getElementById('smsInput'); const txt = (inp?.value || '').trim(); if(!txt) return;
+    const btn = document.getElementById('smsSendBtn'); if(btn) btn.disabled = true;
+    try{
+      const r = await fetch(`${API_URL}/api/admin/leads/${CUR.leadId}/send-sms`, { method:'POST', headers: H(), body: JSON.stringify({ message: txt }) });
+      const d = await r.json();
+      if(r.ok && d.success){
+        if(inp){ inp.value=''; inp.style.height='auto'; }
+        CUR.sig=''; paint(await load());
+      } else {
+        if(typeof showToast==='function') showToast(d.message || 'Could not send text.', 'error');
+        else alert(d.message || 'Could not send text.');
+      }
+    }catch(e){ if(typeof showToast==='function') showToast('Network error sending text.', 'error'); }
+    finally{ if(btn) btn.disabled = false; }
+  };
+
+  /* ----- Bulk SMS blast modal ----- */
+  window.openSmsBlast = function(audience, label, count){
+    const ov = document.createElement('div');
+    ov.className='sms-overlay'; ov.id='smsBlastOverlay';
+    ov.innerHTML = `
+      <div class="sms-modal" style="height:auto;max-height:80vh;" onclick="event.stopPropagation()">
+        <div class="sms-head">
+          <div class="who"><div class="n">Text ${esc(label || 'Audience')}</div><div class="s">${count} recipient${count==1?'':'s'} with a phone number</div></div>
+          <button class="x" onclick="closeSmsBlast()">&times;</button>
+        </div>
+        <div style="padding:18px 18px 6px;">
+          <textarea id="smsBlastBody" rows="5" placeholder="Write your text… Use {{name}} to personalize." style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid var(--border-default);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:14px;font-family:inherit;resize:vertical;"></textarea>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">Contacts who replied STOP are skipped automatically. Standard message rates apply.</div>
+        </div>
+        <div class="sms-compose" style="justify-content:flex-end;">
+          <button class="btn btn-secondary" onclick="closeSmsBlast()">Cancel</button>
+          <button class="btn btn-primary" id="smsBlastBtn" onclick="sendSmsBlast('${audience}', ${count})">Send Texts</button>
+        </div>
+      </div>`;
+    ov.onclick = closeSmsBlast;
+    document.body.appendChild(ov);
+  };
+  window.closeSmsBlast = function(){ const ov=document.getElementById('smsBlastOverlay'); if(ov) ov.remove(); };
+  window.sendSmsBlast = async function(audience, count){
+    const body = (document.getElementById('smsBlastBody')?.value || '').trim();
+    if(!body){ if(typeof showToast==='function') showToast('Write a message first.', 'error'); return; }
+    if(!confirm(`Send this text to ${count} recipient${count==1?'':'s'}? This sends immediately.`)) return;
+    const btn = document.getElementById('smsBlastBtn'); if(btn){ btn.disabled=true; btn.textContent='Sending…'; }
+    try{
+      const r = await fetch(`${API_URL}/api/admin/sms/blast`, { method:'POST', headers: H(), body: JSON.stringify({ audience, message: body }) });
+      const d = await r.json();
+      if(r.ok && d.success){
+        if(typeof showToast==='function') showToast(`Sent ${d.sent} text${d.sent==1?'':'s'}.${d.skipped?` ${d.skipped} skipped.`:''}`, 'success');
+        closeSmsBlast();
+      } else { if(typeof showToast==='function') showToast(d.message || 'Blast failed.', 'error'); if(btn){ btn.disabled=false; btn.textContent='Send Texts'; } }
+    }catch(e){ if(typeof showToast==='function') showToast('Network error.', 'error'); if(btn){ btn.disabled=false; btn.textContent='Send Texts'; } }
+  };
+})();
+</script>
 </body>
 </html>
